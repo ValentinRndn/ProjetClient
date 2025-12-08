@@ -1,0 +1,152 @@
+// ============================================
+// Vizion Academy - Schema Prisma MVP
+// CDC Article 5 : PostgreSQL OBLIGATOIRE
+// Version Prisma : 5.22.0 (pas Prisma 7)
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Note: Cette syntaxe est correcte pour Prisma 5
+  // Le linter peut afficher une erreur si il utilise Prisma 7, mais c'est une fausse alerte
+  url = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUM : Rôles utilisateur (CDC Article 4, 5)
+// ============================================
+enum UserRole {
+  ADMIN
+  ECOLE
+  INTERVENANT
+}
+
+// ============================================
+// MODEL : User (Authentification JWT - CDC Article 5)
+// ============================================
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Haché avec bcrypt
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations One-to-One (un User est soit Ecole, soit Intervenant)
+  ecole       Ecole?
+  intervenant Intervenant?
+
+  // Refresh tokens pour JWT
+  refreshTokens RefreshToken[]
+}
+
+// ============================================
+// MODEL : RefreshToken (pour rotation JWT)
+// ============================================
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
+}
+
+// ============================================
+// MODEL : Ecole (CDC - Déclaration de missions)
+// ============================================
+model Ecole {
+  id           String   @id @default(uuid())
+  name         String
+  contactEmail String?
+  address      String?
+  phone        String?
+  userId       String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relation One-to-One avec User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relation One-to-Many avec Mission (missions déclarées par l'école)
+  missions Mission[]
+
+  @@index([userId])
+}
+
+// ============================================
+// MODEL : Intervenant (CDC - Profil et missions)
+// ============================================
+model Intervenant {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  bio          String?
+  siret        String?
+  disponibility Json?    // Disponibilités au format JSON
+  status       String   @default("pending") // pending, approved, rejected
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relation One-to-One avec User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relation One-to-Many avec Mission (missions affectées)
+  missions Mission[]
+
+  // Relation One-to-Many avec Document
+  documents Document[]
+
+  @@index([userId])
+}
+
+// ============================================
+// MODEL : Mission (MVP - CDC)
+// Status : DRAFT, ACTIVE, COMPLETED
+// ============================================
+model Mission {
+  id            String    @id @default(uuid())
+  title         String
+  description   String?
+  status        String    @default("DRAFT") // DRAFT, ACTIVE, COMPLETED
+  startDate     DateTime?
+  endDate       DateTime?
+  priceCents    Int?      // Prix en centimes
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relation Many-to-One vers Ecole (créateur)
+  ecoleId String
+  ecole   Ecole  @relation(fields: [ecoleId], references: [id], onDelete: Cascade)
+
+  // Relation Many-to-One vers Intervenant (affecté) - optionnel
+  intervenantId String?
+  intervenant   Intervenant? @relation(fields: [intervenantId], references: [id], onDelete: SetNull)
+
+  @@index([ecoleId])
+  @@index([intervenantId])
+  @@index([status])
+}
+
+// ============================================
+// MODEL : Document (MVP-Simple - CDC)
+// Note : Pas de chiffrement dans le MVP
+// ============================================
+model Document {
+  id            String   @id @default(uuid())
+  fileName      String
+  filePath      String   // Chemin S3 ou local
+  type          String   // CV, RIB, KBIS, etc.
+  uploadedAt    DateTime @default(now())
+
+  // Relation Many-to-One vers Intervenant
+  intervenantId String
+  intervenant   Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
+
+  @@index([intervenantId])
+  @@index([type])
+}
