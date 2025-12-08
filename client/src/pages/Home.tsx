@@ -1,5 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Navbar } from "@/components/ui/Navbar";
+import Hero from "@/components/features/Hero";
+import WhyChooseUs from "@/components/features/WhyChooseUs";
 import { NavLink, useNavigate } from "react-router";
 import { Button } from "@/components/ui/Button";
 import { Dropdown } from "@/components/ui/Dropdown";
@@ -45,20 +47,20 @@ export default function Home() {
             <Dropdown
               className="dropdown-hover"
               trigger={
-                <NavLink to="/" className="flex items-center gap-2">
+                <NavLink to="/ecoles" className="flex items-center gap-2">
                   <span className="font-medium">Espace Écoles</span>{" "}
                   <ChevronDownIcon className="w-4 h-4" />
                 </NavLink>
               }
               items={[
                 <NavLink
-                  to="/"
+                  to="/nouvelle-mission"
                   className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md"
                 >
                   <PlusIcon className="w-4 h-4" /> Proposer une mission
                 </NavLink>,
                 <NavLink
-                  to="/"
+                  to="/intervenants"
                   className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md"
                 >
                   <UserIcon className="w-4 h-4" /> Trouver un intervenant
@@ -69,17 +71,17 @@ export default function Home() {
               className="dropdown-hover"
               items={[
                 <NavLink
-                  to="/"
+                  to="/devenir-intervenant"
                   className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md"
                 >
                   <UserIcon className="w-4 h-4" /> Devenir intervenant
                 </NavLink>,
-                <NavLink to="/" className="flex items-center gap-2">
+                <NavLink to="/missions" className="flex items-center gap-2">
                   <TargetIcon className="w-4 h-4" /> Mur des missions
                 </NavLink>,
               ]}
               trigger={
-                <NavLink to="/" className="flex items-center gap-2">
+                <NavLink to="/intervenants" className="flex items-center gap-2">
                   <span className="font-medium">Espace Intervenants</span>{" "}
                   <ChevronDownIcon className="w-4 h-4" />
                 </NavLink>
@@ -87,28 +89,34 @@ export default function Home() {
             />,
             <Dropdown
               className="dropdown-hover"
+              items={[
+                <NavLink
+                  to="/voir-challenges"
+                  className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md"
+                >
+                  <span className="font-medium">Voir les challenges</span>
+                </NavLink>,
+              ]}
               trigger={
-                <NavLink to="/" className="flex items-center gap-2">
-                  <span className="font-medium">Challenges</span>{" "}
+                <NavLink to="/challenges" className="flex items-center gap-2">
+                  <span className="font-medium">Challenges</span>
                   <ChevronDownIcon className="w-4 h-4" />
                 </NavLink>
               }
-              items={[
-                <NavLink
-                  to="/"
-                  className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md"
-                >
-                  <EyeIcon className="w-4 h-4" /> Voir les challenges
-                </NavLink>,
-              ]}
             />,
+            <NavLink to="contact">
+              <span className="font-medium">Contact</span>
+            </NavLink>,
           ]}
           navEnd={[
             isAuthenticated ? authenticatedButtons : unAuthenticatedButtons,
           ]}
         />
       </header>
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8"></main>
+      <main>
+        <Hero />
+        <WhyChooseUs />
+      </main>
     </>
   );
 }

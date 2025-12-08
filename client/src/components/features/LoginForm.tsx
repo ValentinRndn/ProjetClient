@@ -68,7 +68,7 @@ export function LoginForm() {
 
   return (
     <PageContainer
-      className="bg-gradient-to-br from-gray-50 to-gray-100"
+      className="bg-linear-to-br from-gray-50 to-gray-100"
       maxWidth="md"
     >
       <FormCard
