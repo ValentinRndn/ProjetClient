@@ -1,0 +1,89 @@
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: vizion-postgres
+    environment:
+      POSTGRES_USER: vizion
+      POSTGRES_PASSWORD: vizion_dev_password
+      POSTGRES_DB: vizion_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vizion -d vizion_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vizion-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vizion-backend
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://vizion:vizion_dev_password@postgres:5432/vizion_db?schema=public
+      JWT_SECRET: dev-secret-change-in-production
+      CORS_ORIGIN: "*"
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run dev
+    networks:
+      - vizion-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: vizion-client
+    environment:
+      VITE_API_URL: http://localhost:3001
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    command: pnpm run dev -- --host 0.0.0.0
+    networks:
+      - vizion-network
+
+  # Frontend Web
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: vizion-web
+    environment:
+      VITE_API_URL: http://localhost:3001
+    ports:
+      - "5174:5174"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    command: pnpm run dev -- --host 0.0.0.0 --port 5174
+    networks:
+      - vizion-network
+
+volumes:
+  postgres_data:
+
+networks:
+  vizion-network:
+    driver: bridge
