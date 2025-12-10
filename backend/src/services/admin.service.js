@@ -1,15 +1,17 @@
-import prisma from '../db/prisma.js';
+import prisma from "../../prisma.js";
 
 /**
  * listUsers - pagination + recherche
  */
-export async function listUsers({ take = 50, skip = 0, q = null, role = null } = {}) {
+export async function listUsers({
+  take = 50,
+  skip = 0,
+  q = null,
+  role = null,
+} = {}) {
   const where = {};
   if (q) {
-    where.OR = [
-      { email: { contains: q, mode: 'insensitive' } },
-      { name: { contains: q, mode: 'insensitive' } }
-    ];
+    where.email = { contains: q, mode: "insensitive" };
   }
   if (role) where.role = role;
 
@@ -19,9 +21,14 @@ export async function listUsers({ take = 50, skip = 0, q = null, role = null } =
       where,
       take,
       skip,
-      orderBy: { createdAt: 'desc' },
-      select: { id: true, email: true, name: true, role: true, createdAt: true }
-    })
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    }),
   ]);
 
   return { total, items };
@@ -38,8 +45,8 @@ export async function getLogs({ take = 100, skip = 0, q = null } = {}) {
     const where = {};
     if (q) {
       where.OR = [
-        { action: { contains: q, mode: 'insensitive' } },
-        { meta: { contains: q, mode: 'insensitive' } }
+        { action: { contains: q, mode: "insensitive" } },
+        { meta: { contains: q, mode: "insensitive" } },
       ];
     }
 
@@ -50,9 +57,9 @@ export async function getLogs({ take = 100, skip = 0, q = null } = {}) {
             where,
             take,
             skip,
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: "desc" },
           })
-        : []
+        : [],
     ]);
 
     return { total, items };
@@ -65,10 +72,17 @@ export async function getLogs({ take = 100, skip = 0, q = null } = {}) {
 /**
  * validateIntervenant - set status + journaliser action
  */
-export async function validateIntervenant(intervenantId, status, reason = null, actor) {
-  const interv = await prisma.intervenant.findUnique({ where: { id: intervenantId } });
+export async function validateIntervenant(
+  intervenantId,
+  status,
+  reason = null,
+  actor
+) {
+  const interv = await prisma.intervenant.findUnique({
+    where: { id: intervenantId },
+  });
   if (!interv) {
-    const e = new Error('Intervenant not found');
+    const e = new Error("Intervenant not found");
     e.status = 404;
     throw e;
   }
@@ -76,11 +90,11 @@ export async function validateIntervenant(intervenantId, status, reason = null, 
   const updated = await prisma.intervenant.update({
     where: { id: intervenantId },
     data: {
-      status
+      status,
     },
     include: {
-      user: { select: { id: true, email: true, name: true } }
-    }
+      user: { select: { id: true, email: true, role: true } },
+    },
   });
 
   // Auditer l'action (si table log présente)
@@ -88,11 +102,11 @@ export async function validateIntervenant(intervenantId, status, reason = null, 
     await prisma.log.create({
       data: {
         actorId: actor?.id ?? null,
-        action: 'intervenant.validate',
-        resourceType: 'Intervenant',
+        action: "intervenant.validate",
+        resourceType: "Intervenant",
         resourceId: intervenantId,
         meta: JSON.stringify({ status, reason }),
-      }
+      },
     });
   }
 
@@ -110,16 +124,22 @@ export async function createExport(resource, filters = {}, actor) {
     // fallback: on renvoie un objet simulé
     const id = `exp_${Date.now()}`;
     // idempotence / persistance à implémenter selon ton infra (S3 + DB)
-    return { id, resource, filters, status: 'pending', createdAt: new Date().toISOString() };
+    return {
+      id,
+      resource,
+      filters,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    };
   }
 
   const rec = await prisma.export.create({
     data: {
       resource,
       filters: JSON.stringify(filters),
-      status: 'pending',
-      requestedBy: actor?.id ?? null
-    }
+      status: "pending",
+      requestedBy: actor?.id ?? null,
+    },
   });
 
   // ici tu peux push un job dans la queue pour générer l'export
@@ -140,22 +160,31 @@ export async function getExport(id) {
  * getStats - quelques aggregations utiles
  */
 export async function getStats() {
-  // compter users, intervenants, schools, missions
-  const [usersCount, intervenantsCount, schoolsCount, missionsCount] = await Promise.all([
+  // compter users, intervenants, ecoles, missions
+  const [
+    totalUsers,
+    totalIntervenants,
+    totalEcoles,
+    pendingIntervenants,
+    approvedIntervenants,
+    rejectedIntervenants,
+  ] = await Promise.all([
     prisma.user.count(),
     prisma.intervenant.count(),
-    prisma.school.count(),
-    prisma.mission.count()
+    prisma.ecole.count(),
+    prisma.intervenant.count({ where: { status: "pending" } }),
+    prisma.intervenant.count({ where: { status: "approved" } }),
+    prisma.intervenant.count({ where: { status: "rejected" } }),
   ]);
 
-  // missions by status
-  const statuses = ['proposed', 'confirmed', 'active', 'completed', 'cancelled'];
-  const missionsByStatus = {};
-  await Promise.all(statuses.map(async (s) => {
-    missionsByStatus[s] = await prisma.mission.count({ where: { status: s } });
-  }));
-
-  return { usersCount, intervenantsCount, schoolsCount, missionsCount, missionsByStatus };
+  return {
+    totalUsers,
+    totalIntervenants,
+    totalEcoles,
+    pendingIntervenants,
+    approvedIntervenants,
+    rejectedIntervenants,
+  };
 }
 
 /**

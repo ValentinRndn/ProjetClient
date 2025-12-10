@@ -97,6 +97,10 @@ export function useAuth(): UseAuthReturn {
     try {
       const currentUser = await authService.getCurrentUser();
       setUser(currentUser);
+
+      // Si le rôle a changé dans la DB mais pas dans le token,
+      // on peut forcer un refresh du token en se reconnectant
+      // Mais pour l'instant, on laisse le backend gérer ça
     } catch (err) {
       authUtils.clearTokens();
       setUser(null);

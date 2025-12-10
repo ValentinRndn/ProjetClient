@@ -1,50 +1,48 @@
+import { useForm, FormProvider } from "react-hook-form";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, Link } from "react-router";
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/Input";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { FormCard } from "@/components/ui/FormCard";
 import { PageContainer } from "@/components/ui/PageContainer";
 import { LogoIcon } from "@/components/ui/LogoIcon";
-import { Mail, Lock } from "lucide-react";
+import { loginFormFields } from "@/config/loginFormConfig";
+import { useState } from "react";
+import { FormField } from "@/components/shared/FormField";
+
+interface LoginFormData {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
 
 export function LoginForm() {
+  const methods = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+    },
+  });
+
+  const { handleSubmit, register } = methods;
   const { login, error, isLoading, user } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
 
-  // Redirection après connexion réussie
   useEffect(() => {
     if (user) {
-      const role = user.role;
-      if (role === "ECOLE") {
-        navigate("/dashboard-ecole");
-      } else if (role === "INTERVENANT") {
-        navigate("/dashboard-intervenant");
-      } else if (role === "ADMIN") {
-        navigate("/dashboard-ecole");
-      } else {
-        navigate("/");
-      }
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginFormData) => {
     setLocalError(null);
 
-    if (!email || !password) {
-      setLocalError("Veuillez remplir tous les champs");
-      return;
-    }
-
     try {
-      await login(email, password);
+      await login(data.email, data.password);
     } catch (err: unknown) {
-      // L'erreur est déjà formatée par l'intercepteur API avec { message, status, ... }
       const errorObj = err as { message?: string; status?: number };
       setLocalError(errorObj?.message || "Identifiants invalides");
     }
@@ -85,65 +83,42 @@ export function LoginForm() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-5">
-            <div className="relative">
-              <Mail className="absolute left-3 top-[38px] w-5 h-5 text-gray-400 pointer-events-none z-10" />
-              <Input
-                type="email"
-                label="Adresse email"
-                placeholder="votre@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                disabled={isLoading}
-                className="pl-10"
-              />
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-5">
+              {loginFormFields.map((field) => (
+                <FormField key={field.name} field={field} />
+              ))}
             </div>
 
-            <div className="relative">
-              <Lock className="absolute left-3 top-[38px] w-5 h-5 text-gray-400 pointer-events-none z-10" />
-              <Input
-                type="password"
-                label="Mot de passe"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                disabled={isLoading}
-                className="pl-10"
-              />
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  {...register("rememberMe")}
+                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <span className="ml-2 text-gray-600">Se souvenir de moi</span>
+              </label>
+              <Link
+                to="/forgot-password"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                Mot de passe oublié ?
+              </Link>
             </div>
-          </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-              />
-              <span className="ml-2 text-gray-600">Se souvenir de moi</span>
-            </label>
-            <Link
-              to="/forgot-password"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              isLoading={isLoading}
+              className="w-full"
             >
-              Mot de passe oublié ?
-            </Link>
-          </div>
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            isLoading={isLoading}
-            className="w-full"
-          >
-            Se connecter
-          </Button>
-        </form>
+              Se connecter
+            </Button>
+          </form>
+        </FormProvider>
       </FormCard>
 
       <div className="mt-6 text-center">

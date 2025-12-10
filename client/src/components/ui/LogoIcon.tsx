@@ -19,7 +19,7 @@ export function LogoIcon({ size = "md", className }: LogoIconProps) {
       }`}
     >
       <img
-        src="/logo.png"
+        src="/logo.svg"
         alt="Vizion Academy"
         className={`${sizes[size]} rounded-full object-cover`}
         onError={(e) => {

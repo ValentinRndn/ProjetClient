@@ -41,6 +41,7 @@ export interface RegisterData {
     phone?: string;
   };
   intervenantData?: {
+    name?: string;
     bio?: string;
     siret?: string;
   };

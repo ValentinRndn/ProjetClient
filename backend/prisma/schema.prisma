@@ -34,7 +34,6 @@ model User {
   role      UserRole
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   // Relations One-to-One (un User est soit Ecole, soit Intervenant)
   ecole       Ecole?
   intervenant Intervenant?
@@ -87,9 +86,12 @@ model Intervenant {
   userId       String   @unique
   bio          String?
   siret        String?
+  firstName    String?
+  lastName     String?
+  profileImage String?  // URL ou chemin de l'image de profil
   disponibility Json?    // Disponibilités au format JSON
   status       String   @default("pending") // pending, approved, rejected
-  createdAt    DateTime @default(now())
+  createdAt    DateTime @default(now())  
   updatedAt    DateTime @updatedAt
 
   // Relation One-to-One avec User

@@ -6,11 +6,10 @@ export interface SelectProps
   label?: string;
   error?: string;
   helperText?: string;
-  options: Array<{ value: string; label: string }>;
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, helperText, id, options, ...props }, ref) => {
+  ({ className, label, error, helperText, id, children, ...props }, ref) => {
     const selectId =
       id || `select-${label?.toLowerCase().replace(/\s+/g, "-")}`;
 
@@ -30,11 +29,10 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           className={cn(
             "w-full px-4 py-2 border rounded-lg transition-colors",
             "focus:outline-none focus:ring-2 focus:ring-offset-0",
-            "bg-white",
             error
               ? "border-red-500 focus:ring-red-500"
               : "border-gray-300 focus:border-indigo-500 focus:ring-indigo-500",
-            "text-gray-900",
+            "text-gray-900 bg-white",
             "disabled:bg-gray-100 disabled:cursor-not-allowed",
             className
           )}
@@ -45,11 +43,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           }
           {...props}
         >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          {children}
         </select>
         {(error || helperText) && (
           <p

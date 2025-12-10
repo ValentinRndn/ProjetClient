@@ -4,29 +4,33 @@
  * ============================================
  */
 
-import { Router } from 'express';
+import { Router } from "express";
 
-import authRoutes from './auth.routes.js';
-import usersRoutes from './users.routes.js';
-import schoolsRoutes from './schools.routes.js';
-import intervenantsRoutes from './intervenants.routes.js';
-import missionsRoutes from './missions.routes.js';
+import authRoutes from "./auth.routes.js";
+import usersRoutes from "./users.routes.js";
+import schoolsRoutes from "./schools.routes.js";
+import intervenantsRoutes from "./intervenants.routes.js";
+import missionsRoutes from "./missions.routes.js";
+import adminRoutes from "./admin.routes.js";
 
 const router = Router();
 
 // Routes d'authentification (publiques + protégées)
-router.use('/auth', authRoutes);
+router.use("/auth", authRoutes);
 
 // Routes utilisateurs (admin)
-router.use('/users', usersRoutes);
+router.use("/users", usersRoutes);
 
 // Routes écoles
-router.use('/ecoles', schoolsRoutes);
+router.use("/ecoles", schoolsRoutes);
 
 // Routes intervenants
-router.use('/intervenants', intervenantsRoutes);
+router.use("/intervenants", intervenantsRoutes);
 
 // Routes missions
-router.use('/missions', missionsRoutes);
+router.use("/missions", missionsRoutes);
+
+// Routes admin (protégées par vérification de rôle)
+router.use("/admin", adminRoutes);
 
 export default router;

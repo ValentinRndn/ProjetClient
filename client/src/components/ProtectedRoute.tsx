@@ -5,6 +5,7 @@
 
 import { Navigate } from "react-router";
 import * as auth from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,15 +16,25 @@ export default function ProtectedRoute({
   children,
   requiredRole,
 }: ProtectedRouteProps) {
+  const { user, isLoading } = useAuth();
   const isAuthenticated = auth.isAuthenticated();
 
-  if (!isAuthenticated) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-500">Chargement...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Si un rôle spécifique est requis, il faudra vérifier le rôle de l'utilisateur
-  // Pour l'instant, on laisse passer si authentifié
-  // TODO: Implémenter la vérification de rôle si nécessaire
+  // Vérifier le rôle si requis
+  if (requiredRole && user.role !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
 
   return <>{children}</>;
 }

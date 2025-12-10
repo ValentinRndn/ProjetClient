@@ -9,26 +9,62 @@ export interface Intervenant {
   id: string;
   bio?: string;
   siret?: string;
-  disponibility?: boolean;
+  firstName?: string;
+  lastName?: string;
+  profileImage?: string;
+  disponibility?: boolean | object;
   status?: string;
   userId?: string;
   user?: {
     id: string;
     email: string;
+    name?: string;
+    role?: string;
   };
+  documents?: Document[];
   createdAt?: string;
   updatedAt?: string;
 }
 
 /**
  * Liste tous les intervenants
+ * @param filters - Filtres optionnels (status, take, skip)
  */
-export async function getAllIntervenants(): Promise<Intervenant[]> {
+export async function getAllIntervenants(filters?: {
+  status?: string;
+  take?: number;
+  skip?: number;
+}): Promise<Intervenant[]> {
+  const params = new URLSearchParams();
+  if (filters?.status) params.append("status", filters.status);
+  if (filters?.take) params.append("take", filters.take.toString());
+  if (filters?.skip) params.append("skip", filters.skip.toString());
+
+  const url = `/intervenants${
+    params.toString() ? `?${params.toString()}` : ""
+  }`;
   const response = await apiClient.get<{
     success: boolean;
     data: Intervenant[];
-  }>("/intervenants");
-  return response.data || [];
+  }>(url);
+
+  // L'apiClient transforme la réponse: si l'API retourne { success: true, data: [...] }
+  // alors response est { success: true, data: [...] }, donc response.data est le tableau
+  if (
+    response &&
+    typeof response === "object" &&
+    "data" in response &&
+    Array.isArray(response.data)
+  ) {
+    return response.data;
+  }
+
+  // Fallback si la structure est différente
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  return [];
 }
 
 /**
@@ -119,4 +155,24 @@ export async function deleteDocument(
   await apiClient.delete(
     `/intervenants/${intervenantId}/documents/${documentId}`
   );
+}
+
+export interface Document {
+  id: string;
+  fileName: string;
+  filePath: string;
+  type: string;
+  uploadedAt: string;
+}
+
+/**
+ * Obtenir l'URL de téléchargement d'un document
+ */
+export function getDocumentDownloadUrl(
+  intervenantId: string,
+  documentId: string
+): string {
+  const baseUrl =
+    import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1";
+  return `${baseUrl}/intervenants/${intervenantId}/documents/${documentId}/download`;
 }

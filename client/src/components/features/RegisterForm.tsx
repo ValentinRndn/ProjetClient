@@ -1,118 +1,148 @@
+import { useForm, FormProvider } from "react-hook-form";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, Link } from "react-router";
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/Input";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { RoleSelector } from "@/components/ui/RoleSelector";
 import { FormCard } from "@/components/ui/FormCard";
 import { PageContainer } from "@/components/ui/PageContainer";
 import { LogoIcon } from "@/components/ui/LogoIcon";
+import { registerFormFields } from "@/config/registerFormConfig";
 import type { RegisterData } from "@/services/auth";
-import { Mail, Lock, Building2, MapPin, Phone } from "lucide-react";
+import { useState } from "react";
+import { FormField } from "@/components/shared/FormField";
+import { FileUpload } from "@/components/ui/FileUpload";
+import { uploadDocument } from "@/services/intervenants";
+import { getCurrentUser } from "@/services/auth";
+
+interface RegisterFormData {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  role: "ECOLE" | "INTERVENANT";
+  ecoleData?: {
+    name?: string;
+    contactEmail?: string;
+    address?: string;
+    phone?: string;
+  };
+  intervenantData?: {
+    firstName?: string;
+    lastName?: string;
+    bio?: string;
+    siret?: string;
+  };
+}
 
 export function RegisterForm() {
-  const { register, error, isLoading, user } = useAuth();
+  const { register: registerUser, error, isLoading, user } = useAuth();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    name: "",
-    role: "INTERVENANT" as "ECOLE" | "INTERVENANT",
-    ecoleData: {
-      name: "",
-      contactEmail: "",
-      address: "",
-      phone: "",
-    },
-    intervenantData: {
-      bio: "",
-      siret: "",
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+
+  const methods = useForm<RegisterFormData>({
+    defaultValues: {
+      role: "INTERVENANT",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
-  const [localError, setLocalError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  // Redirection après inscription réussie
+  const { handleSubmit, watch, setValue } = methods;
+  const role = watch("role");
+
   useEffect(() => {
     if (user) {
-      if (user) {
-        navigate("/dashboard");
-      } else {
-        navigate("/");
-      }
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
-  const validatePassword = (password: string): string | null => {
-    if (password.length < 8) {
-      return "Le mot de passe doit contenir au moins 8 caractères";
-    }
-    return null;
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: RegisterFormData) => {
     setLocalError(null);
-    setPasswordError(null);
 
-    // Validation des champs obligatoires
-    if (!formData.email || !formData.password || !formData.confirmPassword) {
-      setLocalError("Veuillez remplir tous les champs obligatoires");
-      return;
-    }
-
-    // Validation du mot de passe
-    const pwdError = validatePassword(formData.password);
-    if (pwdError) {
-      setPasswordError(pwdError);
-      return;
-    }
-
-    // Validation de la confirmation du mot de passe
-    if (formData.password !== formData.confirmPassword) {
-      setPasswordError("Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    // Validation des données spécifiques au rôle
-    if (formData.role === "ECOLE" && !formData.ecoleData.name) {
-      setLocalError("Le nom de l'école est requis");
-      return;
-    }
-
-    // Préparer les données pour l'API
     const registrationData: RegisterData = {
-      email: formData.email,
-      password: formData.password,
-      role: formData.role,
+      email: data.email,
+      password: data.password,
+      role: data.role,
     };
 
-    if (formData.name) {
-      registrationData.name = formData.name;
-    }
-
-    if (formData.role === "ECOLE") {
+    if (data.role === "ECOLE" && data.ecoleData) {
       registrationData.ecoleData = {
-        name: formData.ecoleData.name,
-        contactEmail: formData.ecoleData.contactEmail || undefined,
-        address: formData.ecoleData.address || undefined,
-        phone: formData.ecoleData.phone || undefined,
+        name: data.ecoleData.name || "",
+        contactEmail: data.ecoleData.contactEmail || undefined,
+        address: data.ecoleData.address || undefined,
+        phone: data.ecoleData.phone || undefined,
       };
-    } else if (formData.role === "INTERVENANT") {
+    } else if (data.role === "INTERVENANT" && data.intervenantData) {
+      const name =
+        [data.intervenantData.firstName, data.intervenantData.lastName]
+          .filter(Boolean)
+          .join(" ") || undefined;
+
       registrationData.intervenantData = {
-        bio: formData.intervenantData.bio || undefined,
-        siret: formData.intervenantData.siret || undefined,
+        name: name,
+        bio: data.intervenantData.bio || undefined,
+        siret: data.intervenantData.siret || undefined,
       };
     }
 
     try {
-      await register(registrationData);
+      await registerUser(registrationData);
+
+      // Attendre un peu pour que l'utilisateur soit bien créé côté serveur
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Si c'est un intervenant et qu'il y a des fichiers à uploader
+      if (data.role === "INTERVENANT" && (profileImage || cvFile)) {
+        try {
+          // Récupérer l'utilisateur pour obtenir l'ID de l'intervenant
+          const currentUser = await getCurrentUser();
+          const intervenantId = currentUser.intervenant?.id;
+
+          if (intervenantId) {
+            // Upload de l'image de profil
+            if (profileImage) {
+              try {
+                await uploadDocument(
+                  intervenantId,
+                  profileImage,
+                  "PROFILE_IMAGE"
+                );
+              } catch (err) {
+                console.error("Erreur lors de l'upload de l'image:", err);
+                // Ne pas bloquer l'inscription si l'upload d'image échoue
+              }
+            }
+
+            // Upload du CV
+            if (cvFile) {
+              try {
+                await uploadDocument(intervenantId, cvFile, "CV");
+              } catch (err) {
+                console.error("Erreur lors de l'upload du CV:", err);
+                // Ne pas bloquer l'inscription si l'upload de CV échoue
+              }
+            }
+          }
+        } catch (err) {
+          console.error(
+            "Erreur lors de la récupération de l'utilisateur:",
+            err
+          );
+          // Ne pas bloquer l'inscription si la récupération échoue
+        }
+      }
     } catch (err: unknown) {
       const errorObj = err as { message?: string; status?: number };
       setLocalError(errorObj?.message || "Erreur lors de l'inscription");
     }
+  };
+
+  const handleRoleChange = (newRole: "ECOLE" | "INTERVENANT") => {
+    setValue("role", newRole);
   };
 
   const displayError = localError || error;
@@ -133,7 +163,7 @@ export function RegisterForm() {
 
   return (
     <PageContainer
-      className="bg-gradient-to-br from-gray-50 to-gray-100"
+      className="bg-linear-to-br from-gray-50 to-gray-100"
       maxWidth="lg"
     >
       <FormCard
@@ -150,160 +180,72 @@ export function RegisterForm() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Sélection du type de compte */}
-          <RoleSelector
-            value={formData.role}
-            onChange={(role) => setFormData({ ...formData, role })}
-            disabled={isLoading}
-          />
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Sélection du type de compte */}
+            <RoleSelector
+              value={role || "INTERVENANT"}
+              onChange={handleRoleChange}
+              disabled={isLoading}
+            />
 
-          {/* Informations de base */}
-          <div className="space-y-5 pt-6 border-t border-gray-200">
-            <div className="relative">
-              <Mail className="absolute left-3 top-[38px] w-5 h-5 text-gray-400 pointer-events-none z-10" />
-              <Input
-                type="email"
-                label="Email"
-                placeholder="votre@email.com"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                required
-                autoComplete="email"
-                disabled={isLoading}
-                className="pl-10"
-              />
+            {/* Informations de base */}
+            <div className="space-y-5 pt-6 border-t border-gray-200">
+              {registerFormFields
+                .filter((field) => field.group === "base")
+                .map((field) => (
+                  <FormField key={field.name} field={field} />
+                ))}
             </div>
 
-            <div className="relative">
-              <Lock className="absolute left-3 top-[38px] w-5 h-5 text-gray-400 pointer-events-none z-10" />
-              <Input
-                type="password"
-                label="Mot de passe"
-                placeholder="Minimum 8 caractères"
-                value={formData.password}
-                onChange={(e) => {
-                  setFormData({ ...formData, password: e.target.value });
-                  setPasswordError(validatePassword(e.target.value));
-                }}
-                required
-                autoComplete="new-password"
-                disabled={isLoading}
-                error={passwordError || undefined}
-                className="pl-10"
-              />
-            </div>
+            {/* Champs conditionnels selon le rôle */}
+            {(role === "ECOLE" || role === "INTERVENANT") && (
+              <div className="space-y-5">
+                {registerFormFields
+                  .filter(
+                    (field) =>
+                      field.group ===
+                      (role === "ECOLE" ? "ecole" : "intervenant")
+                  )
+                  .map((field) => (
+                    <FormField key={field.name} field={field} />
+                  ))}
 
-            <div className="relative">
-              <Lock className="absolute left-3 top-[38px] w-5 h-5 text-gray-400 pointer-events-none z-10" />
-              <Input
-                type="password"
-                label="Confirmer le mot de passe"
-                placeholder="Répétez le mot de passe"
-                value={formData.confirmPassword}
-                onChange={(e) => {
-                  setFormData({ ...formData, confirmPassword: e.target.value });
-                  if (formData.password !== e.target.value) {
-                    setPasswordError("Les mots de passe ne correspondent pas");
-                  } else {
-                    setPasswordError(null);
-                  }
-                }}
-                required
-                autoComplete="new-password"
-                disabled={isLoading}
-                error={
-                  formData.confirmPassword &&
-                  formData.password !== formData.confirmPassword
-                    ? "Les mots de passe ne correspondent pas"
-                    : undefined
-                }
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          {/* Champs conditionnels selon le rôle */}
-          {formData.role === "ECOLE" && (
-            <div className="space-y-5">
-              <div className="relative">
-                <Building2 className="absolute left-3 top-[38px] w-5 h-5 text-gray-400 pointer-events-none z-10" />
-                <Input
-                  type="text"
-                  label="Nom de l'école"
-                  placeholder="Nom de votre établissement"
-                  value={formData.ecoleData.name}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      ecoleData: {
-                        ...formData.ecoleData,
-                        name: e.target.value,
-                      },
-                    })
-                  }
-                  required
-                  disabled={isLoading}
-                  className="pl-10"
-                />
+                {/* Champs d'upload pour les intervenants */}
+                {role === "INTERVENANT" && (
+                  <>
+                    <FileUpload
+                      label="Photo de profil (optionnel)"
+                      accept="image/*"
+                      maxSizeMB={5}
+                      value={profileImage}
+                      onChange={setProfileImage}
+                      helperText="Formats acceptés: JPG, PNG. Taille max: 5MB"
+                    />
+                    <FileUpload
+                      label="CV (optionnel)"
+                      accept=".pdf,.doc,.docx"
+                      maxSizeMB={10}
+                      value={cvFile}
+                      onChange={setCvFile}
+                      helperText="Formats acceptés: PDF, DOC, DOCX. Taille max: 10MB"
+                    />
+                  </>
+                )}
               </div>
+            )}
 
-              <div className="relative">
-                <MapPin className="absolute left-3 top-[38px] w-5 h-5 text-gray-400 pointer-events-none z-10" />
-                <Input
-                  type="text"
-                  label="Adresse"
-                  placeholder="123 Rue de Paris, 75001 Paris"
-                  value={formData.ecoleData.address}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      ecoleData: {
-                        ...formData.ecoleData,
-                        address: e.target.value,
-                      },
-                    })
-                  }
-                  disabled={isLoading}
-                  className="pl-10"
-                />
-              </div>
-
-              <div className="relative">
-                <Phone className="absolute left-3 top-[38px] w-5 h-5 text-gray-400 pointer-events-none z-10" />
-                <Input
-                  type="tel"
-                  label="Numéro de téléphone"
-                  placeholder="01 23 45 67 89"
-                  value={formData.ecoleData.phone}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      ecoleData: {
-                        ...formData.ecoleData,
-                        phone: e.target.value,
-                      },
-                    })
-                  }
-                  disabled={isLoading}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            isLoading={isLoading}
-            className="w-full"
-          >
-            Créer mon compte
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              isLoading={isLoading}
+              className="w-full"
+            >
+              Créer mon compte
+            </Button>
+          </form>
+        </FormProvider>
       </FormCard>
 
       <div className="mt-6 text-center">

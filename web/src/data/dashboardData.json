@@ -1,0 +1,57 @@
+{
+  "stats": {
+    "totalMissions": 1,
+    "activeMissions": 0,
+    "revenue": 1700.00,
+    "invoices": 1
+  },
+  "missions": [
+    {
+      "id": "M001",
+      "school": "ESSEC Business School",
+      "module": "Marketing Digital et Stratégie",
+      "date": "2025-02-15",
+      "endDate": "2025-02-17",
+      "status": "completed",
+      "remuneration": 1700.00,
+      "duration": "3 jours",
+      "students": 25
+    }
+  ],
+  "contacts": [
+    {
+      "name": "Mickael NOGUEIRA",
+      "role": "Gestion des intervenants",
+      "phone": "06 84 88 96 94",
+      "email": "mickael.nogueira@vizionacademy.fr"
+    },
+    {
+      "name": "Guillaume ROURE",
+      "role": "Gestion des écoles et planification",
+      "phone": "06 59 19 65 50",
+      "email": "guillaume.roure@vizionacademy.fr"
+    },
+    {
+      "name": "Narjesse MALKI",
+      "role": "Facturation et gestion administrative",
+      "phone": "06 50 71 77 42",
+      "email": "narjesse.malki@vizionacademy.fr"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "INV-2025-001",
+      "date": "2025-02-20",
+      "amount": 1700.00,
+      "status": "paid",
+      "school": "ESSEC Business School",
+      "mission": "M001"
+    }
+  ],
+  "partnerOffer": {
+    "title": "Offre Partenaire : Vizion x Jump",
+    "description": "Facilitez votre gestion administrative. Profitez d'une offre exclusive avec notre partenaire Jump pour le portage salarial.",
+    "buttonText": "Découvrir l'offre",
+    "url": "https://jump.eu"
+  }
+}
