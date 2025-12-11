@@ -1,0 +1,62 @@
+# ============================================
+# Vizion Academy - Backend Production Dockerfile
+# Multi-stage build for optimized image size
+# ============================================
+
+# Stage 1: Dependencies
+FROM node:20-slim AS deps
+WORKDIR /app
+
+# Install system dependencies for Prisma
+RUN apt-get update && apt-get install -y \
+    openssl \
+    libssl-dev \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependency files
+COPY package*.json ./
+COPY prisma ./prisma
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Stage 2: Production
+FROM node:20-slim AS runner
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    openssl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 vizion
+
+# Copy built dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/prisma ./prisma
+
+# Copy application code
+COPY --chown=vizion:nodejs . .
+
+# Create uploads directory with proper permissions
+RUN mkdir -p uploads && chown -R vizion:nodejs uploads
+
+# Switch to non-root user
+USER vizion
+
+# Expose port
+EXPOSE 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+
+# Start the application
+CMD ["node", "src/server.js"]
