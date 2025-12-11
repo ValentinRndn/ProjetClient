@@ -57,7 +57,7 @@ services:
       context: ./client
       dockerfile: Dockerfile.prod
       args:
-        VITE_API_URL: ${VITE_API_URL:-https://api.vizion.yourdomain.com}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3001/api/v1}
     container_name: vizion-client
     restart: unless-stopped
     networks:
