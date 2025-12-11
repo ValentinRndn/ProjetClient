@@ -43,35 +43,35 @@ const upload = multer({
 export const uploadSingle = (fieldName = 'file') => {
   return (req, res, next) => {
     const singleUpload = upload.single(fieldName);
-    
+
     singleUpload(req, res, (err) => {
       if (err) {
-        logger.error('Multer upload error', { 
+        logger.error('Multer upload error', {
           error: err.message,
           fieldName,
-          userId: req.user?.id 
+          userId: req.user?.id
         });
-        
+
         if (err.code === 'LIMIT_FILE_SIZE') {
           return res.status(400).json({
             success: false,
             message: 'File size too large (max 10MB)'
           });
         }
-        
+
         if (err.code === 'LIMIT_FILE_COUNT') {
           return res.status(400).json({
             success: false,
             message: 'Too many files (max 5)'
           });
         }
-        
+
         return res.status(400).json({
           success: false,
           message: err.message
         });
       }
-      
+
       // Vérifier qu'un fichier a bien été uploadé
       if (!req.file) {
         return res.status(400).json({
@@ -79,14 +79,55 @@ export const uploadSingle = (fieldName = 'file') => {
           message: 'No file uploaded'
         });
       }
-      
+
       logger.info('File uploaded via multer', {
         originalName: req.file.originalname,
         size: req.file.size,
         mimetype: req.file.mimetype,
         userId: req.user?.id
       });
-      
+
+      next();
+    });
+  };
+};
+
+// Middleware optionnel pour upload - ne bloque pas si pas de fichier (supporte JSON et FormData)
+export const uploadSingleOptional = (fieldName = 'file') => {
+  return (req, res, next) => {
+    const singleUpload = upload.single(fieldName);
+
+    singleUpload(req, res, (err) => {
+      if (err) {
+        logger.error('Multer upload error', {
+          error: err.message,
+          fieldName,
+          userId: req.user?.id
+        });
+
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({
+            success: false,
+            message: 'File size too large (max 10MB)'
+          });
+        }
+
+        return res.status(400).json({
+          success: false,
+          message: err.message
+        });
+      }
+
+      // Log seulement si un fichier est présent
+      if (req.file) {
+        logger.info('File uploaded via multer', {
+          originalName: req.file.originalname,
+          size: req.file.size,
+          mimetype: req.file.mimetype,
+          userId: req.user?.id
+        });
+      }
+
       next();
     });
   };

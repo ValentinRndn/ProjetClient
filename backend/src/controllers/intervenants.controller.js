@@ -8,6 +8,11 @@
 import * as intervenantsService from "../services/intervenants.service.js";
 import logger from "../utils/logger.js";
 import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * GET /api/v1/intervenants
@@ -170,17 +175,60 @@ export async function getDocuments(req, res, next) {
 /**
  * POST /api/v1/intervenants/:id/documents
  * Ajouter un document à un intervenant (CDC MVP - sans chiffrement)
+ * Accepte FormData avec file + type OU JSON avec fileName/filePath/type
  */
 export async function uploadDocument(req, res, next) {
   try {
     const { id } = req.params;
-    const { fileName, filePath, type } = req.body;
-    logger.info("Upload intervenant document", {
-      intervenantId: id,
-      fileName,
-      type,
-      requesterId: req.user?.id,
-    });
+
+    let fileName, filePath, type;
+
+    // Si un fichier a été uploadé via multer (FormData)
+    if (req.file) {
+      fileName = req.file.originalname;
+      type = req.body.type || "AUTRE";
+
+      // Créer le dossier uploads s'il n'existe pas
+      const uploadsDir = path.join(__dirname, "../../uploads", id);
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      // Sauvegarder le fichier
+      const uniqueName = `${Date.now()}-${fileName}`;
+      filePath = path.join(uploadsDir, uniqueName);
+      fs.writeFileSync(filePath, req.file.buffer);
+
+      // Stocker le chemin relatif
+      filePath = `uploads/${id}/${uniqueName}`;
+
+      logger.info("File uploaded via FormData", {
+        intervenantId: id,
+        fileName,
+        type,
+        size: req.file.size,
+        requesterId: req.user?.id,
+      });
+    } else {
+      // Fallback : JSON body (ancien comportement)
+      fileName = req.body.fileName;
+      filePath = req.body.filePath;
+      type = req.body.type;
+
+      if (!fileName || !filePath || !type) {
+        return res.status(400).json({
+          success: false,
+          message: "fileName, filePath et type sont requis",
+        });
+      }
+
+      logger.info("Upload intervenant document via JSON", {
+        intervenantId: id,
+        fileName,
+        type,
+        requesterId: req.user?.id,
+      });
+    }
 
     const doc = await intervenantsService.addDocument(id, {
       fileName,

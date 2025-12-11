@@ -19,6 +19,7 @@ import {
 import { verifyToken, checkRole } from "../middlewares/auth.middleware.js";
 import validate from "../middlewares/validate.middleware.js";
 import { updateIntervenantSchema } from "../validators/intervenant.validator.js";
+import { uploadSingleOptional } from "../config/multer.js";
 import Joi from "joi";
 
 const router = Router();
@@ -87,11 +88,13 @@ router.get(
   }),
   downloadDocument
 );
+// Upload document avec multer (FormData) - validation désactivée pour multipart
 router.post(
   "/:id/documents",
-  validate({ params: paramsSchema, body: documentSchema }),
+  validate({ params: paramsSchema }),
   verifyToken,
   checkRole(["ADMIN", "INTERVENANT"]),
+  uploadSingleOptional("file"),
   uploadDocument
 );
 router.delete(
