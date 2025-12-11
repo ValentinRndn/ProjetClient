@@ -6,16 +6,17 @@
  */
 
 import { Router } from 'express';
-import { 
-    createMission, 
-    getMissions, 
-    getMission, 
+import {
+    createMission,
+    getMissions,
+    getMission,
     getMissionsByEcole,
     getMissionsByIntervenant,
-    updateMission, 
-    changeMissionStatus, 
-    assignIntervenant, 
-    removeMission 
+    updateMission,
+    changeMissionStatus,
+    assignIntervenant,
+    applyToMission,
+    removeMission
 } from '../controllers/missions.controller.js';
 import { verifyToken, checkRole } from '../middlewares/auth.middleware.js';
 import validate from '../middlewares/validate.middleware.js';
@@ -80,7 +81,7 @@ router.get('/', validate({ query: querySchema }), verifyToken, getMissions);
  * Déclaration d'une nouvelle mission (CDC)
  * Middleware: checkRole(['ECOLE']) - Seules les écoles peuvent créer des missions
  */
-router.post('/', validate(createMissionSchema), verifyToken, checkRole(['ECOLE']), createMission);
+router.post('/', validate(createMissionSchema), verifyToken, checkRole(['ECOLE', 'ADMIN']), createMission);
 
 /**
  * GET /api/v1/missions/:id
@@ -105,6 +106,12 @@ router.patch('/:id/status', validate({ params: paramsSchema, body: updateMission
  * Affecter un intervenant à une mission
  */
 router.post('/:id/assign', validate({ params: paramsSchema, body: assignSchema }), verifyToken, checkRole(['ECOLE', 'ADMIN']), assignIntervenant);
+
+/**
+ * POST /api/v1/missions/:id/apply
+ * Permet à un intervenant de postuler à une mission
+ */
+router.post('/:id/apply', validate({ params: paramsSchema }), verifyToken, checkRole(['INTERVENANT']), applyToMission);
 
 /**
  * DELETE /api/v1/missions/:id

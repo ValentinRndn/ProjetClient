@@ -9,6 +9,7 @@ export interface SectionHeaderProps {
   badgeClassName?: string;
   titleClassName?: string;
   descriptionClassName?: string;
+  align?: "center" | "left";
 }
 
 export function SectionHeader({
@@ -19,22 +20,33 @@ export function SectionHeader({
   badgeClassName,
   titleClassName,
   descriptionClassName,
+  align = "center",
 }: SectionHeaderProps) {
   return (
-    <div className={cn("text-center mb-16", className)}>
+    <div
+      className={cn(
+        "mb-12 sm:mb-16",
+        align === "center" ? "text-center" : "text-left",
+        className
+      )}
+    >
       {badge && (
         <div
           className={cn(
-            "inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold mb-4",
+            "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6",
+            "bg-indigo-100 text-indigo-700 border border-indigo-200/50",
             badgeClassName
           )}
         >
+          <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
           {badge}
         </div>
       )}
       <h2
         className={cn(
-          "text-4xl md:text-5xl font-extrabold text-center mb-4",
+          "text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 tracking-tight",
+          "text-gray-900",
+          align === "center" && "mx-auto",
           titleClassName
         )}
       >
@@ -43,7 +55,9 @@ export function SectionHeader({
       {description && (
         <p
           className={cn(
-            "text-center text-gray-700 text-lg max-w-2xl mx-auto",
+            "text-gray-600 text-lg sm:text-xl leading-relaxed",
+            align === "center" && "max-w-2xl mx-auto",
+            align === "left" && "max-w-xl",
             descriptionClassName
           )}
         >

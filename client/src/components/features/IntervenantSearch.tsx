@@ -91,7 +91,7 @@ export function IntervenantSearch() {
     });
   }, [intervenants, searchQuery, selectedCity, selectedTheme, selectedFormat]);
   return (
-    <section className="py-12 px-4 bg-gray-50">
+    <section id="liste-intervenants" className="py-12 px-4 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

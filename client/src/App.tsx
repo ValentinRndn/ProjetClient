@@ -5,6 +5,7 @@ import LoggedOutRoute from "@/components/LoggedOutRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import RegisterIntervenantPage from "./pages/RegisterIntervenantPage";
 import LogoutPage from "./pages/LogoutPage";
 import SchoolPage from "./pages/SchoolPage";
 import IntervenantsPage from "./pages/IntervenantsPage";
@@ -13,6 +14,15 @@ import AdminIntervenantsPage from "./pages/AdminIntervenantsPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import DashboardIntervenantPage from "./pages/DashboardIntervenantPage";
 import DashboardRouter from "./pages/DashboardRouter";
+import MissionsPage from "./pages/MissionsPage";
+import MesMissionsPage from "./pages/MesMissionsPage";
+import NouvelleMissionPage from "./pages/NouvelleMissionPage";
+import DashboardEcolePage from "./pages/DashboardEcolePage";
+import ContactPage from "./pages/ContactPage";
+import DevenirIntervenantPage from "./pages/DevenirIntervenantPage";
+import MentionsLegalesPage from "./pages/MentionsLegalesPage";
+import CGUPage from "./pages/CGUPage";
+import ChallengesPage from "./pages/ChallengesPage";
 import NavLayout from "./components/layouts/DefaultLayout";
 
 function App() {
@@ -43,6 +53,14 @@ function App() {
           </LoggedOutRoute>
         }
       />
+      <Route
+        path="/register/intervenant"
+        element={
+          <LoggedOutRoute>
+            <RegisterIntervenantPage />
+          </LoggedOutRoute>
+        }
+      />
 
       <Route
         path="/ecoles"
@@ -63,6 +81,81 @@ function App() {
       />
 
       <Route path="/logout" element={<LogoutPage />} />
+
+      {/* Pages publiques */}
+      <Route
+        path="/contact"
+        element={
+          <NavLayout>
+            <ContactPage />
+          </NavLayout>
+        }
+      />
+      <Route
+        path="/devenir-intervenant"
+        element={
+          <NavLayout>
+            <DevenirIntervenantPage />
+          </NavLayout>
+        }
+      />
+      <Route
+        path="/mentions-legales"
+        element={
+          <NavLayout>
+            <MentionsLegalesPage />
+          </NavLayout>
+        }
+      />
+      <Route
+        path="/cgu"
+        element={
+          <NavLayout>
+            <CGUPage />
+          </NavLayout>
+        }
+      />
+      <Route
+        path="/challenges"
+        element={
+          <NavLayout>
+            <ChallengesPage />
+          </NavLayout>
+        }
+      />
+
+      <Route
+        path="/missions"
+        element={
+          <ProtectedRoute>
+            <NavLayout>
+              <MissionsPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/mes-missions"
+        element={
+          <ProtectedRoute requiredRole={["ECOLE", "ADMIN"]}>
+            <NavLayout>
+              <MesMissionsPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/nouvelle-mission"
+        element={
+          <ProtectedRoute requiredRole={["ECOLE", "ADMIN"]}>
+            <NavLayout>
+              <NouvelleMissionPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Routes protégées (nécessitent une authentification) */}
       {/* Dashboard Admin */}
@@ -104,6 +197,18 @@ function App() {
           <ProtectedRoute requiredRole="INTERVENANT">
             <NavLayout>
               <DashboardIntervenantPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Dashboard Ecole */}
+      <Route
+        path="/dashboard/ecole"
+        element={
+          <ProtectedRoute requiredRole="ECOLE">
+            <NavLayout>
+              <DashboardEcolePage />
             </NavLayout>
           </ProtectedRoute>
         }

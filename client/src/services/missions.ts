@@ -165,3 +165,13 @@ export async function assignIntervenant(
 export async function deleteMission(id: string): Promise<void> {
   await apiClient.delete(`/missions/${id}`);
 }
+
+/**
+ * Postuler à une mission (pour les intervenants)
+ */
+export async function applyToMission(missionId: string): Promise<Mission> {
+  const response = await apiClient.post<{ success: boolean; data: Mission; message: string }>(
+    `/missions/${missionId}/apply`
+  );
+  return response.data || (response as unknown as Mission);
+}

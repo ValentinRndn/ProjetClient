@@ -298,8 +298,15 @@ export async function downloadDocument(req, res, next) {
     }
 
     // Si le fichier est stocké localement, le servir directement
-    if (filePath && filePath.startsWith("/")) {
+    if (filePath && (filePath.startsWith("/") || filePath.startsWith("uploads/"))) {
       const absolutePath = path.resolve(process.cwd(), filePath);
+
+      // Vérifier que le fichier existe
+      if (!fs.existsSync(absolutePath)) {
+        logger.error("File not found on disk", { filePath, absolutePath });
+        return res.status(404).json({ success: false, message: "Fichier non trouvé sur le disque." });
+      }
+
       return res.sendFile(absolutePath);
     }
 
@@ -311,6 +318,7 @@ export async function downloadDocument(req, res, next) {
       return res.redirect(filePath);
     }
 
+    logger.error("Unknown file path format", { filePath });
     res.status(404).json({ success: false, message: "Fichier non trouvé." });
   } catch (err) {
     logger.error("Download intervenant document error", {

@@ -1,4 +1,5 @@
 import { CTAButton } from "./CTAButton";
+import { cn } from "@/lib/utils";
 import React from "react";
 
 export interface HeroCTAProps {
@@ -6,30 +7,44 @@ export interface HeroCTAProps {
     label: string;
     onClick?: () => void;
     href?: string;
+    icon?: React.ReactNode;
   };
   secondaryAction?: {
     label: string;
     onClick?: () => void;
     href?: string;
+    icon?: React.ReactNode;
   };
   className?: string;
+  align?: "center" | "left" | "right";
 }
 
 export function HeroCTA({
   primaryAction,
   secondaryAction,
   className,
+  align = "center",
 }: HeroCTAProps) {
+  const alignments = {
+    center: "justify-center",
+    left: "justify-start",
+    right: "justify-end",
+  };
+
   return (
     <div
-      className={`flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 px-4 ${
-        className || ""
-      }`}
+      className={cn(
+        "flex flex-col sm:flex-row gap-4 px-4",
+        alignments[align],
+        className
+      )}
     >
       <CTAButton
         onClick={primaryAction.onClick}
         href={primaryAction.href}
         variant="primary"
+        size="lg"
+        icon={primaryAction.icon}
       >
         {primaryAction.label}
       </CTAButton>
@@ -38,6 +53,8 @@ export function HeroCTA({
           onClick={secondaryAction.onClick}
           href={secondaryAction.href}
           variant="secondary"
+          size="lg"
+          icon={secondaryAction.icon}
         >
           {secondaryAction.label}
         </CTAButton>

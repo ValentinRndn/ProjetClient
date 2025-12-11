@@ -5,9 +5,6 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { RoleSelector } from "@/components/ui/RoleSelector";
-import { FormCard } from "@/components/ui/FormCard";
-import { PageContainer } from "@/components/ui/PageContainer";
-import { LogoIcon } from "@/components/ui/LogoIcon";
 import { registerFormFields } from "@/config/registerFormConfig";
 import type { RegisterData } from "@/services/auth";
 import { useState } from "react";
@@ -15,6 +12,8 @@ import { FormField } from "@/components/shared/FormField";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { uploadDocument } from "@/services/intervenants";
 import { getCurrentUser } from "@/services/auth";
+import { motion } from "motion/react";
+import { UserPlus, ArrowLeft, CheckCircle, Users, Building2 } from "lucide-react";
 
 interface RegisterFormData {
   email: string;
@@ -92,47 +91,32 @@ export function RegisterForm() {
     try {
       await registerUser(registrationData);
 
-      // Attendre un peu pour que l'utilisateur soit bien créé côté serveur
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Si c'est un intervenant et qu'il y a des fichiers à uploader
       if (data.role === "INTERVENANT" && (profileImage || cvFile)) {
         try {
-          // Récupérer l'utilisateur pour obtenir l'ID de l'intervenant
           const currentUser = await getCurrentUser();
           const intervenantId = currentUser.intervenant?.id;
 
           if (intervenantId) {
-            // Upload de l'image de profil
             if (profileImage) {
               try {
-                await uploadDocument(
-                  intervenantId,
-                  profileImage,
-                  "PROFILE_IMAGE"
-                );
+                await uploadDocument(intervenantId, profileImage, "PROFILE_IMAGE");
               } catch (err) {
                 console.error("Erreur lors de l'upload de l'image:", err);
-                // Ne pas bloquer l'inscription si l'upload d'image échoue
               }
             }
 
-            // Upload du CV
             if (cvFile) {
               try {
                 await uploadDocument(intervenantId, cvFile, "CV");
               } catch (err) {
                 console.error("Erreur lors de l'upload du CV:", err);
-                // Ne pas bloquer l'inscription si l'upload de CV échoue
               }
             }
           }
         } catch (err) {
-          console.error(
-            "Erreur lors de la récupération de l'utilisateur:",
-            err
-          );
-          // Ne pas bloquer l'inscription si la récupération échoue
+          console.error("Erreur lors de la récupération de l'utilisateur:", err);
         }
       }
     } catch (err: unknown) {
@@ -147,128 +131,246 @@ export function RegisterForm() {
 
   const displayError = localError || error;
 
-  const footer = (
-    <div className="text-center">
-      <p className="text-sm text-gray-600">
-        Vous avez déjà un compte ?{" "}
-        <Link
-          to="/login"
-          className="font-medium text-indigo-600 hover:text-indigo-500"
-        >
-          Se connecter
-        </Link>
-      </p>
-    </div>
-  );
+  const benefits = [
+    "Accès à un réseau d'experts qualifiés",
+    "Processus simplifié de mise en relation",
+    "Gestion administrative facilitée",
+    "Support dédié tout au long de vos projets",
+  ];
 
   return (
-    <PageContainer
-      className="bg-linear-to-br from-gray-50 to-gray-100"
-      maxWidth="lg"
-    >
-      <FormCard
-        title="Créer un compte"
-        subtitle="Rejoignez Vizion Academy et commencez dès aujourd'hui"
-        icon={<LogoIcon size="md" />}
-        footer={footer}
-      >
-        {displayError && (
-          <div className="mb-6">
-            <Alert type="error" onClose={() => setLocalError(null)}>
-              {displayError}
-            </Alert>
-          </div>
-        )}
+    <div className="min-h-screen flex">
+      {/* Left Side - Decorative */}
+      <div className="hidden lg:flex lg:w-2/5 bg-gradient-mesh relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
+        </div>
 
-        <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Sélection du type de compte */}
-            <RoleSelector
-              value={role || "INTERVENANT"}
-              onChange={handleRoleChange}
-              disabled={isLoading}
-            />
-
-            {/* Informations de base */}
-            <div className="space-y-5 pt-6 border-t border-gray-200">
-              {registerFormFields
-                .filter((field) => field.group === "base")
-                .map((field) => (
-                  <FormField key={field.name} field={field} />
-                ))}
+        <div className="relative z-10 flex flex-col justify-center px-10 xl:px-16 text-white">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex items-center gap-3 mb-8">
+              <img src="/logo.svg" alt="Vizion Academy" className="w-12 h-12" />
+              <div>
+                <span className="text-2xl font-bold block">Vizion</span>
+                <span className="text-sm text-indigo-300">Academy</span>
+              </div>
             </div>
 
-            {/* Champs conditionnels selon le rôle */}
-            {(role === "ECOLE" || role === "INTERVENANT") && (
-              <div className="space-y-5">
-                {registerFormFields
-                  .filter(
-                    (field) =>
-                      field.group ===
-                      (role === "ECOLE" ? "ecole" : "intervenant")
-                  )
-                  .map((field) => (
-                    <FormField key={field.name} field={field} />
-                  ))}
+            <h1 className="text-3xl xl:text-4xl font-extrabold mb-6 leading-tight">
+              Rejoignez notre{" "}
+              <span className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
+                communauté
+              </span>
+            </h1>
 
-                {/* Champs d'upload pour les intervenants */}
-                {role === "INTERVENANT" && (
-                  <>
-                    <FileUpload
-                      label="Photo de profil (optionnel)"
-                      accept="image/*"
-                      maxSizeMB={5}
-                      value={profileImage}
-                      onChange={setProfileImage}
-                      helperText="Formats acceptés: JPG, PNG. Taille max: 5MB"
-                    />
-                    <FileUpload
-                      label="CV (optionnel)"
-                      accept=".pdf,.doc,.docx"
-                      maxSizeMB={10}
-                      value={cvFile}
-                      onChange={setCvFile}
-                      helperText="Formats acceptés: PDF, DOC, DOCX. Taille max: 10MB"
-                    />
-                  </>
-                )}
+            <p className="text-base text-indigo-100/80 mb-8 max-w-sm">
+              Créez votre compte et connectez-vous avec les meilleures écoles
+              et intervenants du marché.
+            </p>
+
+            <div className="space-y-3">
+              {benefits.map((benefit, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
+                  className="flex items-center gap-3"
+                >
+                  <div className="w-6 h-6 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <span className="text-sm text-indigo-100/90">{benefit}</span>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="mt-10 flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-lg font-bold">35+</div>
+                  <div className="text-xs text-indigo-200">Écoles</div>
+                </div>
               </div>
-            )}
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              isLoading={isLoading}
-              className="w-full"
-            >
-              Créer mon compte
-            </Button>
-          </form>
-        </FormProvider>
-      </FormCard>
-
-      <div className="mt-6 text-center">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          Retour à l'accueil
-        </Link>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-lg font-bold">150+</div>
+                  <div className="text-xs text-indigo-200">Intervenants</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </PageContainer>
+
+      {/* Right Side - Form */}
+      <div className="w-full lg:w-3/5 flex items-center justify-center p-6 sm:p-8 bg-gray-50 overflow-y-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-xl py-8"
+        >
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-6">
+            <Link to="/" className="inline-flex items-center gap-3">
+              <img src="/logo.svg" alt="Vizion Academy" className="w-10 h-10" />
+              <div className="text-left">
+                <span className="text-xl font-bold text-gray-900 block">Vizion</span>
+                <span className="text-xs text-indigo-600">Academy</span>
+              </div>
+            </Link>
+          </div>
+
+          <div className="text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">
+              Créer un compte
+            </h2>
+            <p className="text-gray-600">
+              Rejoignez Vizion Academy et commencez dès aujourd'hui
+            </p>
+          </div>
+
+          {displayError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6"
+            >
+              <Alert type="error" onClose={() => setLocalError(null)}>
+                {displayError}
+              </Alert>
+            </motion.div>
+          )}
+
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
+            <FormProvider {...methods}>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* Sélection du type de compte */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Type de compte
+                  </label>
+                  <RoleSelector
+                    value={role || "INTERVENANT"}
+                    onChange={handleRoleChange}
+                    disabled={isLoading}
+                  />
+                </div>
+
+                {/* Informations de base */}
+                <div className="space-y-5 pt-6 border-t border-gray-100">
+                  <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                    Informations de connexion
+                  </h3>
+                  {registerFormFields
+                    .filter((field) => field.group === "base")
+                    .map((field) => (
+                      <FormField key={field.name} field={field} />
+                    ))}
+                </div>
+
+                {/* Champs conditionnels selon le rôle */}
+                {(role === "ECOLE" || role === "INTERVENANT") && (
+                  <div className="space-y-5 pt-6 border-t border-gray-100">
+                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                      {role === "ECOLE" ? "Informations de l'école" : "Informations personnelles"}
+                    </h3>
+                    {registerFormFields
+                      .filter(
+                        (field) =>
+                          field.group === (role === "ECOLE" ? "ecole" : "intervenant")
+                      )
+                      .map((field) => (
+                        <FormField key={field.name} field={field} />
+                      ))}
+
+                    {/* Champs d'upload pour les intervenants */}
+                    {role === "INTERVENANT" && (
+                      <div className="space-y-4 pt-4">
+                        <h4 className="text-sm font-medium text-gray-700">
+                          Documents (optionnel)
+                        </h4>
+                        <FileUpload
+                          label="Photo de profil"
+                          accept="image/*"
+                          maxSizeMB={5}
+                          value={profileImage}
+                          onChange={setProfileImage}
+                          helperText="JPG, PNG. Max 5MB"
+                        />
+                        <FileUpload
+                          label="CV"
+                          accept=".pdf,.doc,.docx"
+                          maxSizeMB={10}
+                          value={cvFile}
+                          onChange={setCvFile}
+                          helperText="PDF, DOC, DOCX. Max 10MB"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="gradient"
+                  size="lg"
+                  isLoading={isLoading}
+                  fullWidth
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Créer mon compte
+                </Button>
+              </form>
+            </FormProvider>
+
+            <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+              <p className="text-sm text-gray-600">
+                Vous avez déjà un compte ?{" "}
+                <Link
+                  to="/login"
+                  className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
+                >
+                  Se connecter
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 text-center">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Retour à l'accueil
+            </Link>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-gray-400">
+            En créant un compte, vous acceptez nos{" "}
+            <a href="#" className="text-indigo-600 hover:underline">
+              CGU
+            </a>{" "}
+            et notre{" "}
+            <a href="#" className="text-indigo-600 hover:underline">
+              politique de confidentialité
+            </a>
+          </p>
+        </motion.div>
+      </div>
+    </div>
   );
 }

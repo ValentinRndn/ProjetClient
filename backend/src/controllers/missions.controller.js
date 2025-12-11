@@ -206,12 +206,31 @@ export async function removeMission(req, res, next) {
     try {
         const { id } = req.params;
         logger.info('Delete mission attempt', { missionId: id, requesterId: req.user?.id });
-        
+
         await missionsService.remove(id, req.user);
         logger.info('Mission deleted successfully', { missionId: id, requesterId: req.user?.id });
         res.json({ success: true, message: 'Mission supprimée.' });
     } catch (err) {
         logger.error('Delete mission error', { missionId: req.params.id, requesterId: req.user?.id, error: err.message });
+        next(err);
+    }
+}
+
+/**
+ * POST /api/v1/missions/:id/apply
+ * Permet à un intervenant de postuler à une mission
+ */
+export async function applyToMission(req, res, next) {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        logger.info('Apply to mission attempt', { missionId: id, userId });
+
+        const updated = await missionsService.applyToMission(id, userId);
+        logger.info('Applied to mission successfully', { missionId: id, userId });
+        res.json({ success: true, data: updated, message: 'Candidature envoyée avec succès!' });
+    } catch (err) {
+        logger.error('Apply to mission error', { missionId: req.params.id, userId: req.user?.id, error: err.message });
         next(err);
     }
 }

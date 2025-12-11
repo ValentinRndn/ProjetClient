@@ -4,18 +4,47 @@ import React from "react";
 export interface CardProps {
   children: React.ReactNode;
   className?: string;
-  variant?: "default" | "elevated" | "outlined";
+  variant?: "default" | "elevated" | "outlined" | "glass" | "gradient";
+  hover?: boolean;
+  padding?: "none" | "sm" | "md" | "lg";
 }
 
-export function Card({ children, className, variant = "default" }: CardProps) {
+export function Card({
+  children,
+  className,
+  variant = "default",
+  hover = false,
+  padding = "none",
+}: CardProps) {
   const variants = {
-    default: "bg-white border border-gray-200",
-    elevated: "bg-white shadow-xl",
-    outlined: "bg-white border-2 border-gray-300",
+    default: "bg-white border border-gray-200/80",
+    elevated: "bg-white shadow-lg shadow-gray-200/50",
+    outlined: "bg-white border-2 border-gray-200",
+    glass: "glass",
+    gradient: "bg-gradient-to-br from-white to-gray-50 border border-gray-200/50",
   };
 
+  const paddings = {
+    none: "",
+    sm: "p-4",
+    md: "p-6",
+    lg: "p-8",
+  };
+
+  const hoverStyles = hover
+    ? "transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-200 hover:-translate-y-1 cursor-pointer"
+    : "";
+
   return (
-    <div className={cn("rounded-2xl", variants[variant], className)}>
+    <div
+      className={cn(
+        "rounded-2xl overflow-hidden",
+        variants[variant],
+        paddings[padding],
+        hoverStyles,
+        className
+      )}
+    >
       {children}
     </div>
   );
@@ -24,10 +53,18 @@ export function Card({ children, className, variant = "default" }: CardProps) {
 export interface CardHeaderProps {
   children: React.ReactNode;
   className?: string;
+  actions?: React.ReactNode;
 }
 
-export function CardHeader({ children, className }: CardHeaderProps) {
-  return <div className={cn("p-6 sm:p-8", className)}>{children}</div>;
+export function CardHeader({ children, className, actions }: CardHeaderProps) {
+  return (
+    <div className={cn("px-6 py-5 border-b border-gray-100", className)}>
+      <div className="flex items-center justify-between">
+        <div>{children}</div>
+        {actions && <div className="flex items-center gap-2">{actions}</div>}
+      </div>
+    </div>
+  );
 }
 
 export interface CardContentProps {
@@ -36,7 +73,7 @@ export interface CardContentProps {
 }
 
 export function CardContent({ children, className }: CardContentProps) {
-  return <div className={cn("p-6 sm:p-8 pt-0", className)}>{children}</div>;
+  return <div className={cn("p-6", className)}>{children}</div>;
 }
 
 export interface CardFooterProps {
@@ -45,5 +82,36 @@ export interface CardFooterProps {
 }
 
 export function CardFooter({ children, className }: CardFooterProps) {
-  return <div className={cn("p-6 sm:p-8 pt-0", className)}>{children}</div>;
+  return (
+    <div className={cn("px-6 py-4 bg-gray-50/50 border-t border-gray-100", className)}>
+      {children}
+    </div>
+  );
+}
+
+export interface CardTitleProps {
+  children: React.ReactNode;
+  className?: string;
+  as?: "h1" | "h2" | "h3" | "h4";
+}
+
+export function CardTitle({ children, className, as: Component = "h3" }: CardTitleProps) {
+  return (
+    <Component className={cn("text-lg font-semibold text-gray-900", className)}>
+      {children}
+    </Component>
+  );
+}
+
+export interface CardDescriptionProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function CardDescription({ children, className }: CardDescriptionProps) {
+  return (
+    <p className={cn("text-sm text-gray-500 mt-1", className)}>
+      {children}
+    </p>
+  );
 }

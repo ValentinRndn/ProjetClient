@@ -165,26 +165,40 @@ export async function findByIntervenantUserId(userId, queryOpts = {}) {
 
 /**
  * createByEcole - Crée une mission pour une école (CDC)
- * @param {Object} payload - { title, description?, startDate?, endDate?, priceCents? }
- * @param {string} userId - ID de l'utilisateur école
+ * @param {Object} payload - { title, description?, startDate?, endDate?, priceCents?, ecoleId? }
+ * @param {string} userId - ID de l'utilisateur école ou admin
  */
 export async function createByEcole(payload, userId) {
-    // Trouver l'école associée à cet utilisateur
-    const ecole = await prisma.ecole.findUnique({
-        where: { userId }
+    // Récupérer l'utilisateur pour vérifier son rôle
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { role: true }
     });
 
-    if (!ecole) {
-        const err = new Error('École non trouvée pour cet utilisateur.');
-        err.status = 404;
-        throw err;
+    let ecoleId = null;
+
+    // Si c'est un ADMIN, on peut spécifier l'ecoleId ou créer sans école
+    if (user?.role === 'ADMIN') {
+        ecoleId = payload.ecoleId || null;
+    } else {
+        // Sinon, trouver l'école associée à cet utilisateur
+        const ecole = await prisma.ecole.findUnique({
+            where: { userId }
+        });
+
+        if (!ecole) {
+            const err = new Error('École non trouvée pour cet utilisateur.');
+            err.status = 404;
+            throw err;
+        }
+        ecoleId = ecole.id;
     }
 
     const data = {
-        ecoleId: ecole.id,
+        ecoleId,
         title: payload.title,
         description: payload.description || null,
-        status: 'DRAFT', // Status MVP: DRAFT par défaut
+        status: payload.status || 'ACTIVE', // Missions publiées directement
         startDate: payload.startDate ? new Date(payload.startDate) : null,
         endDate: payload.endDate ? new Date(payload.endDate) : null,
         priceCents: payload.priceCents ? Number(payload.priceCents) : null,
@@ -342,4 +356,70 @@ export async function remove(id, user) {
 
     await prisma.mission.delete({ where: { id } });
     return;
+}
+
+/**
+ * applyToMission - Permet à un intervenant de postuler à une mission
+ * @param {string} missionId - ID de la mission
+ * @param {string} userId - ID de l'utilisateur intervenant
+ */
+export async function applyToMission(missionId, userId) {
+    // Trouver l'intervenant associé à cet utilisateur
+    const intervenant = await prisma.intervenant.findUnique({
+        where: { userId }
+    });
+
+    if (!intervenant) {
+        const err = new Error('Intervenant non trouvé pour cet utilisateur.');
+        err.status = 404;
+        throw err;
+    }
+
+    // Vérifier que l'intervenant est approuvé
+    if (intervenant.status !== 'approved') {
+        const err = new Error('Votre profil doit être approuvé pour postuler à une mission.');
+        err.status = 403;
+        throw err;
+    }
+
+    // Trouver la mission
+    const mission = await prisma.mission.findUnique({ where: { id: missionId } });
+
+    if (!mission) {
+        const err = new Error('Mission non trouvée.');
+        err.status = 404;
+        throw err;
+    }
+
+    // Vérifier que la mission est active
+    if (mission.status !== 'ACTIVE') {
+        const err = new Error('Cette mission n\'est plus disponible.');
+        err.status = 400;
+        throw err;
+    }
+
+    // Vérifier qu'aucun intervenant n'est déjà assigné
+    if (mission.intervenantId) {
+        const err = new Error('Un intervenant est déjà assigné à cette mission.');
+        err.status = 400;
+        throw err;
+    }
+
+    // Assigner l'intervenant à la mission
+    const updated = await prisma.mission.update({
+        where: { id: missionId },
+        data: { intervenantId: intervenant.id },
+        include: {
+            ecole: { select: { id: true, name: true, contactEmail: true } },
+            intervenant: {
+                select: {
+                    id: true,
+                    bio: true,
+                    user: { select: { id: true, email: true } }
+                }
+            }
+        }
+    });
+
+    return updated;
 }

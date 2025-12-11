@@ -7,9 +7,11 @@ import { Navigate } from "react-router";
 import * as auth from "@/lib/auth";
 import { useAuth } from "@/hooks/useAuth";
 
+type Role = "ADMIN" | "ECOLE" | "INTERVENANT";
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: "ADMIN" | "ECOLE" | "INTERVENANT";
+  requiredRole?: Role | Role[];
 }
 
 export default function ProtectedRoute({
@@ -32,8 +34,11 @@ export default function ProtectedRoute({
   }
 
   // Vérifier le rôle si requis
-  if (requiredRole && user.role !== requiredRole) {
-    return <Navigate to="/" replace />;
+  if (requiredRole) {
+    const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    if (!allowedRoles.includes(user.role as Role)) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;
