@@ -17,6 +17,8 @@ import {
   Sparkles,
   ArrowRight,
   Target,
+  History,
+  Heart,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -177,7 +179,7 @@ export default function DashboardEcolePage() {
             <h2 className="text-xl font-bold text-gray-900">Actions rapides</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <Link to="/nouvelle-mission" className="group">
               <div className="flex items-center justify-between p-4 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors">
                 <div className="flex items-center gap-3">
@@ -208,6 +210,21 @@ export default function DashboardEcolePage() {
               </div>
             </Link>
 
+            <Link to="/dashboard/ecole/favoris" className="group">
+              <div className="flex items-center justify-between p-4 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-rose-500 rounded-lg flex items-center justify-center">
+                    <Heart className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Mes favoris</p>
+                    <p className="text-sm text-gray-500">Intervenants favoris</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-rose-600 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
             <Link to="/missions" className="group">
               <div className="flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
                 <div className="flex items-center gap-3">
@@ -220,6 +237,21 @@ export default function DashboardEcolePage() {
                   </div>
                 </div>
                 <ArrowRight className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            <Link to="/dashboard/ecole/historique" className="group">
+              <div className="flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <History className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Historique</p>
+                    <p className="text-sm text-gray-500">Mes collaborations</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
           </div>

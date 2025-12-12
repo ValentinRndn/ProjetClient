@@ -3,17 +3,26 @@ import {
   getDocumentDownloadUrl,
   Document,
 } from "@/services/intervenants";
-import { User, Mail, Briefcase, FileText, Download } from "lucide-react";
+import { User, Mail, FileText, Download, MapPin, Eye, Award, Heart } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from "react";
+import { Link } from "react-router";
+import { useAuth } from "@/hooks/useAuth";
+import { checkFavorite, toggleFavorite } from "@/services/favorites";
 
 interface IntervenantCardProps {
   intervenant: Intervenant;
+  onFavoriteChange?: () => void;
 }
 
-export function IntervenantCard({ intervenant }: IntervenantCardProps) {
+export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCardProps) {
+  const { user } = useAuth();
   const [cvDocument, setCvDocument] = useState<Document | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLoadingFavorite, setIsLoadingFavorite] = useState(false);
+
+  const isEcole = user?.role === "ECOLE";
 
   const fullName =
     [intervenant.firstName, intervenant.lastName].filter(Boolean).join(" ") ||
@@ -34,6 +43,38 @@ export function IntervenantCard({ intervenant }: IntervenantCardProps) {
     };
     fetchCV();
   }, [intervenant]);
+
+  // Vérifier si l'intervenant est dans les favoris (pour les écoles)
+  useEffect(() => {
+    const checkIfFavorite = async () => {
+      if (isEcole && intervenant.id && intervenant.status === "approved") {
+        try {
+          const response = await checkFavorite(intervenant.id);
+          setIsFavorite(response.isFavorite);
+        } catch (err) {
+          // Ignorer les erreurs silencieusement
+        }
+      }
+    };
+    checkIfFavorite();
+  }, [isEcole, intervenant.id, intervenant.status]);
+
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!intervenant.id || isLoadingFavorite) return;
+
+    try {
+      setIsLoadingFavorite(true);
+      const result = await toggleFavorite(intervenant.id);
+      setIsFavorite(result.isFavorite);
+      onFavoriteChange?.();
+    } catch (err) {
+      console.error("Erreur lors du toggle favori:", err);
+    } finally {
+      setIsLoadingFavorite(false);
+    }
+  };
 
   const getStatusBadge = (status?: string) => {
     switch (status) {
@@ -107,7 +148,25 @@ export function IntervenantCard({ intervenant }: IntervenantCardProps) {
   const profileImageUrl = getProfileImageUrl();
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow">
+    <Card className="p-6 hover:shadow-lg transition-shadow relative">
+      {/* Bouton favori pour les écoles */}
+      {isEcole && intervenant.status === "approved" && (
+        <button
+          onClick={handleToggleFavorite}
+          disabled={isLoadingFavorite}
+          className={`absolute top-4 right-4 p-2 rounded-full transition-all z-10 ${
+            isFavorite
+              ? "bg-rose-100 text-rose-600 hover:bg-rose-200"
+              : "bg-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-500"
+          } ${isLoadingFavorite ? "opacity-50 cursor-not-allowed" : ""}`}
+          title={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+        >
+          <Heart
+            className={`w-5 h-5 ${isFavorite ? "fill-rose-600" : ""}`}
+          />
+        </button>
+      )}
+
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           {profileImageUrl ? (
@@ -144,17 +203,42 @@ export function IntervenantCard({ intervenant }: IntervenantCardProps) {
         </p>
       )}
 
+      {/* Expertises */}
+      {intervenant.expertises && intervenant.expertises.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {intervenant.expertises.slice(0, 3).map((expertise, idx) => (
+            <span
+              key={idx}
+              className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium"
+            >
+              {expertise}
+            </span>
+          ))}
+          {intervenant.expertises.length > 3 && (
+            <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full text-xs">
+              +{intervenant.expertises.length - 3}
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="space-y-2 mb-4">
+        {intervenant.city && (
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <MapPin className="w-4 h-4" />
+            <span>{intervenant.city}</span>
+          </div>
+        )}
+        {intervenant.yearsExperience && (
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Award className="w-4 h-4" />
+            <span>{intervenant.yearsExperience} ans d'expérience</span>
+          </div>
+        )}
         {intervenant.user?.email && (
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Mail className="w-4 h-4" />
-            <span>{intervenant.user.email}</span>
-          </div>
-        )}
-        {intervenant.siret && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Briefcase className="w-4 h-4" />
-            <span>SIRET: {intervenant.siret}</span>
+            <span className="truncate">{intervenant.user.email}</span>
           </div>
         )}
       </div>
@@ -172,9 +256,23 @@ export function IntervenantCard({ intervenant }: IntervenantCardProps) {
         </div>
       )}
 
-      {/* Bouton pour voir le CV */}
-      {cvDocument && intervenant.status === "approved" && (
-        <div className="pt-4 border-t border-gray-200">
+      {/* Boutons d'action */}
+      <div className="pt-4 border-t border-gray-200 space-y-2">
+        {/* Lien vers le profil complet */}
+        {intervenant.status === "approved" && (
+          <Link to={`/intervenants/${intervenant.id}`}>
+            <Button
+              variant="primary"
+              className="w-full flex items-center justify-center gap-2"
+            >
+              <Eye className="w-4 h-4" />
+              <span>Voir le profil</span>
+            </Button>
+          </Link>
+        )}
+
+        {/* Bouton pour voir le CV */}
+        {cvDocument && intervenant.status === "approved" && (
           <Button
             onClick={handleViewCV}
             variant="outline"
@@ -184,8 +282,8 @@ export function IntervenantCard({ intervenant }: IntervenantCardProps) {
             <span>Voir le CV</span>
             <Download className="w-4 h-4" />
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </Card>
   );
 }

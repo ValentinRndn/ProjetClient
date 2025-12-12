@@ -7,7 +7,6 @@ import {
   User,
   Mail,
   FileText,
-  Calendar,
   CheckCircle,
   Clock,
   XCircle,
@@ -17,6 +16,7 @@ import {
   Target,
   Award,
   Building2,
+  Calculator,
 } from "lucide-react";
 import { Alert } from "@/components/ui/Alert";
 import { Link } from "react-router";
@@ -365,25 +365,41 @@ export default function DashboardIntervenantPage() {
                     </div>
                   </Link>
 
-                  <div className="flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-white" />
+                  <Link to="/dashboard/intervenant/profil" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-gray-900">Mon profil public</span>
                       </div>
-                      <span className="font-semibold text-gray-900">Mes documents</span>
+                      <ArrowRight className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" />
                     </div>
-                    <ArrowRight className="w-5 h-5 text-blue-600" />
-                  </div>
+                  </Link>
 
-                  <div className="flex items-center justify-between p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
-                        <Calendar className="w-5 h-5 text-white" />
+                  <Link to="/dashboard/intervenant/documents" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-gray-900">Mon dossier</span>
                       </div>
-                      <span className="font-semibold text-gray-900">Mes disponibilités</span>
+                      <ArrowRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
                     </div>
-                    <ArrowRight className="w-5 h-5 text-emerald-600" />
-                  </div>
+                  </Link>
+
+                  <Link to="/dashboard/intervenant/declarations" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-amber-50 hover:bg-amber-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+                          <Calculator className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-gray-900">Mes déclarations</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-amber-600 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
                 </div>
               </motion.div>
             </div>

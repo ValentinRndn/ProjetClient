@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMyEcoleMissions, type Mission, type MissionStatus, deleteMission, updateMissionStatus } from "@/services/missions";
+import { getMyEcoleMissions, getAllMissions, type Mission, type MissionStatus, deleteMission, updateMissionStatus } from "@/services/missions";
 import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -7,9 +7,11 @@ import { Alert } from "@/components/ui/Alert";
 import { Search, Briefcase, Plus, Trash2, CheckCircle, Filter, User, Calendar, RotateCcw, Sparkles, Target, Clock } from "lucide-react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function MesMissionsPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,15 +19,25 @@ export default function MesMissionsPage() {
   const [statusFilter, setStatusFilter] = useState<"ACTIVE" | "COMPLETED" | "all">("all");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const isAdmin = user?.role === "ADMIN";
+
   useEffect(() => {
-    fetchMissions();
-  }, []);
+    // Attendre que user soit chargé avant de fetch
+    if (user) {
+      fetchMissions();
+    }
+  }, [user, isAdmin]);
 
   const fetchMissions = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await getMyEcoleMissions();
+
+      // Admin voit toutes les missions, École voit seulement les siennes
+      const response = isAdmin
+        ? await getAllMissions({ take: 100 })
+        : await getMyEcoleMissions();
+
       setMissions(response.items || []);
     } catch (err) {
       const errorMessage =

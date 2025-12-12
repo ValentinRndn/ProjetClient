@@ -9,6 +9,7 @@ import RegisterIntervenantPage from "./pages/RegisterIntervenantPage";
 import LogoutPage from "./pages/LogoutPage";
 import SchoolPage from "./pages/SchoolPage";
 import IntervenantsPage from "./pages/IntervenantsPage";
+import IntervenantProfilePage from "./pages/IntervenantProfilePage";
 import DashboardAdminPage from "./pages/DashboardAdminPage";
 import AdminIntervenantsPage from "./pages/AdminIntervenantsPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
@@ -18,6 +19,12 @@ import MissionsPage from "./pages/MissionsPage";
 import MesMissionsPage from "./pages/MesMissionsPage";
 import NouvelleMissionPage from "./pages/NouvelleMissionPage";
 import DashboardEcolePage from "./pages/DashboardEcolePage";
+import HistoriqueCollaborationsPage from "./pages/HistoriqueCollaborationsPage";
+import MesFavorisPage from "./pages/MesFavorisPage";
+import DeclarationsPage from "./pages/DeclarationsPage";
+import MonProfilIntervenantPage from "./pages/MonProfilIntervenantPage";
+import OnboardingDocumentsPage from "./pages/OnboardingDocumentsPage";
+import FacturesPage from "./pages/FacturesPage";
 import ContactPage from "./pages/ContactPage";
 import DevenirIntervenantPage from "./pages/DevenirIntervenantPage";
 import MentionsLegalesPage from "./pages/MentionsLegalesPage";
@@ -79,6 +86,14 @@ function App() {
           </NavLayout>
         }
       />
+      <Route
+        path="/intervenants/:id"
+        element={
+          <NavLayout>
+            <IntervenantProfilePage />
+          </NavLayout>
+        }
+      />
 
       <Route path="/logout" element={<LogoutPage />} />
 
@@ -124,14 +139,13 @@ function App() {
         }
       />
 
+      {/* Route publique - Mur des missions accessible à tous */}
       <Route
         path="/missions"
         element={
-          <ProtectedRoute>
-            <NavLayout>
-              <MissionsPage />
-            </NavLayout>
-          </ProtectedRoute>
+          <NavLayout>
+            <MissionsPage />
+          </NavLayout>
         }
       />
 
@@ -189,6 +203,16 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/dashboard/admin/factures"
+        element={
+          <ProtectedRoute requiredRole="ADMIN">
+            <NavLayout>
+              <FacturesPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Dashboard Intervenant */}
       <Route
@@ -201,6 +225,46 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/dashboard/intervenant/declarations"
+        element={
+          <ProtectedRoute requiredRole="INTERVENANT">
+            <NavLayout>
+              <DeclarationsPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/intervenant/profil"
+        element={
+          <ProtectedRoute requiredRole="INTERVENANT">
+            <NavLayout>
+              <MonProfilIntervenantPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/intervenant/documents"
+        element={
+          <ProtectedRoute requiredRole="INTERVENANT">
+            <NavLayout>
+              <OnboardingDocumentsPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/intervenant/factures"
+        element={
+          <ProtectedRoute requiredRole="INTERVENANT">
+            <NavLayout>
+              <FacturesPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Dashboard Ecole */}
       <Route
@@ -209,6 +273,36 @@ function App() {
           <ProtectedRoute requiredRole="ECOLE">
             <NavLayout>
               <DashboardEcolePage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/ecole/historique"
+        element={
+          <ProtectedRoute requiredRole="ECOLE">
+            <NavLayout>
+              <HistoriqueCollaborationsPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/ecole/favoris"
+        element={
+          <ProtectedRoute requiredRole="ECOLE">
+            <NavLayout>
+              <MesFavorisPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/ecole/factures"
+        element={
+          <ProtectedRoute requiredRole="ECOLE">
+            <NavLayout>
+              <FacturesPage />
             </NavLayout>
           </ProtectedRoute>
         }

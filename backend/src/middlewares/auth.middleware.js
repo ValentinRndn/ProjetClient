@@ -192,5 +192,42 @@ export const isEcoleOrAdmin = checkRole(["ECOLE", "ADMIN"]);
  */
 export const isIntervenantOrAdmin = checkRole(["INTERVENANT", "ADMIN"]);
 
+/**
+ * optionalAuth - Middleware d'authentification optionnelle
+ * Décode le token si présent, mais ne bloque pas si absent
+ */
+export function optionalAuth(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      // Pas de token, mais c'est OK - continuer sans user
+      req.user = null;
+      return next();
+    }
+
+    const parts = authHeader.split(" ");
+    if (parts.length !== 2 || parts[0] !== "Bearer") {
+      req.user = null;
+      return next();
+    }
+
+    const token = parts[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    req.user = {
+      id: decoded.sub,
+      email: decoded.email,
+      role: decoded.role?.toUpperCase?.() || decoded.role,
+    };
+
+    next();
+  } catch (error) {
+    // En cas d'erreur (token expiré/invalide), continuer sans user
+    req.user = null;
+    next();
+  }
+}
+
 // Export par défaut pour compatibilité avec l'ancien code
 export default verifyToken;

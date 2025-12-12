@@ -43,9 +43,11 @@ export default function MentionsLegalesPage() {
           <p className="text-gray-600 leading-relaxed">
             Le site est hébergé par :<br />
             <br />
-            [Nom de l'hébergeur]
+            <strong>OVH SAS</strong>
             <br />
-            [Adresse de l'hébergeur]
+            2 rue Kellermann - 59100 Roubaix - France
+            <br />
+            RCS Lille Métropole 424 761 419 00045
           </p>
         </section>
 

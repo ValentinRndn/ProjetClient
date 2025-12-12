@@ -4,6 +4,10 @@
  */
 
 import apiClient from "@/lib/api";
+import axios from "axios";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api/v1";
 
 export type MissionStatus = "DRAFT" | "ACTIVE" | "COMPLETED";
 
@@ -43,6 +47,26 @@ export interface MissionListResponse {
   success: boolean;
   items: Mission[];
   total?: number;
+}
+
+/**
+ * Liste publique des missions actives (sans authentification)
+ */
+export async function getPublicMissions(
+  filters: { q?: string; take?: number; skip?: number } = {}
+): Promise<MissionListResponse> {
+  const params = new URLSearchParams();
+
+  if (filters.take) params.append("take", filters.take.toString());
+  if (filters.skip) params.append("skip", filters.skip.toString());
+  if (filters.q) params.append("q", filters.q);
+
+  const queryString = params.toString();
+  const url = `${API_BASE_URL}/missions/public${queryString ? `?${queryString}` : ""}`;
+
+  // Utiliser axios directement sans authentification
+  const response = await axios.get<MissionListResponse>(url);
+  return response.data;
 }
 
 /**

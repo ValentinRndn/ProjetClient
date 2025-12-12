@@ -218,71 +218,74 @@ export default function AdminIntervenantsPage() {
             const canReject = intervenant.status !== "rejected";
 
             return (
-              <Card key={intervenant.id} className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-4">
-                      {intervenant.profileImage ? (
-                        <img
-                          src={intervenant.profileImage}
-                          alt={getFullName(intervenant)}
-                          className="w-16 h-16 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
-                          <User className="w-8 h-8 text-indigo-600" />
-                        </div>
+              <Card key={intervenant.id} className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                  {/* Avatar et infos */}
+                  <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                    {intervenant.profileImage ? (
+                      <img
+                        src={intervenant.profileImage}
+                        alt={getFullName(intervenant)}
+                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                        <User className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                          {getFullName(intervenant)}
+                        </h3>
+                        {getStatusBadge(intervenant.status)}
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-gray-600">
+                        {intervenant.user?.email && (
+                          <div className="flex items-center gap-1 min-w-0">
+                            <Mail className="w-4 h-4 shrink-0" />
+                            <span className="truncate">{intervenant.user.email}</span>
+                          </div>
+                        )}
+                        {intervenant.siret && (
+                          <div className="flex items-center gap-1">
+                            <FileText className="w-4 h-4 shrink-0" />
+                            <span className="text-xs sm:text-sm">SIRET: {intervenant.siret}</span>
+                          </div>
+                        )}
+                      </div>
+                      {intervenant.bio && (
+                        <p className="text-gray-600 text-sm mt-2 line-clamp-2 hidden sm:block">{intervenant.bio}</p>
                       )}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-1">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {getFullName(intervenant)}
-                          </h3>
-                          {getStatusBadge(intervenant.status)}
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                          {intervenant.user?.email && (
-                            <div className="flex items-center gap-1">
-                              <Mail className="w-4 h-4" />
-                              <span>{intervenant.user.email}</span>
-                            </div>
-                          )}
-                          {intervenant.siret && (
-                            <div className="flex items-center gap-1">
-                              <FileText className="w-4 h-4" />
-                              <span>SIRET: {intervenant.siret}</span>
-                            </div>
-                          )}
-                        </div>
+                      <div className="text-xs text-gray-500 mt-2">
+                        Inscrit le {new Date(intervenant.createdAt || "").toLocaleDateString("fr-FR")}
                       </div>
                     </div>
-                    {intervenant.bio && (
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{intervenant.bio}</p>
-                    )}
-                    <div className="text-xs text-gray-500">
-                      Inscrit le {new Date(intervenant.createdAt || "").toLocaleDateString("fr-FR")}
-                    </div>
                   </div>
+
+                  {/* Boutons d'action */}
                   {intervenant.status === "pending" && (
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex gap-2 w-full sm:w-auto sm:shrink-0">
                       <Button
                         variant="primary"
                         size="sm"
                         onClick={() => handleValidate(intervenant.id, "approved")}
                         disabled={isProcessing}
                         isLoading={isProcessing}
+                        className="flex-1 sm:flex-initial"
                       >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        Approuver
+                        <CheckCircle className="w-4 h-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Approuver</span>
                       </Button>
                       <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => handleValidate(intervenant.id, "rejected")}
                         disabled={isProcessing}
+                        className="flex-1 sm:flex-initial"
                       >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        Rejeter
+                        <XCircle className="w-4 h-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Rejeter</span>
                       </Button>
                     </div>
                   )}

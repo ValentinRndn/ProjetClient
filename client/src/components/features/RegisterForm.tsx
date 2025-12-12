@@ -4,7 +4,6 @@ import { useNavigate, Link } from "react-router";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
-import { RoleSelector } from "@/components/ui/RoleSelector";
 import { registerFormFields } from "@/config/registerFormConfig";
 import type { RegisterData } from "@/services/auth";
 import { useState } from "react";
@@ -50,8 +49,7 @@ export function RegisterForm() {
     },
   });
 
-  const { handleSubmit, watch, setValue } = methods;
-  const role = watch("role");
+  const { handleSubmit } = methods;
 
   useEffect(() => {
     if (user) {
@@ -62,20 +60,15 @@ export function RegisterForm() {
   const onSubmit = async (data: RegisterFormData) => {
     setLocalError(null);
 
+    // Forcer le rôle INTERVENANT
     const registrationData: RegisterData = {
       email: data.email,
       password: data.password,
-      role: data.role,
+      role: "INTERVENANT",
     };
 
-    if (data.role === "ECOLE" && data.ecoleData) {
-      registrationData.ecoleData = {
-        name: data.ecoleData.name || "",
-        contactEmail: data.ecoleData.contactEmail || undefined,
-        address: data.ecoleData.address || undefined,
-        phone: data.ecoleData.phone || undefined,
-      };
-    } else if (data.role === "INTERVENANT" && data.intervenantData) {
+    // Données intervenant
+    if (data.intervenantData) {
       const name =
         [data.intervenantData.firstName, data.intervenantData.lastName]
           .filter(Boolean)
@@ -93,7 +86,7 @@ export function RegisterForm() {
 
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      if (data.role === "INTERVENANT" && (profileImage || cvFile)) {
+      if (profileImage || cvFile) {
         try {
           const currentUser = await getCurrentUser();
           const intervenantId = currentUser.intervenant?.id;
@@ -123,10 +116,6 @@ export function RegisterForm() {
       const errorObj = err as { message?: string; status?: number };
       setLocalError(errorObj?.message || "Erreur lors de l'inscription");
     }
-  };
-
-  const handleRoleChange = (newRole: "ECOLE" | "INTERVENANT") => {
-    setValue("role", newRole);
   };
 
   const displayError = localError || error;
@@ -257,17 +246,16 @@ export function RegisterForm() {
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
             <FormProvider {...methods}>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Sélection du type de compte */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Type de compte
-                  </label>
-                  <RoleSelector
-                    value={role || "INTERVENANT"}
-                    onChange={handleRoleChange}
-                    disabled={isLoading}
-                  />
+                {/* Info: inscription intervenant uniquement */}
+                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                  <p className="text-sm text-indigo-700">
+                    <strong>Inscription Intervenant</strong> - Les comptes école sont créés par l'administration.
+                    Contactez-nous si vous êtes une école.
+                  </p>
                 </div>
+
+                {/* Role caché - toujours INTERVENANT */}
+                <input type="hidden" value="INTERVENANT" {...methods.register("role")} />
 
                 {/* Informations de base */}
                 <div className="space-y-5 pt-6 border-t border-gray-100">
@@ -281,47 +269,40 @@ export function RegisterForm() {
                     ))}
                 </div>
 
-                {/* Champs conditionnels selon le rôle */}
-                {(role === "ECOLE" || role === "INTERVENANT") && (
-                  <div className="space-y-5 pt-6 border-t border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
-                      {role === "ECOLE" ? "Informations de l'école" : "Informations personnelles"}
-                    </h3>
-                    {registerFormFields
-                      .filter(
-                        (field) =>
-                          field.group === (role === "ECOLE" ? "ecole" : "intervenant")
-                      )
-                      .map((field) => (
-                        <FormField key={field.name} field={field} />
-                      ))}
+                {/* Champs intervenant */}
+                <div className="space-y-5 pt-6 border-t border-gray-100">
+                  <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                    Informations personnelles
+                  </h3>
+                  {registerFormFields
+                    .filter((field) => field.group === "intervenant")
+                    .map((field) => (
+                      <FormField key={field.name} field={field} />
+                    ))}
 
-                    {/* Champs d'upload pour les intervenants */}
-                    {role === "INTERVENANT" && (
-                      <div className="space-y-4 pt-4">
-                        <h4 className="text-sm font-medium text-gray-700">
-                          Documents (optionnel)
-                        </h4>
-                        <FileUpload
-                          label="Photo de profil"
-                          accept="image/*"
-                          maxSizeMB={5}
-                          value={profileImage}
-                          onChange={setProfileImage}
-                          helperText="JPG, PNG. Max 5MB"
-                        />
-                        <FileUpload
-                          label="CV"
-                          accept=".pdf,.doc,.docx"
-                          maxSizeMB={10}
-                          value={cvFile}
-                          onChange={setCvFile}
-                          helperText="PDF, DOC, DOCX. Max 10MB"
-                        />
-                      </div>
-                    )}
+                  {/* Champs d'upload pour les intervenants */}
+                  <div className="space-y-4 pt-4">
+                    <h4 className="text-sm font-medium text-gray-700">
+                      Documents (optionnel)
+                    </h4>
+                    <FileUpload
+                      label="Photo de profil"
+                      accept="image/*"
+                      maxSizeMB={5}
+                      value={profileImage}
+                      onChange={setProfileImage}
+                      helperText="JPG, PNG. Max 5MB"
+                    />
+                    <FileUpload
+                      label="CV"
+                      accept=".pdf,.doc,.docx"
+                      maxSizeMB={10}
+                      value={cvFile}
+                      onChange={setCvFile}
+                      helperText="PDF, DOC, DOCX. Max 10MB"
+                    />
                   </div>
-                )}
+                </div>
 
                 <Button
                   type="submit"

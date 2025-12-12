@@ -15,6 +15,14 @@ export interface Intervenant {
   disponibility?: boolean | object;
   status?: string;
   userId?: string;
+  // Nouveaux champs pour profil enrichi
+  expertises?: string[];
+  videoUrl?: string;
+  linkedinUrl?: string;
+  website?: string;
+  phone?: string;
+  city?: string;
+  yearsExperience?: number;
   user?: {
     id: string;
     email: string;
@@ -68,7 +76,7 @@ export async function getAllIntervenants(filters?: {
 }
 
 /**
- * Récupérer un intervenant par son ID
+ * Récupérer un intervenant par son ID (authentifié)
  */
 export async function getIntervenantById(id: string): Promise<Intervenant> {
   const response = await apiClient.get<{ success: boolean; data: Intervenant }>(
@@ -78,15 +86,49 @@ export async function getIntervenantById(id: string): Promise<Intervenant> {
 }
 
 /**
+ * Récupérer le profil public d'un intervenant (sans authentification)
+ */
+export async function getPublicIntervenantById(id: string): Promise<Intervenant> {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api/v1";
+  const response = await fetch(`${baseUrl}/intervenants/public/${id}`);
+
+  if (!response.ok) {
+    throw new Error("Intervenant non trouvé");
+  }
+
+  const data = await response.json();
+  return data.data || data;
+}
+
+export interface UpdateIntervenantData {
+  // Informations personnelles
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+  phone?: string;
+  city?: string;
+
+  // Informations professionnelles
+  siret?: string;
+  yearsExperience?: number | null;
+  expertises?: string[];
+
+  // Liens et médias
+  videoUrl?: string;
+  linkedinUrl?: string;
+  website?: string;
+  profileImage?: string;
+
+  // Disponibilités
+  disponibility?: boolean | object;
+}
+
+/**
  * Mettre à jour un intervenant
  */
 export async function updateIntervenant(
   id: string,
-  data: Partial<{
-    bio: string;
-    siret: string;
-    disponibility: boolean;
-  }>
+  data: UpdateIntervenantData
 ): Promise<Intervenant> {
   const response = await apiClient.patch<{
     success: boolean;

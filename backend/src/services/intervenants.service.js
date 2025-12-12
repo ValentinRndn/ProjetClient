@@ -105,20 +105,40 @@ export async function findByUserId(userId) {
 }
 
 /**
- * update - Met à jour un intervenant
+ * update - Met à jour un intervenant (tous les champs du profil)
  */
 export async function update(id, payload) {
   const existing = await prisma.intervenant.findUnique({ where: { id } });
   if (!existing) return null;
 
+  // Construire l'objet de mise à jour avec tous les champs possibles
+  const updateData = {};
+
+  // Informations personnelles
+  if (payload.firstName !== undefined) updateData.firstName = payload.firstName;
+  if (payload.lastName !== undefined) updateData.lastName = payload.lastName;
+  if (payload.bio !== undefined) updateData.bio = payload.bio;
+  if (payload.phone !== undefined) updateData.phone = payload.phone;
+  if (payload.city !== undefined) updateData.city = payload.city;
+
+  // Informations professionnelles
+  if (payload.siret !== undefined) updateData.siret = payload.siret;
+  if (payload.yearsExperience !== undefined) updateData.yearsExperience = payload.yearsExperience;
+  if (payload.expertises !== undefined) updateData.expertises = payload.expertises;
+
+  // Liens et médias
+  if (payload.videoUrl !== undefined) updateData.videoUrl = payload.videoUrl;
+  if (payload.linkedinUrl !== undefined) updateData.linkedinUrl = payload.linkedinUrl;
+  if (payload.website !== undefined) updateData.website = payload.website;
+  if (payload.profileImage !== undefined) updateData.profileImage = payload.profileImage;
+
+  // Disponibilités et statut
+  if (payload.disponibility !== undefined) updateData.disponibility = payload.disponibility;
+  if (payload.status !== undefined) updateData.status = payload.status;
+
   return prisma.intervenant.update({
     where: { id },
-    data: {
-      bio: payload.bio ?? existing.bio,
-      siret: payload.siret ?? existing.siret,
-      disponibility: payload.disponibility ?? existing.disponibility,
-      status: payload.status ?? existing.status,
-    },
+    data: updateData,
     include: {
       user: { select: { id: true, email: true, role: true } },
       documents: true,
@@ -143,7 +163,8 @@ export async function updateStatus(id, status) {
 }
 
 /**
- * addDocument - Ajoute un document à un intervenant (CDC MVP)
+ * addDocument - Ajoute un document à un intervenant
+ * Avec support du chiffrement pour les pièces sensibles
  */
 export async function addDocument(intervenantId, doc) {
   const interv = await prisma.intervenant.findUnique({
@@ -160,7 +181,11 @@ export async function addDocument(intervenantId, doc) {
       intervenantId,
       fileName: doc.fileName,
       filePath: doc.filePath || doc.s3Key || "",
-      type: doc.type, // CV, RIB, KBIS, etc.
+      type: doc.type,
+      // Champs de chiffrement (si fournis)
+      isEncrypted: doc.isEncrypted || false,
+      encryptionIV: doc.encryptionIV || null,
+      checksum: doc.checksum || null,
     },
   });
 }

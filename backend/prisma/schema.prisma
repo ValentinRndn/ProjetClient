@@ -41,6 +41,18 @@ model User {
 
   // Refresh tokens pour JWT
   refreshTokens RefreshToken[]
+
+  // Logs de téléchargement de documents
+  documentDownloads DocumentDownloadLog[]
+
+  // Consultations de profils
+  profilConsultations ProfilConsultation[]
+
+  // Notifications
+  notifications Notification[]
+
+  // Tokens de réinitialisation de mot de passe
+  passwordResetTokens PasswordResetToken[]
 }
 
 // ============================================
@@ -55,6 +67,23 @@ model RefreshToken {
   expiresAt DateTime
 
   @@index([userId])
+}
+
+// ============================================
+// MODEL : PasswordResetToken
+// Token pour réinitialisation de mot de passe
+// ============================================
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  @@index([userId])
+  @@index([token])
 }
 
 // ============================================
@@ -76,7 +105,31 @@ model Ecole {
   // Relation One-to-Many avec Mission (missions déclarées par l'école)
   missions Mission[]
 
+  // Relation Many-to-Many avec Intervenant (favoris)
+  favoriteIntervenants EcoleFavorite[]
+
+  // Relation One-to-Many avec ProfilConsultation (consultations effectuées)
+  profilConsultations ProfilConsultation[]
+
   @@index([userId])
+}
+
+// ============================================
+// MODEL : EcoleFavorite (Favoris des écoles)
+// ============================================
+model EcoleFavorite {
+  id            String   @id @default(uuid())
+  ecoleId       String
+  intervenantId String
+  note          String?  // Note privée de l'école sur l'intervenant
+  createdAt     DateTime @default(now())
+
+  ecole       Ecole       @relation(fields: [ecoleId], references: [id], onDelete: Cascade)
+  intervenant Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
+
+  @@unique([ecoleId, intervenantId])
+  @@index([ecoleId])
+  @@index([intervenantId])
 }
 
 // ============================================
@@ -92,7 +145,15 @@ model Intervenant {
   profileImage String?  // URL ou chemin de l'image de profil
   disponibility Json?    // Disponibilités au format JSON
   status       String   @default("pending") // pending, approved, rejected
-  createdAt    DateTime @default(now())  
+  // Nouveaux champs pour profil public enrichi
+  expertises   String[] @default([])  // Liste des domaines d'expertise
+  videoUrl     String?  // URL vidéo de présentation (YouTube, Vimeo)
+  linkedinUrl  String?  // Profil LinkedIn
+  website      String?  // Site web personnel
+  phone        String?  // Téléphone
+  city         String?  // Ville
+  yearsExperience Int?  // Années d'expérience
+  createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   // Relation One-to-One avec User
@@ -104,7 +165,17 @@ model Intervenant {
   // Relation One-to-Many avec Document
   documents Document[]
 
+  // Relation Many-to-Many avec Ecole (favoris)
+  favoritedBy EcoleFavorite[]
+
+  // Relation One-to-Many avec DeclarationActivite
+  declarations DeclarationActivite[]
+
+  // Relation One-to-Many avec ProfilConsultation (consultations reçues)
+  consultations ProfilConsultation[]
+
   @@index([userId])
+  @@index([status])
 }
 
 // ============================================
@@ -122,6 +193,10 @@ model Mission {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // Statut de paiement (Task 14 CDC)
+  paymentStatus String    @default("non_paye") // non_paye, en_attente, paye
+  datePaiement  DateTime?
+
   // Relation Many-to-One vers Ecole (créateur)
   ecoleId String
   ecole   Ecole  @relation(fields: [ecoleId], references: [id], onDelete: Cascade)
@@ -130,26 +205,390 @@ model Mission {
   intervenantId String?
   intervenant   Intervenant? @relation(fields: [intervenantId], references: [id], onDelete: SetNull)
 
+  // Relation One-to-Many vers Factures
+  factures      Facture[]
+
   @@index([ecoleId])
   @@index([intervenantId])
   @@index([status])
+  @@index([paymentStatus])
 }
 
 // ============================================
-// MODEL : Document (MVP-Simple - CDC)
-// Note : Pas de chiffrement dans le MVP
+// MODEL : Document (avec chiffrement pour pièces sensibles)
 // ============================================
 model Document {
   id            String   @id @default(uuid())
   fileName      String
   filePath      String   // Chemin S3 ou local
-  type          String   // CV, RIB, KBIS, etc.
+  type          String   // CV, RIB, KBIS, PIECE_IDENTITE, etc.
   uploadedAt    DateTime @default(now())
+
+  // Champs pour le chiffrement des pièces sensibles
+  isEncrypted   Boolean  @default(false)  // Indique si le fichier est chiffré
+  encryptionIV  String?  // Vecteur d'initialisation pour AES
+  checksum      String?  // Hash SHA-256 pour vérifier l'intégrité
 
   // Relation Many-to-One vers Intervenant
   intervenantId String
   intervenant   Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
 
+  // Relation One-to-Many vers les logs de téléchargement
+  downloadLogs  DocumentDownloadLog[]
+
   @@index([intervenantId])
   @@index([type])
+}
+
+// ============================================
+// MODEL : DocumentDownloadLog (Journal des téléchargements)
+// Audit trail pour le suivi des accès aux documents
+// ============================================
+model DocumentDownloadLog {
+  id          String   @id @default(uuid())
+  documentId  String
+  userId      String?  // Peut être null si accès public (CV)
+  userRole    String?  // ADMIN, ECOLE, INTERVENANT
+  userEmail   String?  // Pour traçabilité
+  ipAddress   String?
+  userAgent   String?
+  action      String   @default("download") // download, view, preview
+  createdAt   DateTime @default(now())
+
+  // Relations
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([documentId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ============================================
+// MODEL : ContactMessage (Formulaire de contact)
+// ============================================
+model ContactMessage {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  company     String?  // Nom de l'école/entreprise
+  type        String   @default("contact") // contact, partenariat, support, autre
+  subject     String
+  message     String
+  status      String   @default("new") // new, read, replied, archived
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ============================================
+// MODEL : DeclarationActivite (URSSAF-like)
+// Déclaration mensuelle/trimestrielle d'activité
+// ============================================
+model DeclarationActivite {
+  id              String   @id @default(uuid())
+  intervenantId   String
+  periode         String   // Format: "2024-01" pour janvier 2024
+  type            String   @default("mensuelle") // mensuelle, trimestrielle
+
+  // Données financières (en centimes pour éviter les problèmes de float)
+  chiffreAffaires Int      @default(0) // CA brut en centimes
+  nbMissions      Int      @default(0) // Nombre de missions réalisées
+  nbHeures        Int      @default(0) // Nombre d'heures travaillées
+  fraisPro        Int      @default(0) // Frais professionnels en centimes
+
+  // Cotisations calculées (en centimes)
+  cotisationsSociales   Int @default(0)  // ~22% du CA pour auto-entrepreneur
+  contributionFormation Int @default(0)  // CFP ~0.1% à 0.3%
+
+  // Statut
+  status          String   @default("brouillon") // brouillon, validee, transmise
+  notes           String?  // Notes personnelles
+
+  // Dates
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  validatedAt     DateTime? // Date de validation
+
+  // Relation
+  intervenant     Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
+
+  @@unique([intervenantId, periode])
+  @@index([intervenantId])
+  @@index([periode])
+  @@index([status])
+}
+
+// ============================================
+// MODEL : Facture (Invoice)
+// Facturation école <-> intervenant par mission
+// ============================================
+model Facture {
+  id              String   @id @default(uuid())
+  numero          String   @unique // Numéro de facture (ex: FAC-2024-0001)
+  type            String   // "ecole" (facture à l'école) ou "intervenant" (facture de l'intervenant)
+
+  // Émetteur / Destinataire
+  emetteurType    String   // "plateforme", "ecole", "intervenant"
+  emetteurId      String?  // ID de l'émetteur (école ou intervenant)
+  destinataireType String  // "ecole", "intervenant"
+  destinataireId  String   // ID du destinataire
+
+  // Références
+  missionId       String?
+  mission         Mission? @relation(fields: [missionId], references: [id], onDelete: SetNull)
+
+  // Montants (en centimes)
+  montantHT       Int      // Montant hors taxes
+  tva             Int      @default(0) // TVA applicable (0 si auto-entrepreneur)
+  montantTTC      Int      // Montant TTC
+  fraisService    Int      @default(0) // Frais de service plateforme
+
+  // Informations de paiement
+  status          String   @default("brouillon") // brouillon, envoyee, payee, annulee, en_retard
+  dateEmission    DateTime?
+  dateEcheance    DateTime?
+  datePaiement    DateTime?
+  modePaiement    String?  // virement, cheque, etc.
+  reference       String?  // Référence de paiement
+
+  // Détails
+  description     String?
+  lignes          Json?    // Lignes de facture détaillées en JSON
+  notes           String?  // Notes internes
+
+  // Fichier PDF généré
+  pdfPath         String?  // Chemin vers le PDF généré
+
+  // Dates
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([numero])
+  @@index([type])
+  @@index([status])
+  @@index([emetteurId])
+  @@index([destinataireId])
+  @@index([missionId])
+  @@index([dateEmission])
+}
+
+// ============================================
+// MODEL : ProfilConsultation (Tracking)
+// Suivi des consultations de profils intervenants
+// ============================================
+model ProfilConsultation {
+  id              String   @id @default(uuid())
+  intervenantId   String   // Profil consulté
+  ecoleId         String?  // École qui consulte (null si visiteur public)
+  userId          String?  // User qui consulte
+
+  // Informations de la consultation
+  source          String   @default("profil") // profil, liste, recherche, mission
+  duration        Int?     // Durée de consultation en secondes
+
+  // Informations techniques
+  ipAddress       String?
+  userAgent       String?
+  referer         String?
+
+  // Date
+  createdAt       DateTime @default(now())
+
+  // Relations
+  intervenant     Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
+  ecole           Ecole?      @relation(fields: [ecoleId], references: [id], onDelete: SetNull)
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([intervenantId])
+  @@index([ecoleId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([source])
+}
+
+// ============================================
+// MODEL : Notification
+// Notifications utilisateurs (in-app + email)
+// ============================================
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String   // Destinataire
+  type        String   // mission_created, mission_assigned, facture_payee, document_validated, etc.
+  title       String
+  message     String
+  data        Json?    // Données supplémentaires (missionId, factureId, etc.)
+
+  // Statut
+  read        Boolean  @default(false)
+  readAt      DateTime?
+
+  // Email associé
+  emailSent   Boolean  @default(false)
+  emailSentAt DateTime?
+
+  createdAt   DateTime @default(now())
+
+  // Relation
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([read])
+  @@index([createdAt])
+}
+
+// ============================================
+// MODEL : EmailTemplate
+// Templates d'emails personnalisables
+// ============================================
+model EmailTemplate {
+  id          String   @id @default(uuid())
+  code        String   @unique // mission_created, welcome, etc.
+  name        String
+  subject     String
+  htmlContent String   @db.Text
+  textContent String?  @db.Text
+  variables   Json?    // Liste des variables disponibles
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+}
+
+// ============================================
+// MODEL : EmailLog
+// Historique des emails envoyés
+// ============================================
+model EmailLog {
+  id          String   @id @default(uuid())
+  to          String
+  subject     String
+  templateCode String?
+  status      String   @default("pending") // pending, sent, failed
+  error       String?
+  sentAt      DateTime?
+
+  createdAt   DateTime @default(now())
+
+  @@index([to])
+  @@index([status])
+  @@index([templateCode])
+  @@index([createdAt])
+}
+
+// ============================================
+// MODEL : Thematique
+// Thématiques d'intervention (back-office)
+// ============================================
+model Thematique {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  color       String?  // Couleur hexadécimale pour affichage
+  icon        String?  // Nom d'icône (Lucide)
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([order])
+}
+
+// ============================================
+// MODEL : EcolePartenaire
+// Écoles partenaires pour le carrousel
+// ============================================
+model EcolePartenaire {
+  id          String   @id @default(uuid())
+  name        String
+  logoUrl     String?
+  websiteUrl  String?
+  description String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([order])
+}
+
+// ============================================
+// MODEL : Temoignage
+// Témoignages clients/intervenants
+// ============================================
+model Temoignage {
+  id          String   @id @default(uuid())
+  authorName  String
+  authorRole  String?  // ex: "Directeur École X", "Intervenant"
+  authorImage String?
+  content     String   @db.Text
+  rating      Int?     // Note sur 5
+  isActive    Boolean  @default(true)
+  isFeatured  Boolean  @default(false) // Mis en avant
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([order])
+}
+
+// ============================================
+// MODEL : FAQ
+// Questions fréquentes
+// ============================================
+model FAQ {
+  id          String   @id @default(uuid())
+  question    String
+  answer      String   @db.Text
+  category    String?  // general, ecole, intervenant, facturation, etc.
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@index([order])
+}
+
+// ============================================
+// MODEL : AuditLog
+// Journal d'audit pour traçabilité
+// ============================================
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  userEmail   String?
+  action      String   // create, update, delete, login, etc.
+  entity      String   // user, mission, facture, etc.
+  entityId    String?
+  oldValues   Json?
+  newValues   Json?
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([entityId])
+  @@index([createdAt])
 }

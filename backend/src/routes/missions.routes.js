@@ -28,6 +28,12 @@ const router = Router();
 // ============================================
 // Schemas de validation
 // ============================================
+const publicQuerySchema = Joi.object({
+    status: Joi.string().valid('ACTIVE').default('ACTIVE'),
+    take: Joi.number().integer().min(1).max(100).default(50),
+    skip: Joi.number().integer().min(0).default(0),
+    q: Joi.string().max(100).optional()
+});
 const querySchema = Joi.object({
     ecoleId: Joi.string().uuid().optional(),
     intervenantId: Joi.string().uuid().optional(),
@@ -43,6 +49,32 @@ const paramsSchema = Joi.object({
 
 const assignSchema = Joi.object({
     intervenantId: Joi.string().uuid().required()
+});
+
+// ============================================
+// Route publique - Mur des missions (sans auth)
+// ============================================
+
+/**
+ * GET /api/v1/missions/public
+ * Liste publique des missions actives (sans authentification)
+ * Accessible par tous pour le mur des missions vitrine
+ */
+router.get('/public', validate({ query: publicQuerySchema }), async (req, res, next) => {
+    try {
+        const { take, skip, q } = req.query;
+        const opts = {
+            status: 'ACTIVE', // Toujours uniquement les missions actives
+            q: q || undefined,
+            take: take ? parseInt(take, 10) : 50,
+            skip: skip ? parseInt(skip, 10) : 0,
+            publicOnly: true // Flag pour exclure certaines données sensibles
+        };
+        const data = await import('../services/missions.service.js').then(m => m.findAll(opts));
+        res.json({ success: true, ...data });
+    } catch (error) {
+        next(error);
+    }
 });
 
 // ============================================

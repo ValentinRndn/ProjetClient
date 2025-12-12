@@ -39,14 +39,48 @@ const statusSchema = Joi.object({
   status: Joi.string().valid("pending", "approved", "rejected").required(),
 });
 
+// Types de documents pour l'onboarding complet
+const DOCUMENT_TYPES = [
+  'CV', 'DIPLOME', 'KBIS', 'ASSURANCE', 'RIB',
+  'PIECE_IDENTITE', 'ATTESTATION_URSSAF', 'ATTESTATION_FISCALE',
+  'CASIER_JUDICIAIRE', 'PROFILE_IMAGE', 'AUTRE'
+];
+
 const documentSchema = Joi.object({
   fileName: Joi.string().required(),
   filePath: Joi.string().required(),
-  type: Joi.string().valid("CV", "RIB", "KBIS", "DIPLOME", "AUTRE").required(),
+  type: Joi.string().valid(...DOCUMENT_TYPES).required(),
 });
 
 // Routes CRUD intervenants
 router.get("/", validate({ query: querySchema }), getIntervenants);
+
+// Route publique pour voir le profil d'un intervenant approuvé
+router.get(
+  "/public/:id",
+  validate({ params: paramsSchema }),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const service = await import('../services/intervenants.service.js');
+      const intervenant = await service.findById(id, true); // true = publicOnly
+
+      if (!intervenant) {
+        return res.status(404).json({ success: false, message: 'Intervenant non trouvé' });
+      }
+
+      // Vérifier que l'intervenant est approuvé
+      if (intervenant.status !== 'approved') {
+        return res.status(404).json({ success: false, message: 'Intervenant non disponible' });
+      }
+
+      res.json({ success: true, data: intervenant });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 router.get(
   "/:id",
   validate({ params: paramsSchema }),

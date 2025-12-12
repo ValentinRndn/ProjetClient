@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { getAllMissions, applyToMission, type Mission, type MissionStatus } from "@/services/missions";
+import { getAllMissions, getPublicMissions, applyToMission, type Mission, type MissionStatus } from "@/services/missions";
 import { MissionCard } from "@/components/features/MissionCard";
 import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
-import { Search, Briefcase, Filter, Sparkles, Target, TrendingUp } from "lucide-react";
+import { Search, Briefcase, Filter, Sparkles, Target, TrendingUp, LogIn, UserPlus } from "lucide-react";
+import { Link } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
@@ -23,16 +24,27 @@ export default function MissionsPage() {
 
   useEffect(() => {
     fetchMissions();
-  }, [statusFilter]);
+  }, [statusFilter, isAuthenticated]);
 
   const fetchMissions = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await getAllMissions({
-        status: statusFilter !== "all" ? statusFilter : undefined,
-        take: 50,
-      });
+
+      // Utiliser l'endpoint public si non authentifié, sinon l'endpoint authentifié
+      let response;
+      if (isAuthenticated) {
+        response = await getAllMissions({
+          status: statusFilter !== "all" ? statusFilter : undefined,
+          take: 50,
+        });
+      } else {
+        // Endpoint public - uniquement missions ACTIVE
+        response = await getPublicMissions({
+          take: 50,
+        });
+      }
+
       setMissions(response.items || []);
     } catch (err) {
       const errorMessage =
@@ -52,7 +64,9 @@ export default function MissionsPage() {
       return;
     }
 
-    if (!confirm("Voulez-vous postuler à cette mission ?")) return;
+    if (!window.confirm("En postulant, vous serez directement assigné à cette mission. Voulez-vous continuer ?")) {
+      return;
+    }
 
     try {
       setIsApplying(missionId);
@@ -64,12 +78,13 @@ export default function MissionsPage() {
         m.id === missionId ? updatedMission : m
       ));
 
-      setSuccessMessage("Candidature envoyée avec succès ! Vous êtes maintenant assigné à cette mission.");
+      setSuccessMessage("Vous avez été assigné à cette mission avec succès !");
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err: unknown) {
+      console.error("Erreur postuler:", err);
       const errorMessage = err && typeof err === 'object' && 'message' in err
         ? (err as { message: string }).message
-        : "Erreur lors de la candidature";
+        : "Erreur lors de la candidature. Vérifiez que votre profil est approuvé.";
       setError(errorMessage);
     } finally {
       setIsApplying(null);
@@ -196,8 +211,8 @@ export default function MissionsPage() {
           transition={{ duration: 0.5 }}
           className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8"
         >
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative md:col-span-2">
+          <div className={`grid grid-cols-1 ${isAuthenticated ? "md:grid-cols-4" : "md:grid-cols-1"} gap-4`}>
+            <div className={`relative ${isAuthenticated ? "md:col-span-2" : ""}`}>
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 type="text"
@@ -207,23 +222,26 @@ export default function MissionsPage() {
                 className="pl-12 h-12 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
               />
             </div>
-            <div className="flex gap-2 md:col-span-2">
-              <Button
-                variant={statusFilter === "ACTIVE" ? "primary" : "secondary"}
-                onClick={() => setStatusFilter("ACTIVE")}
-                className="flex-1 h-12 rounded-xl"
-              >
-                <Filter className="w-4 h-4" />
-                Actives
-              </Button>
-              <Button
-                variant={statusFilter === "all" ? "primary" : "secondary"}
-                onClick={() => setStatusFilter("all")}
-                className="flex-1 h-12 rounded-xl"
-              >
-                Toutes
-              </Button>
-            </div>
+            {/* Filtre de statut uniquement pour les utilisateurs authentifiés */}
+            {isAuthenticated && (
+              <div className="flex gap-2 md:col-span-2">
+                <Button
+                  variant={statusFilter === "ACTIVE" ? "primary" : "secondary"}
+                  onClick={() => setStatusFilter("ACTIVE")}
+                  className="flex-1 h-12 rounded-xl"
+                >
+                  <Filter className="w-4 h-4" />
+                  Actives
+                </Button>
+                <Button
+                  variant={statusFilter === "all" ? "primary" : "secondary"}
+                  onClick={() => setStatusFilter("all")}
+                  className="flex-1 h-12 rounded-xl"
+                >
+                  Toutes
+                </Button>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -293,6 +311,43 @@ export default function MissionsPage() {
                 />
               </motion.div>
             ))}
+          </motion.div>
+        )}
+
+        {/* CTA pour les visiteurs non connectés */}
+        {!isAuthenticated && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-12 bg-gradient-mesh rounded-3xl p-8 md:p-12 text-center text-white overflow-hidden relative"
+          >
+            <div className="absolute inset-0">
+              <div className="absolute top-10 left-10 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl" />
+              <div className="absolute bottom-10 right-10 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
+            </div>
+            <div className="relative z-10">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                Intéressé par ces missions ?
+              </h2>
+              <p className="text-indigo-100/80 max-w-xl mx-auto mb-8">
+                Créez votre compte intervenant gratuitement et postulez directement aux missions qui vous intéressent.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/register">
+                  <Button variant="gradient" size="lg" className="bg-white text-indigo-600 hover:bg-gray-100">
+                    <UserPlus className="w-5 h-5" />
+                    Créer mon compte
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button variant="secondary" size="lg" className="border-white/30 text-white hover:bg-white/10">
+                    <LogIn className="w-5 h-5" />
+                    Se connecter
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </motion.div>
         )}
       </PageContainer>

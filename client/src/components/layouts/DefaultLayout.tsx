@@ -458,14 +458,20 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
               </p>
               <div className="flex items-center gap-4">
                 <a
-                  href="#"
+                  href="https://www.linkedin.com/company/vizion-academy"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-colors"
+                  aria-label="LinkedIn"
                 >
                   <Linkedin className="w-4 h-4" />
                 </a>
                 <a
-                  href="#"
+                  href="https://twitter.com/vizionacademy"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-colors"
+                  aria-label="Twitter"
                 >
                   <Twitter className="w-4 h-4" />
                 </a>

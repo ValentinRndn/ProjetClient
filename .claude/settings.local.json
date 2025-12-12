@@ -13,7 +13,11 @@
       "Bash(docker start:*)",
       "Bash(npm run dev:*)",
       "Bash(ECOLE_TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZjZlN2YzNS03ZDY2LTRiYzYtODliNC1lMjY5MGYwM2Q3ZTMiLCJlbWFpbCI6ImVjb2xlQHRlc3QuY29tIiwicm9sZSI6IkVDT0xFIiwiaWF0IjoxNzY1NDY3MzczLCJleHAiOjE3NjU0NjgyNzN9.KqJgI6koVq0aKPycyPpYkIGIf1ue0j_ZzPbBedK0j_I\")",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

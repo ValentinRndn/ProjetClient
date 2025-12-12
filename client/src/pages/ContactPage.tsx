@@ -5,12 +5,16 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
-import { Mail, Phone, MapPin, Send, CheckCircle, MessageSquare, Clock, ArrowRight } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle, MessageSquare, Clock, ArrowRight, Building2, Handshake, HelpCircle, MoreHorizontal } from "lucide-react";
 import { motion } from "motion/react";
+import { submitContactForm, type ContactType } from "@/services/contact";
 
 interface ContactFormData {
   name: string;
   email: string;
+  phone?: string;
+  company?: string;
+  type: ContactType;
   subject: string;
   message: string;
 }
@@ -24,26 +28,42 @@ export default function ContactPage() {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
-  } = useForm<ContactFormData>();
+  } = useForm<ContactFormData>({
+    defaultValues: {
+      type: "contact",
+    },
+  });
+
+  const selectedType = watch("type");
 
   const onSubmit = async (data: ContactFormData) => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Simuler l'envoi (à remplacer par un vrai appel API si nécessaire)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await submitContactForm(data);
 
-      console.log("Contact form submitted:", data);
       setSuccess(true);
       reset();
-    } catch (err) {
-      setError("Erreur lors de l'envoi du message. Veuillez réessayer.");
+    } catch (err: unknown) {
+      const errorMessage =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          : "Erreur lors de l'envoi du message. Veuillez réessayer.";
+      setError(errorMessage || "Erreur lors de l'envoi du message. Veuillez réessayer.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  const requestTypes = [
+    { value: "contact", label: "Question générale", icon: MessageSquare, color: "from-indigo-500 to-purple-600" },
+    { value: "partenariat", label: "Demande de partenariat", icon: Handshake, color: "from-emerald-500 to-teal-600" },
+    { value: "support", label: "Support technique", icon: HelpCircle, color: "from-amber-500 to-orange-600" },
+    { value: "autre", label: "Autre demande", icon: MoreHorizontal, color: "from-gray-500 to-slate-600" },
+  ];
 
   const contactInfo = [
     {
@@ -113,7 +133,7 @@ export default function ContactPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
         >
           {contactInfo.map((info, index) => (
             <div
@@ -127,12 +147,12 @@ export default function ContactPage() {
               {info.href ? (
                 <a
                   href={info.href}
-                  className="text-gray-900 font-semibold hover:text-indigo-600 transition-colors"
+                  className="text-gray-900 font-semibold hover:text-indigo-600 transition-colors break-all sm:break-normal text-sm sm:text-base"
                 >
                   {info.value}
                 </a>
               ) : (
-                <p className="text-gray-900 font-semibold">{info.value}</p>
+                <p className="text-gray-900 font-semibold text-sm sm:text-base">{info.value}</p>
               )}
             </div>
           ))}
@@ -243,6 +263,49 @@ export default function ContactPage() {
                   )}
 
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    {/* Type de demande */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        Type de demande <span className="text-red-500">*</span>
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {requestTypes.map((type) => {
+                          const Icon = type.icon;
+                          const isSelected = selectedType === type.value;
+                          return (
+                            <label
+                              key={type.value}
+                              className={`relative flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                                isSelected
+                                  ? "border-indigo-500 bg-indigo-50"
+                                  : "border-gray-200 hover:border-gray-300 bg-white"
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                value={type.value}
+                                {...register("type", { required: true })}
+                                className="sr-only"
+                              />
+                              <div
+                                className={`w-10 h-10 rounded-lg bg-gradient-to-br ${type.color} flex items-center justify-center text-white mb-2`}
+                              >
+                                <Icon className="w-5 h-5" />
+                              </div>
+                              <span className={`text-xs text-center font-medium ${isSelected ? "text-indigo-700" : "text-gray-600"}`}>
+                                {type.label}
+                              </span>
+                              {isSelected && (
+                                <div className="absolute top-2 right-2 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center">
+                                  <CheckCircle className="w-3 h-3 text-white" />
+                                </div>
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -284,6 +347,31 @@ export default function ContactPage() {
                         )}
                       </div>
                     </div>
+
+                    {/* Champs optionnels pour partenariat */}
+                    {(selectedType === "partenariat" || selectedType === "contact") && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Téléphone
+                          </label>
+                          <Input
+                            {...register("phone")}
+                            placeholder="06 12 34 56 78"
+                            type="tel"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            {selectedType === "partenariat" ? "École / Entreprise" : "Organisation"}
+                          </label>
+                          <Input
+                            {...register("company")}
+                            placeholder={selectedType === "partenariat" ? "Nom de votre école" : "Nom de votre organisation"}
+                          />
+                        </div>
+                      </div>
+                    )}
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
