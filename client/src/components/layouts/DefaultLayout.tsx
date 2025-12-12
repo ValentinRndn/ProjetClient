@@ -12,7 +12,6 @@ import {
   TargetIcon,
   UserIcon,
   LayoutDashboardIcon,
-  BuildingIcon,
   UsersIcon,
   ShieldIcon,
   MapPin,
@@ -90,16 +89,6 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
             <UserIcon className="w-4 h-4 text-indigo-600" />
           </div>
           <span className="text-gray-700">Trouver un intervenant</span>
-        </NavLink>,
-        <NavLink
-          key="register-ecole"
-          to="/register"
-          className="flex items-center gap-3 hover:bg-indigo-50 p-3 rounded-xl transition-colors"
-        >
-          <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-            <BuildingIcon className="w-4 h-4 text-indigo-600" />
-          </div>
-          <span className="text-gray-700">Créer un compte école</span>
         </NavLink>,
       ]}
     />,
@@ -283,7 +272,6 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       links: [
         { label: "Trouver un intervenant", to: "/intervenants" },
         { label: "Proposer une mission", to: "/nouvelle-mission" },
-        { label: "Créer un compte", to: "/register" },
       ],
     },
     {
