@@ -25,7 +25,8 @@
       "Bash(docker restart:*)",
       "Bash(timeout:*)",
       "Bash(ping:*)",
-      "Bash(docker-compose restart:*)"
+      "Bash(docker-compose restart:*)",
+      "Bash(git add:*)"
     ]
   }
 }
