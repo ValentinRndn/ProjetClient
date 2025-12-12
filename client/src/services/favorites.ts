@@ -2,7 +2,7 @@
  * Service de gestion des favoris (écoles uniquement)
  */
 
-import api from "./api";
+import api from "@/lib/api";
 
 export interface Favorite {
   id: string;
@@ -64,10 +64,8 @@ export async function getMyFavorites(
   page = 1,
   limit = 20
 ): Promise<FavoritesResponse> {
-  const response = await api.get<FavoritesResponse>(
-    `/favorites?page=${page}&limit=${limit}`
-  );
-  return response.data;
+  // L'intercepteur retourne directement response.data
+  return api.get(`/favorites?page=${page}&limit=${limit}`);
 }
 
 /**
@@ -77,11 +75,10 @@ export async function addFavorite(
   intervenantId: string,
   note?: string
 ): Promise<AddFavoriteResponse> {
-  const response = await api.post<AddFavoriteResponse>("/favorites", {
+  return api.post("/favorites", {
     intervenantId,
     note,
   });
-  return response.data;
 }
 
 /**
@@ -90,10 +87,7 @@ export async function addFavorite(
 export async function checkFavorite(
   intervenantId: string
 ): Promise<CheckFavoriteResponse> {
-  const response = await api.get<CheckFavoriteResponse>(
-    `/favorites/check/${intervenantId}`
-  );
-  return response.data;
+  return api.get(`/favorites/check/${intervenantId}`);
 }
 
 /**
@@ -103,11 +97,7 @@ export async function updateFavoriteNote(
   intervenantId: string,
   note: string
 ): Promise<{ success: boolean; data: Favorite }> {
-  const response = await api.patch<{ success: boolean; data: Favorite }>(
-    `/favorites/${intervenantId}`,
-    { note }
-  );
-  return response.data;
+  return api.patch(`/favorites/${intervenantId}`, { note });
 }
 
 /**
@@ -116,10 +106,7 @@ export async function updateFavoriteNote(
 export async function removeFavorite(
   intervenantId: string
 ): Promise<{ success: boolean; message: string }> {
-  const response = await api.delete<{ success: boolean; message: string }>(
-    `/favorites/${intervenantId}`
-  );
-  return response.data;
+  return api.delete(`/favorites/${intervenantId}`);
 }
 
 /**

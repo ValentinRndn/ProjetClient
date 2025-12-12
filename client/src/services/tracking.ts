@@ -5,7 +5,7 @@
  * ============================================
  */
 
-import api from "./api";
+import api from "@/lib/api";
 
 export interface Consultation {
   id: string;
@@ -70,12 +70,11 @@ export async function trackConsultation(
   source: "profil" | "liste" | "recherche" | "mission" = "profil",
   duration?: number
 ): Promise<{ success: boolean; data: { id: string } }> {
-  const response = await api.post("/tracking/consultation", {
+  return api.post("/tracking/consultation", {
     intervenantId,
     source,
     duration,
   });
-  return response.data;
 }
 
 /**
@@ -94,8 +93,7 @@ export async function getConsultations(
   if (params.limit) searchParams.append("limit", params.limit.toString());
 
   const query = searchParams.toString();
-  const response = await api.get(`/tracking/consultations${query ? `?${query}` : ""}`);
-  return response.data;
+  return api.get(`/tracking/consultations${query ? `?${query}` : ""}`);
 }
 
 /**
@@ -104,16 +102,14 @@ export async function getConsultations(
 export async function getIntervenantStats(
   intervenantId: string
 ): Promise<{ success: boolean; data: TrackingStats }> {
-  const response = await api.get(`/tracking/stats/intervenant/${intervenantId}`);
-  return response.data;
+  return api.get(`/tracking/stats/intervenant/${intervenantId}`);
 }
 
 /**
  * Récupère les stats globales (admin)
  */
 export async function getGlobalStats(): Promise<{ success: boolean; data: TrackingStats }> {
-  const response = await api.get("/tracking/stats/global");
-  return response.data;
+  return api.get("/tracking/stats/global");
 }
 
 /**
@@ -134,8 +130,8 @@ export async function exportConsultationsCSV(
     responseType: "blob",
   });
 
-  // Télécharger le fichier
-  const url = window.URL.createObjectURL(new Blob([response.data]));
+  // Télécharger le fichier (response est directement le blob)
+  const url = window.URL.createObjectURL(new Blob([response]));
   const link = document.createElement("a");
   link.href = url;
   link.setAttribute("download", `consultations-${new Date().toISOString().split("T")[0]}.csv`);

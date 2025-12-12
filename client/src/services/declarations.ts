@@ -2,7 +2,7 @@
  * Service de gestion des déclarations d'activité (URSSAF-like)
  */
 
-import api from "./api";
+import api from "@/lib/api";
 
 export interface Declaration {
   id: string;
@@ -77,10 +77,7 @@ export async function getDeclarations(
   params.append("page", String(page));
   params.append("limit", String(limit));
 
-  const response = await api.get<DeclarationsResponse>(
-    `/declarations?${params.toString()}`
-  );
-  return response.data;
+  return api.get(`/declarations?${params.toString()}`);
 }
 
 /**
@@ -89,10 +86,7 @@ export async function getDeclarations(
 export async function getDeclaration(
   id: string
 ): Promise<{ success: boolean; data: Declaration }> {
-  const response = await api.get<{ success: boolean; data: Declaration }>(
-    `/declarations/${id}`
-  );
-  return response.data;
+  return api.get(`/declarations/${id}`);
 }
 
 /**
@@ -101,12 +95,7 @@ export async function getDeclaration(
 export async function createDeclaration(
   data: CreateDeclarationData
 ): Promise<{ success: boolean; message: string; data: Declaration }> {
-  const response = await api.post<{
-    success: boolean;
-    message: string;
-    data: Declaration;
-  }>("/declarations", data);
-  return response.data;
+  return api.post("/declarations", data);
 }
 
 /**
@@ -116,12 +105,7 @@ export async function updateDeclaration(
   id: string,
   data: UpdateDeclarationData
 ): Promise<{ success: boolean; message: string; data: Declaration }> {
-  const response = await api.patch<{
-    success: boolean;
-    message: string;
-    data: Declaration;
-  }>(`/declarations/${id}`, data);
-  return response.data;
+  return api.patch(`/declarations/${id}`, data);
 }
 
 /**
@@ -130,10 +114,7 @@ export async function updateDeclaration(
 export async function deleteDeclaration(
   id: string
 ): Promise<{ success: boolean; message: string }> {
-  const response = await api.delete<{ success: boolean; message: string }>(
-    `/declarations/${id}`
-  );
-  return response.data;
+  return api.delete(`/declarations/${id}`);
 }
 
 /**
@@ -142,12 +123,7 @@ export async function deleteDeclaration(
 export async function validerDeclaration(
   id: string
 ): Promise<{ success: boolean; message: string; data: Declaration }> {
-  const response = await api.post<{
-    success: boolean;
-    message: string;
-    data: Declaration;
-  }>(`/declarations/${id}/valider`);
-  return response.data;
+  return api.post(`/declarations/${id}/valider`);
 }
 
 /**

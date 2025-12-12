@@ -5,7 +5,7 @@
  * ============================================
  */
 
-import api from "./api";
+import api from "@/lib/api";
 
 export interface LigneFacture {
   description: string;
@@ -112,16 +112,14 @@ export async function getFactures(
   if (params.limit) searchParams.append("limit", params.limit.toString());
 
   const query = searchParams.toString();
-  const response = await api.get(`/factures${query ? `?${query}` : ""}`);
-  return response.data;
+  return api.get(`/factures${query ? `?${query}` : ""}`);
 }
 
 /**
  * Récupère une facture par son ID
  */
 export async function getFacture(id: string): Promise<{ success: boolean; data: Facture }> {
-  const response = await api.get(`/factures/${id}`);
-  return response.data;
+  return api.get(`/factures/${id}`);
 }
 
 /**
@@ -130,8 +128,7 @@ export async function getFacture(id: string): Promise<{ success: boolean; data: 
 export async function createFacture(
   data: CreateFactureData
 ): Promise<{ success: boolean; message: string; data: Facture }> {
-  const response = await api.post("/factures", data);
-  return response.data;
+  return api.post("/factures", data);
 }
 
 /**
@@ -141,8 +138,7 @@ export async function updateFacture(
   id: string,
   data: UpdateFactureData
 ): Promise<{ success: boolean; message: string; data: Facture }> {
-  const response = await api.patch(`/factures/${id}`, data);
-  return response.data;
+  return api.patch(`/factures/${id}`, data);
 }
 
 /**
@@ -151,8 +147,7 @@ export async function updateFacture(
 export async function deleteFacture(
   id: string
 ): Promise<{ success: boolean; message: string }> {
-  const response = await api.delete(`/factures/${id}`);
-  return response.data;
+  return api.delete(`/factures/${id}`);
 }
 
 /**
@@ -161,8 +156,7 @@ export async function deleteFacture(
 export async function envoyerFacture(
   id: string
 ): Promise<{ success: boolean; message: string; data: Facture }> {
-  const response = await api.post(`/factures/${id}/envoyer`);
-  return response.data;
+  return api.post(`/factures/${id}/envoyer`);
 }
 
 /**
@@ -172,8 +166,7 @@ export async function marquerPayee(
   id: string,
   data?: { modePaiement?: string; reference?: string }
 ): Promise<{ success: boolean; message: string; data: Facture }> {
-  const response = await api.post(`/factures/${id}/marquer-payee`, data || {});
-  return response.data;
+  return api.post(`/factures/${id}/marquer-payee`, data || {});
 }
 
 /**
@@ -220,8 +213,7 @@ export function getStatusColor(status: string): string {
 export async function genererPDF(
   id: string
 ): Promise<{ success: boolean; message: string; data: { pdfPath: string } }> {
-  const response = await api.post(`/factures/${id}/generer-pdf`);
-  return response.data;
+  return api.post(`/factures/${id}/generer-pdf`);
 }
 
 /**
@@ -232,8 +224,8 @@ export async function telechargerPDF(id: string, numero: string): Promise<void> 
     responseType: "blob",
   });
 
-  // Créer un lien de téléchargement
-  const url = window.URL.createObjectURL(new Blob([response.data]));
+  // Créer un lien de téléchargement (response est directement le blob car pas de structure {success, data})
+  const url = window.URL.createObjectURL(new Blob([response]));
   const link = document.createElement("a");
   link.href = url;
   link.setAttribute("download", `Facture-${numero}.pdf`);

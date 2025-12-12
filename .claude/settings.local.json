@@ -17,7 +17,15 @@
       "Bash(grep:*)",
       "Bash(find:*)",
       "Bash(docker-compose up:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(docker info:*)",
+      "Bash(docker rm:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker restart:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)",
+      "Bash(docker-compose restart:*)"
     ]
   }
 }

@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import {
   FileText,
   Search,
@@ -18,7 +18,6 @@ import {
   Clock,
   Download,
   Eye,
-  MoreVertical,
   Calendar,
   Euro,
   Building,
@@ -39,7 +38,7 @@ import {
   type Facture,
   type FacturesQueryParams,
 } from "@/services/factures";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function FacturesPage() {
   const { user } = useAuth();
