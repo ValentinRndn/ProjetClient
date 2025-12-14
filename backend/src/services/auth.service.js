@@ -58,9 +58,12 @@ export async function register(data) {
       },
     });
 
+    let ecole = null;
+    let intervenant = null;
+
     // Créer l'entité liée selon le rôle
     if (role === 'ECOLE') {
-      await tx.ecole.create({
+      ecole = await tx.ecole.create({
         data: {
           name: ecoleData.name,
           contactEmail: ecoleData.contactEmail || email,
@@ -70,9 +73,11 @@ export async function register(data) {
         },
       });
     } else if (role === 'INTERVENANT') {
-      await tx.intervenant.create({
+      intervenant = await tx.intervenant.create({
         data: {
           userId: user.id,
+          firstName: intervenantData?.firstName,
+          lastName: intervenantData?.lastName,
           bio: intervenantData?.bio,
           siret: intervenantData?.siret,
           disponibility: intervenantData?.disponibility,
@@ -81,11 +86,11 @@ export async function register(data) {
       });
     }
 
-    return user;
+    return { user, ecole, intervenant };
   });
 
   // Générer les tokens
-  const payload = { sub: result.id, email: result.email, role: result.role };
+  const payload = { sub: result.user.id, email: result.user.email, role: result.user.role };
   const accessToken = signAccessToken(payload);
   const refreshToken = signRefreshToken(payload);
 
@@ -94,16 +99,18 @@ export async function register(data) {
   await prisma.refreshToken.create({
     data: {
       token: refreshToken,
-      userId: result.id,
+      userId: result.user.id,
       expiresAt,
     },
   });
 
   return {
     user: {
-      id: result.id,
-      email: result.email,
-      role: result.role,
+      id: result.user.id,
+      email: result.user.email,
+      role: result.user.role,
+      ecole: result.ecole,
+      intervenant: result.intervenant,
     },
     accessToken,
     refreshToken,

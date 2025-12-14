@@ -31,6 +31,14 @@ export async function findAll(options = {}) {
       userId: true,
       createdAt: true,
       updatedAt: true,
+      // Champs profil enrichi
+      phone: true,
+      city: true,
+      yearsExperience: true,
+      expertises: true,
+      videoUrl: true,
+      linkedinUrl: true,
+      website: true,
       user: {
         select: { id: true, email: true, role: true },
       },
@@ -65,6 +73,14 @@ export async function findById(id) {
       userId: true,
       createdAt: true,
       updatedAt: true,
+      // Champs profil enrichi
+      phone: true,
+      city: true,
+      yearsExperience: true,
+      expertises: true,
+      videoUrl: true,
+      linkedinUrl: true,
+      website: true,
       user: {
         select: { id: true, email: true, role: true },
       },

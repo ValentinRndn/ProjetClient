@@ -1,20 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { getIntervenantById, uploadDocument, deleteDocument, getDocumentDownloadUrl, type Document } from "@/services/intervenants";
+import { getIntervenantById, uploadDocument, deleteDocument, fetchDocumentAsBlob, type Document } from "@/services/intervenants";
 import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
-import { motion } from "motion/react";
 import {
   FileText,
   Upload,
   CheckCircle,
-  AlertCircle,
-  Clock,
   Trash2,
   Eye,
   ArrowLeft,
-  ArrowRight,
   Shield,
   Award,
   CreditCard,
@@ -22,7 +18,9 @@ import {
   User,
   FileCheck,
   Camera,
-  HelpCircle,
+  FolderOpen,
+  Download,
+  AlertTriangle,
 } from "lucide-react";
 import { Link } from "react-router";
 
@@ -35,7 +33,6 @@ const DOCUMENT_REQUIREMENTS = [
     icon: Camera,
     required: true,
     accepts: ".jpg,.jpeg,.png",
-    color: "indigo",
   },
   {
     type: "CV",
@@ -44,7 +41,6 @@ const DOCUMENT_REQUIREMENTS = [
     icon: FileText,
     required: true,
     accepts: ".pdf,.doc,.docx",
-    color: "blue",
   },
   {
     type: "DIPLOME",
@@ -53,7 +49,6 @@ const DOCUMENT_REQUIREMENTS = [
     icon: Award,
     required: true,
     accepts: ".pdf,.jpg,.jpeg,.png",
-    color: "amber",
     multiple: true,
   },
   {
@@ -63,7 +58,6 @@ const DOCUMENT_REQUIREMENTS = [
     icon: User,
     required: true,
     accepts: ".pdf,.jpg,.jpeg,.png",
-    color: "red",
     sensitive: true,
   },
   {
@@ -73,7 +67,6 @@ const DOCUMENT_REQUIREMENTS = [
     icon: Building,
     required: true,
     accepts: ".pdf",
-    color: "emerald",
   },
   {
     type: "RIB",
@@ -82,7 +75,6 @@ const DOCUMENT_REQUIREMENTS = [
     icon: CreditCard,
     required: true,
     accepts: ".pdf,.jpg,.jpeg,.png",
-    color: "purple",
     sensitive: true,
   },
   {
@@ -92,7 +84,6 @@ const DOCUMENT_REQUIREMENTS = [
     icon: Shield,
     required: true,
     accepts: ".pdf",
-    color: "cyan",
   },
   {
     type: "ATTESTATION_URSSAF",
@@ -101,7 +92,6 @@ const DOCUMENT_REQUIREMENTS = [
     icon: FileCheck,
     required: false,
     accepts: ".pdf",
-    color: "orange",
   },
   {
     type: "ATTESTATION_FISCALE",
@@ -110,7 +100,6 @@ const DOCUMENT_REQUIREMENTS = [
     icon: FileCheck,
     required: false,
     accepts: ".pdf",
-    color: "teal",
   },
   {
     type: "CASIER_JUDICIAIRE",
@@ -119,18 +108,18 @@ const DOCUMENT_REQUIREMENTS = [
     icon: FileCheck,
     required: false,
     accepts: ".pdf",
-    color: "slate",
     sensitive: true,
   },
 ];
 
 export default function OnboardingDocumentsPage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [intervenant, setIntervenant] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [uploadingType, setUploadingType] = useState<string | null>(null);
+  const [hasTriedRefresh, setHasTriedRefresh] = useState(false);
 
   useEffect(() => {
     fetchIntervenant();
@@ -138,6 +127,15 @@ export default function OnboardingDocumentsPage() {
 
   const fetchIntervenant = async () => {
     if (!user?.intervenant?.id) {
+      if (!hasTriedRefresh && user?.role === "INTERVENANT") {
+        setHasTriedRefresh(true);
+        try {
+          await refreshUser();
+        } catch {
+          setIsLoading(false);
+        }
+        return;
+      }
       setIsLoading(false);
       return;
     }
@@ -172,7 +170,7 @@ export default function OnboardingDocumentsPage() {
     }
   };
 
-  const handleDelete = async (docId: string, docType: string) => {
+  const handleDelete = async (docId: string) => {
     if (!user?.intervenant?.id || !confirm("Êtes-vous sûr de vouloir supprimer ce document ?")) return;
 
     try {
@@ -181,6 +179,21 @@ export default function OnboardingDocumentsPage() {
       await fetchIntervenant();
     } catch (err) {
       setError("Erreur lors de la suppression");
+    }
+  };
+
+  const handleView = async (docId: string) => {
+    if (!intervenant?.id) return;
+
+    try {
+      const blobUrl = await fetchDocumentAsBlob(intervenant.id, docId);
+      if (blobUrl) {
+        window.open(blobUrl, "_blank");
+      } else {
+        setError("Impossible d'afficher le document");
+      }
+    } catch {
+      setError("Erreur lors de l'affichage du document");
     }
   };
 
@@ -204,13 +217,13 @@ export default function OnboardingDocumentsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <PageContainer maxWidth="4xl">
+      <div className="min-h-screen bg-[#ebf2fa]">
+        <PageContainer maxWidth="4xl" className="py-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-8 bg-white rounded w-1/3"></div>
             <div className="bg-white rounded-2xl p-8 space-y-4">
               {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="h-24 bg-gray-200 rounded-xl"></div>
+                <div key={i} className="h-24 bg-[#ebf2fa] rounded-xl"></div>
               ))}
             </div>
           </div>
@@ -221,8 +234,8 @@ export default function OnboardingDocumentsPage() {
 
   if (!intervenant) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <PageContainer maxWidth="4xl">
+      <div className="min-h-screen bg-[#ebf2fa]">
+        <PageContainer maxWidth="4xl" className="py-8">
           <Alert type="error">Profil intervenant non trouvé</Alert>
         </PageContainer>
       </div>
@@ -230,119 +243,126 @@ export default function OnboardingDocumentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-mesh">
-        <PageContainer maxWidth="4xl" className="py-8">
+    <div className="min-h-screen bg-[#ebf2fa]">
+      <PageContainer maxWidth="4xl" className="py-8">
+        {/* Header compact */}
+        <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 mb-6">
           <Link
             to="/dashboard/intervenant"
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-[#1c2942]/60 hover:text-[#6d74b5] mb-4 transition-colors text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour au tableau de bord
           </Link>
-          <h1 className="text-3xl font-bold text-white">Dossier de candidature</h1>
-          <p className="text-white/80 mt-2">
-            Complétez votre dossier pour valider votre inscription sur la plateforme
-          </p>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#1c2942] rounded-xl flex items-center justify-center">
+                <FolderOpen className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-[#1c2942]">Dossier de candidature</h1>
+                <p className="text-sm text-[#1c2942]/60">Complétez votre dossier pour valider votre inscription</p>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-[#ebf2fa] rounded-lg">
+                <FileText className="w-4 h-4 text-[#6d74b5]" />
+                <span className="font-bold text-[#1c2942]">{stats.completed}/{stats.total}</span>
+                <span className="text-sm text-[#1c2942]/60">requis</span>
+              </div>
+            </div>
+          </div>
 
           {/* Progress bar */}
-          <div className="mt-6 bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-white font-medium">Progression du dossier</span>
-              <span className="text-white font-bold">{stats.completed}/{stats.total} documents requis</span>
+          <div className="mt-6 pt-4 border-t border-[#1c2942]/10">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-[#1c2942]/60">Progression du dossier</span>
+              <span className="font-medium text-[#1c2942]">{stats.percentage}%</span>
             </div>
-            <div className="h-3 bg-white/20 rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${stats.percentage}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className={`h-full rounded-full ${
-                  stats.percentage === 100 ? "bg-emerald-400" : "bg-amber-400"
+            <div className="h-2 bg-[#ebf2fa] rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  stats.percentage === 100 ? "bg-emerald-500" : "bg-[#6d74b5]"
                 }`}
+                style={{ width: `${stats.percentage}%` }}
               />
             </div>
             {stats.percentage === 100 && (
-              <p className="text-emerald-300 text-sm mt-2 flex items-center gap-2">
+              <p className="text-emerald-600 text-sm mt-2 flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
                 Tous les documents requis sont téléversés !
               </p>
             )}
           </div>
-        </PageContainer>
-      </div>
+        </div>
 
-      <PageContainer maxWidth="4xl" className="py-8 -mt-8">
+        {/* Alerts */}
         {error && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <div className="mb-6">
             <Alert type="error" onClose={() => setError(null)}>{error}</Alert>
-          </motion.div>
+          </div>
         )}
 
         {success && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <div className="mb-6">
             <Alert type="success" onClose={() => setSuccess(null)}>{success}</Alert>
-          </motion.div>
+          </div>
         )}
 
         {/* Help box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-              <HelpCircle className="w-6 h-6 text-blue-600" />
-            </div>
+        <div className="bg-[#6d74b5]/10 border border-[#6d74b5]/20 rounded-2xl p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-[#6d74b5] mt-0.5 shrink-0" />
             <div>
-              <h3 className="font-bold text-blue-900 mb-1">Documents requis pour valider votre profil</h3>
-              <p className="text-blue-700 text-sm">
-                Les documents marqués comme <span className="font-semibold">obligatoires</span> doivent être fournis pour que votre profil soit validé.
-                Les documents sensibles sont stockés de manière sécurisée et ne sont accessibles qu'à l'administration.
+              <p className="text-sm text-[#1c2942]">
+                Les documents marqués <span className="font-semibold text-amber-600">Obligatoire</span> doivent être fournis pour valider votre profil.
+                Les documents <span className="font-semibold text-red-600">sensibles</span> sont stockés de manière sécurisée.
               </p>
             </div>
           </div>
         </div>
 
         {/* Documents list */}
-        <div className="space-y-4">
-          {DOCUMENT_REQUIREMENTS.map((req, idx) => {
+        <div className="space-y-3">
+          {DOCUMENT_REQUIREMENTS.map((req) => {
             const docsOfType = getDocumentsOfType(req.type);
             const hasDoc = docsOfType.length > 0;
             const Icon = req.icon;
             const isUploading = uploadingType === req.type;
 
             return (
-              <motion.div
+              <div
                 key={req.type}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                className={`bg-white rounded-2xl shadow-lg border ${
-                  hasDoc ? "border-emerald-200" : req.required ? "border-amber-200" : "border-gray-100"
-                } overflow-hidden`}
+                className={`bg-white rounded-2xl border transition-all ${
+                  hasDoc
+                    ? "border-emerald-200"
+                    : req.required
+                      ? "border-amber-200"
+                      : "border-[#1c2942]/10"
+                }`}
               >
-                <div className="p-6">
+                <div className="p-5">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                    <div className="flex items-start gap-4 flex-1 min-w-0">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                         hasDoc
                           ? "bg-emerald-100 text-emerald-600"
-                          : `bg-${req.color}-100 text-${req.color}-600`
-                      }`}
-                        style={{
-                          backgroundColor: hasDoc ? undefined : `var(--color-${req.color}-100, #e0e7ff)`,
-                          color: hasDoc ? undefined : `var(--color-${req.color}-600, #4f46e5)`,
-                        }}
-                      >
-                        {hasDoc ? <CheckCircle className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
+                          : "bg-[#ebf2fa] text-[#6d74b5]"
+                      }`}>
+                        {hasDoc ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900">{req.label}</h3>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-[#1c2942]">{req.label}</h3>
                           {req.required ? (
                             <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
                               Obligatoire
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">
+                            <span className="px-2 py-0.5 bg-[#ebf2fa] text-[#1c2942]/50 text-xs font-medium rounded-full">
                               Optionnel
                             </span>
                           )}
@@ -353,7 +373,7 @@ export default function OnboardingDocumentsPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500">{req.description}</p>
+                        <p className="text-sm text-[#1c2942]/60">{req.description}</p>
 
                         {/* Uploaded documents */}
                         {docsOfType.length > 0 && (
@@ -361,26 +381,26 @@ export default function OnboardingDocumentsPage() {
                             {docsOfType.map(doc => (
                               <div
                                 key={doc.id}
-                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                className="flex items-center justify-between p-3 bg-[#ebf2fa] rounded-xl"
                               >
-                                <div className="flex items-center gap-2">
-                                  <FileText className="w-4 h-4 text-gray-400" />
-                                  <span className="text-sm text-gray-700 truncate max-w-[200px]">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <FileText className="w-4 h-4 text-[#6d74b5] shrink-0" />
+                                  <span className="text-sm text-[#1c2942] truncate">
                                     {doc.fileName}
                                   </span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <a
-                                    href={getDocumentDownloadUrl(intervenant.id, doc.id)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                <div className="flex items-center gap-1 shrink-0">
+                                  <button
+                                    onClick={() => handleView(doc.id)}
+                                    className="p-2 text-[#1c2942]/50 hover:text-[#6d74b5] hover:bg-white rounded-lg transition-colors"
+                                    title="Voir"
                                   >
                                     <Eye className="w-4 h-4" />
-                                  </a>
+                                  </button>
                                   <button
-                                    onClick={() => handleDelete(doc.id, doc.type)}
-                                    className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    onClick={() => handleDelete(doc.id)}
+                                    className="p-2 text-[#1c2942]/50 hover:text-red-600 hover:bg-white rounded-lg transition-colors"
+                                    title="Supprimer"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </button>
@@ -395,14 +415,14 @@ export default function OnboardingDocumentsPage() {
                     {/* Upload button */}
                     <div className="shrink-0">
                       {(!hasDoc || req.multiple) && (
-                        <label className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl cursor-pointer transition-colors ${
+                        <label className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl cursor-pointer transition-all text-sm font-medium ${
                           isUploading
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-indigo-600 text-white hover:bg-indigo-700"
+                            ? "bg-[#ebf2fa] text-[#1c2942]/40 cursor-not-allowed"
+                            : "bg-[#6d74b5] text-white hover:bg-[#5a61a0]"
                         }`}>
                           {isUploading ? (
                             <>
-                              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                              <div className="w-4 h-4 border-2 border-[#1c2942]/20 border-t-[#1c2942]/60 rounded-full animate-spin" />
                               Upload...
                             </>
                           ) : (
@@ -423,13 +443,13 @@ export default function OnboardingDocumentsPage() {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
 
         {/* Bottom actions */}
-        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+        <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white rounded-2xl border border-[#1c2942]/10 p-6">
           <div className="text-center sm:text-left">
             {stats.percentage === 100 ? (
               <p className="text-emerald-600 font-medium flex items-center gap-2">
@@ -437,22 +457,21 @@ export default function OnboardingDocumentsPage() {
                 Votre dossier est complet !
               </p>
             ) : (
-              <p className="text-gray-600">
+              <p className="text-[#1c2942]/60">
                 Il vous reste <span className="font-semibold text-amber-600">{stats.total - stats.completed} document(s)</span> à téléverser
               </p>
             )}
           </div>
           <div className="flex gap-3">
             <Link to="/dashboard/intervenant/profil">
-              <Button variant="secondary">
+              <Button variant="outline" className="rounded-xl">
                 <ArrowLeft className="w-4 h-4" />
                 Mon profil
               </Button>
             </Link>
             <Link to="/dashboard/intervenant">
-              <Button>
+              <Button variant="primary" className="bg-[#6d74b5] hover:bg-[#5a61a0] rounded-xl">
                 Tableau de bord
-                <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>

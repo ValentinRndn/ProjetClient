@@ -270,9 +270,21 @@ export async function downloadDocument(req, res, next) {
         .json({ success: false, message: "Document non trouvé." });
     }
 
-    // Vérifier que l'intervenant est approuvé (sécurité : seuls les CV/photos de profil des intervenants approuvés sont publics)
+    // Vérifier l'accès au document
     const intervenant = await intervenantsService.findById(id);
-    if (!intervenant || intervenant.status !== "approved") {
+    if (!intervenant) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Intervenant non trouvé." });
+    }
+
+    // Autoriser l'accès si :
+    // 1. L'intervenant est approuvé (accès public)
+    // 2. C'est l'utilisateur propriétaire du document (vérifié via token si présent)
+    const isOwner = req.user && intervenant.userId === req.user.id;
+    const isApproved = intervenant.status === "approved";
+
+    if (!isApproved && !isOwner) {
       return res
         .status(403)
         .json({ success: false, message: "Document non accessible." });

@@ -26,7 +26,10 @@ const app = express();
 // ============================================
 // Middlewares de sécurité et parsing
 // ============================================
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+}));
 app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json({ limit: '10mb' }));
 app.use(morgan('dev'));

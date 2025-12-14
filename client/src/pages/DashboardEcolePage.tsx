@@ -17,6 +17,7 @@ import {
   Target,
   History,
   Heart,
+  Mail,
 } from "lucide-react";
 
 export default function DashboardEcolePage() {
@@ -51,7 +52,6 @@ export default function DashboardEcolePage() {
     total: missions.length,
     active: missions.filter((m) => m.status === "ACTIVE").length,
     completed: missions.filter((m) => m.status === "COMPLETED").length,
-    draft: missions.filter((m) => m.status === "DRAFT").length,
     withIntervenant: missions.filter((m) => m.intervenant).length,
   };
 
@@ -64,17 +64,20 @@ export default function DashboardEcolePage() {
         <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#1c2942] rounded-xl flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-white" />
+              <div className="w-14 h-14 bg-[#1c2942] rounded-xl flex items-center justify-center">
+                <Building2 className="w-7 h-7 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-[#1c2942]">{ecoleName}</h1>
-                <p className="text-sm text-[#1c2942]/60">Espace École</p>
+                <div className="flex items-center gap-2 text-sm text-[#1c2942]/60">
+                  <Mail className="w-4 h-4" />
+                  <span>{user?.email}</span>
+                </div>
               </div>
             </div>
 
             <Link to="/nouvelle-mission">
-              <Button variant="primary" size="md">
+              <Button variant="primary" size="md" className="bg-[#6d74b5] hover:bg-[#5a61a0]">
                 <Plus className="w-4 h-4" />
                 Nouvelle mission
               </Button>
@@ -97,6 +100,7 @@ export default function DashboardEcolePage() {
             ))}
           </div>
         </div>
+
         {error && (
           <div className="mb-6">
             <Alert type="error" onClose={() => setError(null)}>
@@ -105,148 +109,148 @@ export default function DashboardEcolePage() {
           </div>
         )}
 
-        {/* Actions rapides */}
-        <div className="bg-white rounded-2xl border border-[#1c2942]/10 shadow-lg p-6 mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-[#ebf2fa] rounded-xl flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-[#6d74b5]" />
+        {isLoading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white rounded-2xl border border-[#1c2942]/10 p-6 animate-pulse">
+              <div className="h-6 bg-[#ebf2fa] rounded w-1/3 mb-6"></div>
+              <div className="space-y-4">
+                <div className="h-24 bg-[#ebf2fa] rounded"></div>
+                <div className="h-24 bg-[#ebf2fa] rounded"></div>
+              </div>
             </div>
-            <h2 className="text-xl font-bold text-[#1c2942]">Actions rapides</h2>
+            <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 animate-pulse">
+              <div className="h-6 bg-[#ebf2fa] rounded w-1/2 mb-6"></div>
+              <div className="space-y-3">
+                <div className="h-16 bg-[#ebf2fa] rounded-xl"></div>
+                <div className="h-16 bg-[#ebf2fa] rounded-xl"></div>
+                <div className="h-16 bg-[#ebf2fa] rounded-xl"></div>
+              </div>
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <Link to="/nouvelle-mission" className="group">
-              <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#1c2942] rounded-lg flex items-center justify-center">
-                    <Plus className="w-5 h-5 text-white" />
+        ) : (
+          <>
+            {/* Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Missions récentes */}
+              <div className="lg:col-span-2 bg-white rounded-2xl border border-[#1c2942]/10 shadow-lg p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#ebf2fa] rounded-xl flex items-center justify-center">
+                      <Briefcase className="w-5 h-5 text-[#6d74b5]" />
+                    </div>
+                    <h2 className="text-xl font-bold text-[#1c2942]">Mes missions récentes</h2>
                   </div>
-                  <div>
-                    <p className="font-semibold text-[#1c2942]">Proposer une mission</p>
-                    <p className="text-sm text-[#1c2942]/60">Créer une nouvelle mission</p>
-                  </div>
+                  <Link to="/mes-missions">
+                    <Button variant="outline" size="sm" className="rounded-xl">
+                      Voir tout
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
                 </div>
-                <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+
+                {missions.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-[#ebf2fa] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Briefcase className="w-8 h-8 text-[#6d74b5]" />
+                    </div>
+                    <h3 className="text-lg font-bold text-[#1c2942] mb-2">Aucune mission</h3>
+                    <p className="text-[#1c2942]/60 mb-6">
+                      Commencez par créer votre première mission
+                    </p>
+                    <Link to="/nouvelle-mission">
+                      <Button variant="primary" className="bg-[#6d74b5] hover:bg-[#5a61a0]">
+                        <Plus className="w-4 h-4" />
+                        Créer une mission
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {missions.slice(0, 3).map((mission) => (
+                      <MissionCard
+                        key={mission.id}
+                        mission={mission}
+                        showApplyButton={false}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            </Link>
 
-            <Link to="/intervenants" className="group">
-              <div className="flex items-center justify-between p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-white" />
+              {/* Actions rapides */}
+              <div className="bg-white rounded-2xl border border-[#1c2942]/10 shadow-lg p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-[#ebf2fa] rounded-xl flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-[#6d74b5]" />
                   </div>
-                  <div>
-                    <p className="font-semibold text-[#1c2942]">Trouver un intervenant</p>
-                    <p className="text-sm text-[#1c2942]/60">Parcourir les profils</p>
-                  </div>
+                  <h2 className="text-xl font-bold text-[#1c2942]">Actions rapides</h2>
                 </div>
-                <ArrowRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+
+                <div className="space-y-3">
+                  <Link to="/nouvelle-mission" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#1c2942] rounded-lg flex items-center justify-center">
+                          <Plus className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Proposer une mission</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/intervenants" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
+                          <Users className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Trouver un intervenant</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/mes-missions" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#6d74b5] rounded-lg flex items-center justify-center">
+                          <Briefcase className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Gérer mes missions</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/dashboard/ecole/favoris" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-rose-500 rounded-lg flex items-center justify-center">
+                          <Heart className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Mes favoris</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-rose-600 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/dashboard/ecole/historique" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#1c2942] rounded-lg flex items-center justify-center">
+                          <History className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Historique</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+                </div>
               </div>
-            </Link>
-
-            <Link to="/dashboard/ecole/favoris" className="group">
-              <div className="flex items-center justify-between p-4 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-rose-500 rounded-lg flex items-center justify-center">
-                    <Heart className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#1c2942]">Mes favoris</p>
-                    <p className="text-sm text-[#1c2942]/60">Intervenants favoris</p>
-                  </div>
-                </div>
-                <ArrowRight className="w-5 h-5 text-rose-600 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-
-            <Link to="/missions" className="group">
-              <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#6d74b5] rounded-lg flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#1c2942]">Voir les missions</p>
-                    <p className="text-sm text-[#1c2942]/60">Toutes les missions</p>
-                  </div>
-                </div>
-                <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-
-            <Link to="/dashboard/ecole/historique" className="group">
-              <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#1c2942] rounded-lg flex items-center justify-center">
-                    <History className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#1c2942]">Historique</p>
-                    <p className="text-sm text-[#1c2942]/60">Mes collaborations</p>
-                  </div>
-                </div>
-                <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* Liste des missions */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-[#1c2942]">Mes missions récentes</h2>
-            <Link to="/mes-missions">
-              <Button variant="outline" size="sm" className="rounded-xl">
-                Voir tout
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 animate-pulse">
-                  <div className="flex gap-2 mb-4">
-                    <div className="h-6 bg-[#ebf2fa] rounded-full w-20"></div>
-                  </div>
-                  <div className="h-6 bg-[#ebf2fa] rounded w-3/4 mb-4"></div>
-                  <div className="h-16 bg-[#ebf2fa] rounded mb-4"></div>
-                  <div className="h-4 bg-[#ebf2fa] rounded w-1/3"></div>
-                </div>
-              ))}
             </div>
-          ) : missions.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-16 text-center">
-              <div className="w-20 h-20 bg-[#ebf2fa] rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Briefcase className="w-10 h-10 text-[#6d74b5]" />
-              </div>
-              <h3 className="text-2xl font-bold text-[#1c2942] mb-3">
-                Aucune mission
-              </h3>
-              <p className="text-[#1c2942]/60 max-w-md mx-auto mb-8">
-                Vous n'avez pas encore créé de mission. Commencez maintenant pour trouver les meilleurs intervenants !
-              </p>
-              <Link to="/nouvelle-mission">
-                <Button variant="primary" size="lg" className="px-8">
-                  <Plus className="w-5 h-5" />
-                  Proposer une mission
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {missions.slice(0, 6).map((mission) => (
-                <MissionCard
-                  key={mission.id}
-                  mission={mission}
-                  showApplyButton={false}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+          </>
+        )}
       </PageContainer>
     </div>
   );

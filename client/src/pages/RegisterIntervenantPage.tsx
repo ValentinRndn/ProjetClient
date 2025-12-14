@@ -199,14 +199,14 @@ export default function RegisterIntervenantPage() {
     setLocalError(null);
 
     const data = methods.getValues();
-    const name = `${data.firstName} ${data.lastName}`.trim();
 
     const registrationData: RegisterData = {
       email: data.email,
       password: data.password,
       role: "INTERVENANT",
       intervenantData: {
-        name,
+        firstName: data.firstName,
+        lastName: data.lastName,
       },
     };
 

@@ -215,6 +215,41 @@ export function getDocumentDownloadUrl(
   documentId: string
 ): string {
   const baseUrl =
-    import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1";
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api/v1";
   return `${baseUrl}/intervenants/${intervenantId}/documents/${documentId}/download`;
+}
+
+/**
+ * Télécharger un document avec authentification et retourner un blob URL
+ */
+export async function fetchDocumentAsBlob(
+  intervenantId: string,
+  documentId: string
+): Promise<string | null> {
+  try {
+    const url = getDocumentDownloadUrl(intervenantId, documentId);
+    const token = localStorage.getItem("vizion_academy_access_token");
+
+    console.log("[fetchDocumentAsBlob] URL:", url);
+    console.log("[fetchDocumentAsBlob] Token present:", !!token);
+
+    const response = await fetch(url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+
+    console.log("[fetchDocumentAsBlob] Response status:", response.status);
+
+    if (!response.ok) {
+      console.error("[fetchDocumentAsBlob] Response not OK:", response.status, response.statusText);
+      return null;
+    }
+
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    console.log("[fetchDocumentAsBlob] Blob URL created:", blobUrl);
+    return blobUrl;
+  } catch (error) {
+    console.error("[fetchDocumentAsBlob] Error:", error);
+    return null;
+  }
 }

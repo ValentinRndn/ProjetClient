@@ -16,7 +16,7 @@ import {
   downloadDocument,
   deleteDocument,
 } from "../controllers/intervenants.controller.js";
-import { verifyToken, checkRole } from "../middlewares/auth.middleware.js";
+import { verifyToken, checkRole, optionalAuth } from "../middlewares/auth.middleware.js";
 import validate from "../middlewares/validate.middleware.js";
 import { updateIntervenantSchema } from "../validators/intervenant.validator.js";
 import { uploadSingleOptional } from "../config/multer.js";
@@ -111,9 +111,10 @@ router.get(
   verifyToken,
   getDocuments
 );
-// Route publique pour télécharger/afficher un document (CV, photo de profil)
+// Route pour télécharger/afficher un document (public si approuvé, sinon authentifié)
 router.get(
   "/:id/documents/:docId/download",
+  optionalAuth,
   validate({
     params: Joi.object({
       id: Joi.string().uuid().required(),
