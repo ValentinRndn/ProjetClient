@@ -15,9 +15,9 @@ export interface HeroStatsProps {
 
 export function HeroStats({ stats, className, variant = "glass" }: HeroStatsProps) {
   const variants = {
-    default: "bg-white/10 border-white/20",
-    glass: "bg-white/10 backdrop-blur-xl border-white/20",
-    solid: "bg-indigo-800/50 border-indigo-600/30",
+    default: "bg-white border-[#1c2942]/10",
+    glass: "bg-white/80 backdrop-blur-xl border-[#1c2942]/10",
+    solid: "bg-[#1c2942]/10 border-[#1c2942]/20",
   };
 
   return (
@@ -34,23 +34,23 @@ export function HeroStats({ stats, className, variant = "glass" }: HeroStatsProp
           className={cn(
             "group relative rounded-2xl p-6 sm:p-8 text-center border shadow-xl",
             "transform hover:scale-105 hover:-translate-y-1 transition-all duration-300",
-            "hover:shadow-2xl hover:shadow-indigo-500/20",
+            "hover:shadow-2xl hover:shadow-[#6d74b5]/20",
             variants[variant]
           )}
         >
           {/* Glow effect on hover */}
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-400/0 to-purple-400/0 group-hover:from-indigo-400/10 group-hover:to-purple-400/10 transition-all duration-300" />
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#6d74b5]/0 to-[#1c2942]/0 group-hover:from-[#6d74b5]/5 group-hover:to-[#1c2942]/5 transition-all duration-300" />
 
           <div className="relative">
             {stat.icon && (
-              <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-white/10 flex items-center justify-center">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#1c2942]/10 flex items-center justify-center">
                 {stat.icon}
               </div>
             )}
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-2 sm:mb-3 bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
+            <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-2 sm:mb-3 bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
               {stat.value}
             </div>
-            <div className="text-indigo-100/80 font-medium text-sm sm:text-base">
+            <div className="text-[#1c2942]/80 font-medium text-sm sm:text-base">
               {stat.label}
             </div>
           </div>

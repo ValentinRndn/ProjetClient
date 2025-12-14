@@ -18,6 +18,9 @@ import {
   ArrowRight,
   Linkedin,
   Twitter,
+  GraduationCap,
+  Trophy,
+  Users,
 } from "lucide-react";
 import { PropsWithChildren } from "react";
 
@@ -33,16 +36,18 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       onClick={() => navigate("/login")}
       variant="ghost"
       size="sm"
+      className="text-[#1c2942] hover:text-[#6d74b5] hover:bg-[#ebf2fa]"
     >
-      Se connecter
+      Connexion
     </Button>,
     <Button
       key="register-btn"
-      onClick={() => navigate("/register")}
+      onClick={() => navigate("/register/intervenant")}
       variant="primary"
       size="sm"
+      className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white"
     >
-      Créer un compte
+      S'inscrire
     </Button>,
   ];
 
@@ -53,6 +58,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       onClick={() => navigate("/dashboard")}
       variant="primary"
       size="sm"
+      className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white"
     >
       <LayoutDashboardIcon className="w-4 h-4" />
       Dashboard
@@ -62,20 +68,22 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       onClick={() => navigate("/logout")}
       variant="ghost"
       size="sm"
+      className="text-[#1c2942] hover:text-[#6d74b5] hover:bg-[#ebf2fa]"
     >
       <LogOutIcon className="w-4 h-4" />
       Déconnexion
     </Button>,
   ];
 
-  // Navigation pour les visiteurs (non connectés)
+  // Navigation pour les visiteurs (non connectés) - 3 portes d'entrée avec dropdowns
   const visitorNavItems = [
     <Dropdown
-      key="ecoles-dropdown"
+      key="ecole-dropdown"
       className="dropdown-hover"
       trigger={
-        <span className="flex items-center gap-1.5 cursor-pointer font-medium text-gray-700 hover:text-indigo-600 transition-colors">
-          Espace Écoles
+        <span className="flex items-center gap-1.5 cursor-pointer font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors">
+          <GraduationCap className="w-4 h-4" />
+          Je suis une école
           <ChevronDownIcon className="w-4 h-4" />
         </span>
       }
@@ -83,21 +91,49 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         <NavLink
           key="intervenants"
           to="/intervenants"
-          className="flex items-center gap-3 hover:bg-indigo-50 p-3 rounded-xl transition-colors"
+          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
         >
-          <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-            <UserIcon className="w-4 h-4 text-indigo-600" />
-          </div>
-          <span className="text-gray-700">Trouver un intervenant</span>
+          <span className="font-medium text-[#1c2942]">Trouver un intervenant</span>
+          <span className="text-xs text-[#1c2942]/50">Accédez à notre réseau d'experts qualifiés</span>
+        </NavLink>,
+        <NavLink
+          key="login-ecole"
+          to="/login"
+          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
+        >
+          <span className="font-medium text-[#1c2942]">Connexion école</span>
+          <span className="text-xs text-[#1c2942]/50">Accédez à votre espace</span>
         </NavLink>,
       ]}
     />,
     <Dropdown
-      key="intervenants-dropdown"
+      key="challenges-dropdown"
       className="dropdown-hover"
       trigger={
-        <span className="flex items-center gap-1.5 cursor-pointer font-medium text-gray-700 hover:text-indigo-600 transition-colors">
-          Espace Intervenants
+        <span className="flex items-center gap-1.5 cursor-pointer font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors">
+          <Trophy className="w-4 h-4" />
+          Découvrir nos challenges
+          <ChevronDownIcon className="w-4 h-4" />
+        </span>
+      }
+      items={[
+        <NavLink
+          key="challenges"
+          to="/challenges"
+          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
+        >
+          <span className="font-medium text-[#1c2942]">Voir tous les challenges</span>
+          <span className="text-xs text-[#1c2942]/50">Explorez nos challenges immersifs clé en main</span>
+        </NavLink>,
+      ]}
+    />,
+    <Dropdown
+      key="intervenant-dropdown"
+      className="dropdown-hover"
+      trigger={
+        <span className="flex items-center gap-1.5 cursor-pointer font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors">
+          <Users className="w-4 h-4" />
+          Je suis intervenant
           <ChevronDownIcon className="w-4 h-4" />
         </span>
       }
@@ -105,32 +141,21 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         <NavLink
           key="missions"
           to="/missions"
-          className="flex items-center gap-3 hover:bg-indigo-50 p-3 rounded-xl transition-colors"
+          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
         >
-          <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-            <TargetIcon className="w-4 h-4 text-indigo-600" />
-          </div>
-          <span className="text-gray-700">Voir les missions</span>
+          <span className="font-medium text-[#1c2942]">Voir les missions</span>
+          <span className="text-xs text-[#1c2942]/50">Consultez les offres disponibles</span>
         </NavLink>,
         <NavLink
-          key="devenir-intervenant"
+          key="register-intervenant"
           to="/register/intervenant"
-          className="flex items-center gap-3 hover:bg-indigo-50 p-3 rounded-xl transition-colors"
+          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
         >
-          <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-            <UserIcon className="w-4 h-4 text-indigo-600" />
-          </div>
-          <span className="text-gray-700">Devenir intervenant</span>
+          <span className="font-medium text-[#1c2942]">Devenir intervenant</span>
+          <span className="text-xs text-[#1c2942]/50">Rejoignez notre réseau d'experts</span>
         </NavLink>,
       ]}
     />,
-    <NavLink
-      key="contact"
-      to="/contact"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors"
-    >
-      Contact
-    </NavLink>,
   ];
 
   // Navigation pour les écoles
@@ -138,14 +163,14 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
     <NavLink
       key="intervenants"
       to="/intervenants"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
     >
       Trouver un intervenant
     </NavLink>,
     <NavLink
       key="nouvelle-mission"
       to="/nouvelle-mission"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors flex items-center gap-1.5"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors flex items-center gap-1.5"
     >
       <PlusIcon className="w-4 h-4" />
       Nouvelle mission
@@ -153,14 +178,14 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
     <NavLink
       key="mes-missions"
       to="/mes-missions"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
     >
       Mes missions
     </NavLink>,
     <NavLink
       key="contact"
       to="/contact"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
     >
       Contact
     </NavLink>,
@@ -171,7 +196,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
     <NavLink
       key="missions"
       to="/missions"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors flex items-center gap-1.5"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors flex items-center gap-1.5"
     >
       <TargetIcon className="w-4 h-4" />
       Missions
@@ -179,14 +204,14 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
     <NavLink
       key="intervenants"
       to="/intervenants"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
     >
       Annuaire
     </NavLink>,
     <NavLink
       key="contact"
       to="/contact"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
     >
       Contact
     </NavLink>,
@@ -198,7 +223,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       key="admin-dropdown"
       className="dropdown-hover"
       trigger={
-        <span className="flex items-center gap-1.5 cursor-pointer font-medium text-gray-700 hover:text-indigo-600 transition-colors">
+        <span className="flex items-center gap-1.5 cursor-pointer font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors">
           <ShieldIcon className="w-4 h-4" />
           Administration
           <ChevronDownIcon className="w-4 h-4" />
@@ -208,43 +233,43 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         <NavLink
           key="admin-users"
           to="/dashboard/admin/users"
-          className="flex items-center gap-3 hover:bg-indigo-50 p-3 rounded-xl transition-colors"
+          className="flex items-center gap-3 hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
         >
-          <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-            <UsersIcon className="w-4 h-4 text-indigo-600" />
+          <div className="w-8 h-8 bg-[#ebf2fa] rounded-lg flex items-center justify-center">
+            <UsersIcon className="w-4 h-4 text-[#6d74b5]" />
           </div>
-          <span className="text-gray-700">Utilisateurs</span>
+          <span className="text-[#1c2942]">Utilisateurs</span>
         </NavLink>,
         <NavLink
           key="admin-intervenants"
           to="/dashboard/admin/intervenants"
-          className="flex items-center gap-3 hover:bg-indigo-50 p-3 rounded-xl transition-colors"
+          className="flex items-center gap-3 hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
         >
-          <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-            <UserIcon className="w-4 h-4 text-indigo-600" />
+          <div className="w-8 h-8 bg-[#ebf2fa] rounded-lg flex items-center justify-center">
+            <UserIcon className="w-4 h-4 text-[#6d74b5]" />
           </div>
-          <span className="text-gray-700">Intervenants</span>
+          <span className="text-[#1c2942]">Intervenants</span>
         </NavLink>,
       ]}
     />,
     <NavLink
       key="missions"
       to="/missions"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
     >
       Missions
     </NavLink>,
     <NavLink
-      key="mes-missions"
-      to="/mes-missions"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+      key="gestion-missions"
+      to="/gestion-missions"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
     >
       Gérer missions
     </NavLink>,
     <NavLink
       key="intervenants"
       to="/intervenants"
-      className="font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
     >
       Intervenants
     </NavLink>,
@@ -271,6 +296,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       title: "Écoles",
       links: [
         { label: "Trouver un intervenant", to: "/intervenants" },
+        { label: "Découvrir nos challenges", to: "/challenges" },
         { label: "Proposer une mission", to: "/nouvelle-mission" },
       ],
     },
@@ -300,23 +326,13 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
             <Link
               key="logo"
               to="/"
-              className="flex items-center gap-3 group"
+              className="flex items-center group"
             >
-              <div className="relative">
-                <img
-                  src="/logo.svg"
-                  alt="Vizion Academy"
-                  className="w-10 h-10 transition-transform group-hover:scale-105"
-                />
-              </div>
-              <div className="hidden sm:block">
-                <span className="font-bold text-gray-900 text-lg leading-tight block">
-                  Vizion
-                </span>
-                <span className="text-xs text-indigo-600 font-medium -mt-1 block">
-                  Academy
-                </span>
-              </div>
+              <img
+                src="/logo.svg"
+                alt="Vizion Academy"
+                className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+              />
             </Link>,
           ]}
           navCenter={getNavItems()}
@@ -331,38 +347,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-white">
-        {/* CTA Section */}
-        <div className="border-b border-gray-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 md:p-12 relative overflow-hidden">
-              {/* Background decoration */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                    Prêt à commencer ?
-                  </h3>
-                  <p className="text-indigo-100">
-                    Rejoignez Vizion Academy et connectez-vous avec les meilleurs experts.
-                  </p>
-                </div>
-                <Button
-                  onClick={() => navigate("/register")}
-                  variant="secondary"
-                  size="lg"
-                  className="bg-white text-indigo-600 hover:bg-gray-100 shrink-0"
-                >
-                  Créer un compte
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <footer className="bg-[#1c2942] text-white">
         {/* Main Footer */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
@@ -388,24 +373,24 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
               <div className="space-y-3">
                 <a
                   href="mailto:secretariat@vizionacademy.fr"
-                  className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group"
+                  className="flex items-center gap-3 text-white/60 hover:text-white transition-colors group"
                 >
-                  <div className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 transition-colors">
+                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-[#6d74b5] transition-colors">
                     <Mail className="w-4 h-4" />
                   </div>
                   <span>secretariat@vizionacademy.fr</span>
                 </a>
                 <a
                   href="tel:0659196550"
-                  className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group"
+                  className="flex items-center gap-3 text-white/60 hover:text-white transition-colors group"
                 >
-                  <div className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 transition-colors">
+                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-[#6d74b5] transition-colors">
                     <Phone className="w-4 h-4" />
                   </div>
                   <span>06 59 19 65 50</span>
                 </a>
-                <div className="flex items-center gap-3 text-gray-400">
-                  <div className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center">
+                <div className="flex items-center gap-3 text-white/60">
+                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <span>Paris, France</span>
@@ -424,7 +409,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
                     <li key={link.to}>
                       <Link
                         to={link.to}
-                        className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 group"
+                        className="text-white/60 hover:text-white transition-colors flex items-center gap-2 group"
                       >
                         <ArrowRight className="w-3 h-3 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
                         {link.label}
@@ -438,10 +423,10 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         </div>
 
         {/* Footer Bottom */}
-        <div className="border-t border-gray-800">
+        <div className="border-t border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-white/50">
                 © 2025 Vizion Academy. Tous droits réservés.
               </p>
               <div className="flex items-center gap-4">
@@ -449,7 +434,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
                   href="https://www.linkedin.com/company/vizion-academy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-colors"
+                  className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white/60 hover:bg-[#6d74b5] hover:text-white transition-colors"
                   aria-label="LinkedIn"
                 >
                   <Linkedin className="w-4 h-4" />
@@ -458,7 +443,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
                   href="https://twitter.com/vizionacademy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-colors"
+                  className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white/60 hover:bg-[#6d74b5] hover:text-white transition-colors"
                   aria-label="Twitter"
                 >
                   <Twitter className="w-4 h-4" />

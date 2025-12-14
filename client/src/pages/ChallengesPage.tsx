@@ -178,7 +178,7 @@ function ChallengeCard({
 
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
-      <div className="bg-gradient-to-br from-[#272757] to-[#505081] p-6 text-white">
+      <div className="bg-[#28303a] p-6 text-white">
         <h3 className="text-xl font-bold mb-3">{challenge.title}</h3>
         <div className="flex flex-wrap gap-2">
           <span
@@ -238,16 +238,16 @@ function ChallengeModal({
         className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-gradient-to-br from-[#272757] to-[#505081] text-white p-8 rounded-t-2xl relative">
+        <div className="bg-[#28303a] text-white p-8 rounded-t-2xl relative">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2 rounded-full hover:bg-white/10"
+            className="absolute top-4 right-4 text-white hover:text-[#dbbacf] transition-colors p-2 rounded-full hover:bg-white/10"
           >
             <X className="w-6 h-6" />
           </button>
           <h2 className="text-3xl font-bold mb-4 pr-8">{challenge.title}</h2>
           <div className="flex flex-wrap gap-2">
-            <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold">
+            <span className="px-4 py-2 bg-[#dbbacf] text-[#28303a] rounded-full text-sm font-semibold">
               {challenge.category}
             </span>
             <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold">
@@ -282,26 +282,26 @@ function ChallengeModal({
             </div>
           </div>
 
-          <div className="bg-[#f0f0ff] rounded-lg p-6 mb-6">
+          <div className="bg-[#dbbacf]/20 rounded-lg p-6 mb-6">
             <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
               Ce que vous obtenez
             </h4>
             <ul className="space-y-2 text-gray-700">
               <li className="flex items-start gap-2">
-                <Zap className="w-4 h-4 mt-1 text-[#505081]" />
+                <Zap className="w-4 h-4 mt-1 text-[#28303a]" />
                 <span>Accompagnement pédagogique complet</span>
               </li>
               <li className="flex items-start gap-2">
-                <Target className="w-4 h-4 mt-1 text-[#505081]" />
+                <Target className="w-4 h-4 mt-1 text-[#28303a]" />
                 <span>Livrables et grilles d'évaluation</span>
               </li>
               <li className="flex items-start gap-2">
-                <Trophy className="w-4 h-4 mt-1 text-[#505081]" />
+                <Trophy className="w-4 h-4 mt-1 text-[#28303a]" />
                 <span>Lots et récompenses pour les étudiants</span>
               </li>
               <li className="flex items-start gap-2">
-                <Lightbulb className="w-4 h-4 mt-1 text-[#505081]" />
+                <Lightbulb className="w-4 h-4 mt-1 text-[#28303a]" />
                 <span>Intervenants experts dans leur domaine</span>
               </li>
             </ul>
@@ -347,7 +347,7 @@ export default function ChallengesPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#272757] via-[#505081] to-[#1B263B] text-white py-16 overflow-hidden">
+      <section className="relative bg-[#28303a] text-white py-16 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-10"
           style={{
@@ -356,30 +356,30 @@ export default function ChallengesPage() {
         />
         <PageContainer maxWidth="7xl" className="relative z-10">
           <div className="text-center">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-              <Sparkles className="w-5 h-5 text-yellow-400" />
-              <span className="text-sm font-medium">
+            <div className="inline-flex items-center gap-2 bg-[#dbbacf] text-[#28303a] px-4 py-2 rounded-full mb-6">
+              <Sparkles className="w-5 h-5" />
+              <span className="text-sm font-bold">
                 Challenges Pédagogiques Clés en Main
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Dynamisez l'apprentissage
             </h1>
-            <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto mb-8">
+            <p className="text-lg md:text-xl text-white/80 max-w-3xl mx-auto mb-8">
               Des projets engageants sur des thématiques actuelles pour
               transformer l'expérience pédagogique de vos étudiants.
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               <div className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-yellow-400" />
+                <Trophy className="w-5 h-5 text-[#dbbacf]" />
                 <span>10+ challenges disponibles</span>
               </div>
               <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-yellow-400" />
+                <Users className="w-5 h-5 text-[#dbbacf]" />
                 <span>+5000 étudiants formés</span>
               </div>
               <div className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-yellow-400" />
+                <Star className="w-5 h-5 text-[#dbbacf]" />
                 <span>4.8/5 satisfaction</span>
               </div>
             </div>
@@ -399,7 +399,7 @@ export default function ChallengesPage() {
                   placeholder="Rechercher..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#505081] transition"
+                  className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#28303a] transition"
                 />
               </div>
 
@@ -408,7 +408,7 @@ export default function ChallengesPage() {
                 <select
                   value={selectedDomain}
                   onChange={(e) => setSelectedDomain(e.target.value)}
-                  className="w-full sm:w-auto pl-10 pr-8 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#505081] transition appearance-none bg-white cursor-pointer"
+                  className="w-full sm:w-auto pl-10 pr-8 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#28303a] transition appearance-none bg-white cursor-pointer"
                 >
                   {domains.map((domain) => (
                     <option key={domain} value={domain}>
@@ -421,7 +421,7 @@ export default function ChallengesPage() {
               <select
                 value={selectedLevel}
                 onChange={(e) => setSelectedLevel(e.target.value)}
-                className="w-full sm:w-auto px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#505081] transition appearance-none bg-white cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#28303a] transition appearance-none bg-white cursor-pointer"
               >
                 {levels.map((level) => (
                   <option key={level} value={level}>
@@ -462,26 +462,26 @@ export default function ChallengesPage() {
       </PageContainer>
 
       {/* Section CTA */}
-      <section className="bg-gradient-to-r from-[#272757] to-[#505081] text-white py-16">
+      <section className="bg-[#28303a] text-white py-16">
         <PageContainer maxWidth="4xl" className="text-center">
-          <Play className="w-16 h-16 mx-auto mb-6 text-yellow-400" />
+          <Play className="w-16 h-16 mx-auto mb-6 text-[#dbbacf]" />
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Prêt à révolutionner vos formations ?
           </h2>
-          <p className="text-lg text-gray-200 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
             Contactez-nous pour discuter de votre projet et obtenir un devis
             personnalisé.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               variant="secondary"
-              className="bg-white text-[#272757] hover:bg-gray-100"
+              className="bg-[#dbbacf] text-[#28303a] hover:bg-[#dbbacf]/90"
             >
               Demander un devis
             </Button>
             <Button
               variant="outline"
-              className="border-white text-white hover:bg-white/10"
+              className="border-[#dbbacf] text-[#dbbacf] hover:bg-[#dbbacf]/10"
             >
               En savoir plus
             </Button>

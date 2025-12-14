@@ -9,7 +9,7 @@ export interface HeroBannerProps {
   backgroundImage?: string;
   children?: React.ReactNode;
   className?: string;
-  variant?: "default" | "gradient" | "mesh";
+  variant?: "default" | "gradient" | "mesh" | "image";
 }
 
 export function HeroBanner({
@@ -20,13 +20,26 @@ export function HeroBanner({
   backgroundImage,
   children,
   className,
-  variant = "mesh",
+  variant = "image",
 }: HeroBannerProps) {
+  const isImageVariant = variant === "image";
+
   const variants = {
-    default: "bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900",
-    gradient: "bg-gradient-to-br from-indigo-950 via-purple-900 to-indigo-900",
-    mesh: "bg-gradient-mesh",
+    default: "bg-[#1c2942]",
+    gradient: "bg-gradient-to-br from-[#1c2942] via-[#2a3a5c] to-[#1c2942]",
+    mesh: "bg-[#ebf2fa]",
+    image: "bg-[#1c2942]",
   };
+
+  // Couleurs du texte selon le variant
+  const textColors = {
+    default: { title: "text-white", description: "text-white/80", badge: "text-white", badgeBg: "bg-white/10 border-white/20" },
+    gradient: { title: "text-white", description: "text-white/80", badge: "text-white", badgeBg: "bg-white/10 border-white/20" },
+    mesh: { title: "text-[#1c2942]", description: "text-[#1c2942]/80", badge: "text-[#1c2942]", badgeBg: "bg-[#1c2942]/10 border-[#1c2942]/20" },
+    image: { title: "text-white", description: "text-white/80", badge: "text-white", badgeBg: "bg-white/10 border-white/20" },
+  };
+
+  const colors = textColors[variant];
 
   return (
     <section
@@ -36,24 +49,40 @@ export function HeroBanner({
         className
       )}
     >
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Floating Orbs */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-400/10 rounded-full blur-3xl" />
+      {/* Background Image for image variant */}
+      {isImageVariant && (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop')`,
+            }}
+          />
+          {/* Color Overlay */}
+          <div className="absolute inset-0 bg-[#1c2942]/75" />
+        </>
+      )}
 
-        {/* Grid Pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: "50px 50px",
-          }}
-        />
-      </div>
+      {/* Animated Background Elements (only for non-image variants) */}
+      {!isImageVariant && (
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating Orbs */}
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#6d74b5]/10 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#fdf1f7]/50 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#6d74b5]/5 rounded-full blur-3xl" />
 
-      {backgroundImage && (
+          {/* Grid Pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.02]"
+            style={{
+              backgroundImage: `linear-gradient(#1c2942 1px, transparent 1px), linear-gradient(90deg, #1c2942 1px, transparent 1px)`,
+              backgroundSize: "50px 50px",
+            }}
+          />
+        </div>
+      )}
+
+      {backgroundImage && !isImageVariant && (
         <div className="absolute inset-0">
           <img
             src={backgroundImage}
@@ -67,24 +96,33 @@ export function HeroBanner({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center mb-8 sm:mb-12">
           {badge && (
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-xl rounded-full px-5 py-2.5 mb-8 border border-white/20 shadow-xl animate-fade-in-up">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              <span className="text-sm font-medium text-indigo-100">{badge}</span>
+            <div className={cn(
+              "inline-flex items-center gap-2 backdrop-blur-xl rounded-full px-5 py-2.5 mb-8 border shadow-xl animate-fade-in-up",
+              colors.badgeBg
+            )}>
+              <div className="w-2 h-2 bg-[#6d74b5] rounded-full animate-pulse" />
+              <span className={cn("text-sm font-medium", colors.badge)}>{badge}</span>
             </div>
           )}
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 sm:mb-8 leading-[1.1] tracking-tight animate-fade-in-up stagger-1">
+          <h1 className={cn(
+            "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 sm:mb-8 leading-[1.1] tracking-tight animate-fade-in-up stagger-1",
+            colors.title
+          )}>
             {title}
           </h1>
 
           {subtitle && (
-            <div className="relative inline-block mb-4 animate-fade-in-up stagger-2">
+            <div className={cn("relative inline-block mb-4 animate-fade-in-up stagger-2", colors.title)}>
               {subtitle}
             </div>
           )}
 
           {description && (
-            <p className="text-lg sm:text-xl md:text-2xl text-indigo-100/90 mb-10 sm:mb-14 max-w-3xl mx-auto leading-relaxed animate-fade-in-up stagger-2">
+            <p className={cn(
+              "text-lg sm:text-xl md:text-2xl mb-10 sm:mb-14 max-w-3xl mx-auto leading-relaxed animate-fade-in-up stagger-2",
+              colors.description
+            )}>
               {description}
             </p>
           )}
@@ -96,7 +134,10 @@ export function HeroBanner({
       </div>
 
       {/* Bottom Gradient Fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-50 to-transparent" />
+      <div className={cn(
+        "absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t to-transparent",
+        isImageVariant ? "from-[#1c2942]/50" : "from-white"
+      )} />
     </section>
   );
 }

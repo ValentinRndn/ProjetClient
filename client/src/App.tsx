@@ -25,6 +25,7 @@ import DeclarationsPage from "./pages/DeclarationsPage";
 import MonProfilIntervenantPage from "./pages/MonProfilIntervenantPage";
 import OnboardingDocumentsPage from "./pages/OnboardingDocumentsPage";
 import FacturesPage from "./pages/FacturesPage";
+import DisponibilitesPage from "./pages/DisponibilitesPage";
 import ContactPage from "./pages/ContactPage";
 import DevenirIntervenantPage from "./pages/DevenirIntervenantPage";
 import MentionsLegalesPage from "./pages/MentionsLegalesPage";
@@ -152,7 +153,18 @@ function App() {
       <Route
         path="/mes-missions"
         element={
-          <ProtectedRoute requiredRole={["ECOLE", "ADMIN"]}>
+          <ProtectedRoute requiredRole={["ECOLE"]}>
+            <NavLayout>
+              <MesMissionsPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/gestion-missions"
+        element={
+          <ProtectedRoute requiredRole={["ADMIN"]}>
             <NavLayout>
               <MesMissionsPage />
             </NavLayout>
@@ -261,6 +273,16 @@ function App() {
           <ProtectedRoute requiredRole="INTERVENANT">
             <NavLayout>
               <FacturesPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/intervenant/disponibilites"
+        element={
+          <ProtectedRoute requiredRole="INTERVENANT">
+            <NavLayout>
+              <DisponibilitesPage />
             </NavLayout>
           </ProtectedRoute>
         }

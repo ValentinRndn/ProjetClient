@@ -1,5 +1,5 @@
 import { getAllIntervenants, type Intervenant } from "@/services/intervenants";
-import { MonitorIcon, BookOpen, Search, MapPin } from "lucide-react";
+import { MonitorIcon, BookOpen, Search, MapPin, Users, ChevronDown } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { IntervenantCard } from "./IntervenantCard";
 
@@ -90,125 +90,135 @@ export function IntervenantSearch() {
       return true;
     });
   }, [intervenants, searchQuery, selectedCity, selectedTheme, selectedFormat]);
+
   return (
-    <section id="liste-intervenants" className="py-12 px-4 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="lg:col-span-1">
+    <section id="liste-intervenants" className="bg-white">
+      {/* Barre de filtres */}
+      <div className="bg-[#1c2942] py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-center gap-4">
+            {/* Recherche */}
+            <div className="relative flex-1 w-full lg:max-w-md">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#6d74b5] w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Rechercher un intervenant..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#6d74b5] focus:bg-white/15 transition"
+              />
+            </div>
+
+            {/* Filtres */}
+            <div className="flex flex-wrap justify-center gap-3 w-full lg:w-auto">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Rechercher..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#505081] focus:border-transparent transition"
-                />
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6d74b5] w-4 h-4 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4 pointer-events-none" />
+                <select
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  className="pl-10 pr-10 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#6d74b5] transition appearance-none cursor-pointer min-w-[160px]"
+                >
+                  <option value="all" className="text-[#1c2942]">Toutes les villes</option>
+                  {allCities.map((city) => (
+                    <option key={city} value={city} className="text-[#1c2942]">
+                      {city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative">
+                <BookOpen className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6d74b5] w-4 h-4 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4 pointer-events-none" />
+                <select
+                  value={selectedTheme}
+                  onChange={(e) => setSelectedTheme(e.target.value)}
+                  className="pl-10 pr-10 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#6d74b5] transition appearance-none cursor-pointer min-w-[180px]"
+                >
+                  <option value="all" className="text-[#1c2942]">Toutes thématiques</option>
+                  {allThemes.map((theme) => (
+                    <option key={theme} value={theme} className="text-[#1c2942]">
+                      {theme}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative">
+                <MonitorIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6d74b5] w-4 h-4 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4 pointer-events-none" />
+                <select
+                  value={selectedFormat}
+                  onChange={(e) => setSelectedFormat(e.target.value)}
+                  className="pl-10 pr-10 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#6d74b5] transition appearance-none cursor-pointer min-w-[160px]"
+                >
+                  <option value="all" className="text-[#1c2942]">Tous formats</option>
+                  {allFormats.map((format) => (
+                    <option key={format} value={format} className="text-[#1c2942]">
+                      {format}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
-            <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none z-10" />
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#505081] focus:border-transparent transition appearance-none bg-white cursor-pointer"
-              >
-                <option value="all">Toutes les villes</option>
-                {allCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+            {/* Compteur */}
+            <div className="flex items-center gap-2 px-4 py-2 bg-[#6d74b5] rounded-full">
+              <Users className="w-4 h-4 text-white" />
+              <span className="text-white font-medium text-sm">
+                {isLoading ? "..." : filteredIntervenants.length}
+              </span>
             </div>
-
-            <div className="relative">
-              <BookOpen className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none z-10" />
-              <select
-                value={selectedTheme}
-                onChange={(e) => setSelectedTheme(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#505081] focus:border-transparent transition appearance-none bg-white cursor-pointer"
-              >
-                <option value="all">Toutes les thématiques</option>
-                {allThemes.map((theme) => (
-                  <option key={theme} value={theme}>
-                    {theme}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="relative">
-              <MonitorIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none z-10" />
-              <select
-                value={selectedFormat}
-                onChange={(e) => setSelectedFormat(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#505081] focus:border-transparent transition appearance-none bg-white cursor-pointer"
-              >
-                <option value="all">Tous les formats</option>
-                {allFormats.map((format) => (
-                  <option key={format} value={format}>
-                    {format}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <span className="inline-flex items-center px-6 py-2 bg-[#8686AC]/20 text-[#272757] rounded-full font-semibold">
-              {isLoading
-                ? "Chargement..."
-                : `${filteredIntervenants.length} intervenant(s) trouvé(s)`}
-            </span>
           </div>
         </div>
       </div>
 
-      {error && (
-        <div className="max-w-7xl mx-auto mt-6">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">{error}</p>
-          </div>
-        </div>
-      )}
-
-      {isLoading ? (
-        <div className="max-w-7xl mx-auto mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl border border-gray-200 p-6 animate-pulse"
-              >
-                <div className="h-12 w-12 rounded-full bg-gray-200 mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-                <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+      {/* Liste des intervenants */}
+      <div className="py-12 px-4 bg-[#ebf2fa]">
+        <div className="max-w-7xl mx-auto">
+          {error && (
+            <div className="mb-6">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800">{error}</p>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 animate-pulse shadow-sm"
+                >
+                  <div className="h-12 w-12 rounded-full bg-[#ebf2fa] mb-4"></div>
+                  <div className="h-4 bg-[#ebf2fa] rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-[#ebf2fa] rounded w-1/2 mb-4"></div>
+                  <div className="h-3 bg-[#ebf2fa] rounded w-full mb-2"></div>
+                  <div className="h-3 bg-[#ebf2fa] rounded w-5/6"></div>
+                </div>
+              ))}
+            </div>
+          ) : filteredIntervenants.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-12 text-center shadow-sm">
+              <Users className="w-12 h-12 text-[#6d74b5]/30 mx-auto mb-4" />
+              <p className="text-[#1c2942]/60 text-lg">
+                Aucun intervenant trouvé avec ces critères.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredIntervenants.map((intervenant) => (
+                <IntervenantCard
+                  key={intervenant.id}
+                  intervenant={intervenant}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      ) : filteredIntervenants.length === 0 ? (
-        <div className="max-w-7xl mx-auto mt-8">
-          <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-            <p className="text-gray-500 text-lg">
-              Aucun intervenant trouvé avec ces critères.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="max-w-7xl mx-auto mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {filteredIntervenants.map((intervenant) => (
-              <IntervenantCard key={intervenant.id} intervenant={intervenant} />
-            ))}
-          </div>
-        </div>
-      )}
+      </div>
     </section>
   );
 }

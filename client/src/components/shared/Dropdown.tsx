@@ -14,14 +14,14 @@ export function Dropdown({
   return (
     <div className={cn("dropdown", className)} {...props}>
       <>{trigger}</>
-      <ul
+      <div
         tabIndex={-1}
-        className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+        className="dropdown-content bg-white rounded-xl z-50 min-w-[280px] p-2 shadow-xl border border-gray-100"
       >
         {items.map((item, index) => (
-          <li key={index}>{item}</li>
+          <div key={index}>{item}</div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

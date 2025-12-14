@@ -34,18 +34,18 @@ export function SectionHeader({
         <div
           className={cn(
             "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6",
-            "bg-indigo-100 text-indigo-700 border border-indigo-200/50",
+            "bg-[#ebf2fa] text-[#6d74b5] border border-[#6d74b5]/20",
             badgeClassName
           )}
         >
-          <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+          <span className="w-1.5 h-1.5 bg-[#6d74b5] rounded-full" />
           {badge}
         </div>
       )}
       <h2
         className={cn(
           "text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 tracking-tight",
-          "text-gray-900",
+          "text-[#1c2942]",
           align === "center" && "mx-auto",
           titleClassName
         )}
@@ -55,7 +55,7 @@ export function SectionHeader({
       {description && (
         <p
           className={cn(
-            "text-gray-600 text-lg sm:text-xl leading-relaxed",
+            "text-[#1c2942]/70 text-lg sm:text-xl leading-relaxed",
             align === "center" && "max-w-2xl mx-auto",
             align === "left" && "max-w-xl",
             descriptionClassName

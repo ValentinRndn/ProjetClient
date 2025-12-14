@@ -44,7 +44,7 @@ export function Navbar({ navStart, navCenter, navEnd }: NavbarProps) {
             {navCenter?.map((item, index) => (
               <div
                 key={`nav-center-${index}`}
-                className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors rounded-lg hover:bg-indigo-50"
+                className="px-3 py-2 text-sm font-medium text-[#1c2942]/70 hover:text-[#6d74b5] transition-colors rounded-lg hover:bg-[#ebf2fa]"
               >
                 {item}
               </div>
@@ -61,7 +61,7 @@ export function Navbar({ navStart, navCenter, navEnd }: NavbarProps) {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-2 rounded-xl text-[#1c2942] hover:bg-[#ebf2fa] transition-colors"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -80,13 +80,13 @@ export function Navbar({ navStart, navCenter, navEnd }: NavbarProps) {
           isMobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="px-4 py-4 space-y-2 bg-white border-t border-gray-100">
+        <div className="px-4 py-4 space-y-2 bg-white border-t border-[#1c2942]/10">
           {/* Mobile Navigation */}
           <div className="space-y-1">
             {navCenter?.map((item, index) => (
               <div
                 key={`nav-mobile-center-${index}`}
-                className="px-4 py-3 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors"
+                className="px-4 py-3 text-[#1c2942]/70 hover:text-[#6d74b5] hover:bg-[#ebf2fa] rounded-xl transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {item}
@@ -94,7 +94,7 @@ export function Navbar({ navStart, navCenter, navEnd }: NavbarProps) {
             ))}
           </div>
           {/* Mobile Actions */}
-          <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
+          <div className="pt-4 border-t border-[#1c2942]/10 flex flex-col gap-2">
             {navEnd?.map((item, index) => (
               <div key={`nav-mobile-end-${index}`} onClick={() => setIsMobileMenuOpen(false)}>
                 {item}

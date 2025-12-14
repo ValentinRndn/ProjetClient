@@ -30,7 +30,7 @@ export function BenefitsSection({
   const defaultTitle = (
     <>
       Pourquoi choisir{" "}
-      <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+      <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
         Vizion Academy
       </span>{" "}
       ?
@@ -49,8 +49,8 @@ export function BenefitsSection({
     >
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-100 rounded-full blur-3xl opacity-50" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-100 rounded-full blur-3xl opacity-50" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#6d74b5]/10 rounded-full blur-3xl opacity-50" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#fdf1f7] rounded-full blur-3xl opacity-50" />
       </div>
 
       <div className={cn("max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative", className)}>

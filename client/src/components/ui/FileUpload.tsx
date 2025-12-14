@@ -1,9 +1,10 @@
 import { useRef, useState } from "react";
-import { Upload, X, File } from "lucide-react";
+import { Upload, X, File, Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "./Button";
 
 interface FileUploadProps {
-  label: string;
+  label?: string;
   accept?: string;
   maxSizeMB?: number;
   value?: File | null;
@@ -11,6 +12,9 @@ interface FileUploadProps {
   error?: string;
   helperText?: string;
   required?: boolean;
+  compact?: boolean;
+  disabled?: boolean;
+  isLoading?: boolean;
 }
 
 export function FileUpload({
@@ -22,11 +26,16 @@ export function FileUpload({
   error,
   helperText,
   required,
+  compact = false,
+  disabled = false,
+  isLoading = false,
 }: FileUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
 
   const handleFile = (file: File) => {
+    if (disabled || isLoading) return;
+
     // Vérifier la taille
     const sizeMB = file.size / (1024 * 1024);
     if (sizeMB > maxSizeMB) {
@@ -39,6 +48,8 @@ export function FileUpload({
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (disabled || isLoading) return;
+
     if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
     } else if (e.type === "dragleave") {
@@ -50,6 +61,8 @@ export function FileUpload({
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
+    if (disabled || isLoading) return;
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFile(e.dataTransfer.files[0]);
     }
@@ -62,23 +75,74 @@ export function FileUpload({
   };
 
   const removeFile = () => {
+    if (disabled || isLoading) return;
     onChange(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
+  // Version compacte (bouton simple)
+  if (compact) {
+    return (
+      <div className="shrink-0">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={accept}
+          onChange={handleChange}
+          className="hidden"
+          disabled={disabled || isLoading}
+        />
+        {value ? (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+              <Check className="w-3 h-3" />
+              Téléversé
+            </span>
+            <button
+              type="button"
+              onClick={removeFile}
+              disabled={disabled || isLoading}
+              className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={disabled || isLoading}
+            isLoading={isLoading}
+          >
+            {!isLoading && <Upload className="w-4 h-4" />}
+            Téléverser
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  // Version standard (zone de drop)
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
+      {label && (
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+      )}
 
       {!value ? (
         <div
           className={cn(
-            "border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer",
+            "border-2 border-dashed rounded-lg p-6 text-center transition-colors",
+            disabled || isLoading
+              ? "cursor-not-allowed opacity-50"
+              : "cursor-pointer",
             dragActive
               ? "border-indigo-500 bg-indigo-50"
               : error
@@ -90,7 +154,7 @@ export function FileUpload({
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => !disabled && !isLoading && fileInputRef.current?.click()}
         >
           <input
             ref={fileInputRef}
@@ -98,8 +162,13 @@ export function FileUpload({
             accept={accept}
             onChange={handleChange}
             className="hidden"
+            disabled={disabled || isLoading}
           />
-          <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+          {isLoading ? (
+            <Loader2 className="w-8 h-8 mx-auto text-indigo-500 mb-2 animate-spin" />
+          ) : (
+            <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+          )}
           <p className="text-sm text-gray-600">
             <span className="font-medium text-indigo-600">Cliquez pour téléverser</span> ou glissez-déposez
           </p>
@@ -124,7 +193,8 @@ export function FileUpload({
             <button
               type="button"
               onClick={removeFile}
-              className="text-red-500 hover:text-red-700 p-1"
+              disabled={disabled || isLoading}
+              className="text-red-500 hover:text-red-700 p-1 disabled:opacity-50"
             >
               <X className="w-5 h-5" />
             </button>

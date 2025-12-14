@@ -3,21 +3,16 @@ import { motion } from "motion/react";
 
 export function IntervenantsHero() {
   return (
-    <section className="relative bg-gradient-mesh text-white py-24 sm:py-32 overflow-hidden min-h-[70vh] flex items-center">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
-
-        {/* Grid Pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: "50px 50px",
-          }}
-        />
-      </div>
+    <section className="relative bg-[#1c2942] py-24 sm:py-32 overflow-hidden min-h-[70vh] flex items-center">
+      {/* Background Image with Overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop')`,
+        }}
+      />
+      {/* Color Overlay */}
+      <div className="absolute inset-0 bg-[#1c2942]/80" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center mb-12 sm:mb-16">
@@ -25,9 +20,9 @@ export function IntervenantsHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-yellow-300 text-indigo-950 px-6 py-2.5 rounded-full text-sm font-bold mb-8 shadow-xl"
+            className="inline-flex items-center gap-2 bg-[#ebf2fa] text-[#1c2942] px-6 py-2.5 rounded-full text-sm font-bold mb-8 shadow-xl"
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-4 h-4 text-[#6d74b5]" />
             100% GRATUIT
           </motion.div>
 
@@ -35,11 +30,11 @@ export function IntervenantsHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight tracking-tight"
+            className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight tracking-tight text-white"
           >
             Trouvez des intervenants
             <br />
-            <span className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
+            <span className="text-[#ebf2fa]">
               compétents et passionnés
             </span>
           </motion.h1>
@@ -48,7 +43,7 @@ export function IntervenantsHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg sm:text-xl text-indigo-100/90 max-w-3xl mx-auto mb-12"
+            className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto mb-12"
           >
             Tous nos intervenants sont des professionnels reconnus dans leur domaine,
             sélectionnés pour leur expertise et leur pédagogie.
@@ -64,30 +59,30 @@ export function IntervenantsHero() {
         >
           {[
             {
-              icon: <Receipt className="w-6 h-6" />,
+              icon: <Receipt className="w-6 h-6 text-white" />,
               title: "Facturation simplifiée",
               description: "Prise en charge complète de la facturation pour faciliter votre gestion administrative.",
             },
             {
-              icon: <Zap className="w-6 h-6" />,
+              icon: <Zap className="w-6 h-6 text-white" />,
               title: "Remplacement express",
               description: "Système d'urgence pour remplacer vos intervenants en cas de besoin.",
             },
             {
-              icon: <Calendar className="w-6 h-6" />,
+              icon: <Calendar className="w-6 h-6 text-white" />,
               title: "Réservation rapide",
               description: "Réservez un créneau de rencontre en moins de 2 minutes.",
             },
           ].map((item, index) => (
             <div
               key={index}
-              className="group relative bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300"
+              className="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl mb-4 mx-auto shadow-lg group-hover:scale-110 transition-transform">
+              <div className="flex items-center justify-center w-14 h-14 bg-[#6d74b5] rounded-xl mb-4 mx-auto shadow-lg group-hover:scale-110 transition-transform">
                 {item.icon}
               </div>
-              <h3 className="text-lg font-semibold text-center mb-2">{item.title}</h3>
-              <p className="text-center text-sm text-indigo-100/80">
+              <h3 className="text-lg font-semibold text-center mb-2 text-[#1c2942]">{item.title}</h3>
+              <p className="text-center text-sm text-[#1c2942]/70">
                 {item.description}
               </p>
             </div>
@@ -102,7 +97,7 @@ export function IntervenantsHero() {
         >
           <a
             href="#liste-intervenants"
-            className="group inline-flex items-center gap-3 bg-white text-indigo-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-indigo-50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-white/20 transform hover:scale-[1.02]"
+            className="group inline-flex items-center gap-3 bg-[#1c2942] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#1c2942]/90 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-[1.02]"
           >
             Voir les intervenants
             <ArrowDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
@@ -110,8 +105,6 @@ export function IntervenantsHero() {
         </motion.div>
       </div>
 
-      {/* Bottom Gradient Fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-50 to-transparent" />
     </section>
   );
 }

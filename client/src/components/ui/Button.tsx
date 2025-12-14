@@ -35,25 +35,24 @@ export function Button({
 
   const variants = {
     primary: [
-      "bg-indigo-600 text-white",
-      "hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/25",
-      "focus-visible:ring-indigo-500",
-      "btn-shimmer",
+      "bg-[#1c2942] text-white",
+      "hover:bg-[#1c2942]/90 hover:shadow-lg hover:shadow-[#1c2942]/25",
+      "focus-visible:ring-[#1c2942]",
     ],
     secondary: [
-      "bg-gray-100 text-gray-900",
-      "hover:bg-gray-200 hover:shadow-md",
-      "focus-visible:ring-gray-500",
+      "bg-[#ebf2fa] text-[#1c2942]",
+      "hover:bg-[#ebf2fa]/80 hover:shadow-md",
+      "focus-visible:ring-[#6d74b5]",
     ],
     outline: [
-      "border-2 border-indigo-600 text-indigo-600 bg-transparent",
-      "hover:bg-indigo-50 hover:border-indigo-700 hover:text-indigo-700",
-      "focus-visible:ring-indigo-500",
+      "border-2 border-[#1c2942] text-[#1c2942] bg-transparent",
+      "hover:bg-[#ebf2fa] hover:border-[#1c2942]",
+      "focus-visible:ring-[#1c2942]",
     ],
     ghost: [
-      "text-gray-600 bg-transparent",
-      "hover:bg-gray-100 hover:text-gray-900",
-      "focus-visible:ring-gray-500",
+      "text-[#1c2942] bg-transparent",
+      "hover:bg-[#ebf2fa] hover:text-[#1c2942]",
+      "focus-visible:ring-[#6d74b5]",
     ],
     danger: [
       "bg-red-600 text-white",
@@ -66,10 +65,9 @@ export function Button({
       "focus-visible:ring-emerald-500",
     ],
     gradient: [
-      "bg-gradient-to-r from-indigo-600 to-purple-600 text-white",
-      "hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:shadow-indigo-500/30",
-      "focus-visible:ring-indigo-500",
-      "btn-shimmer",
+      "bg-gradient-to-r from-[#1c2942] to-[#6d74b5] text-white",
+      "hover:from-[#1c2942]/90 hover:to-[#6d74b5]/90 hover:shadow-lg hover:shadow-[#1c2942]/30",
+      "focus-visible:ring-[#6d74b5]",
     ],
   };
 

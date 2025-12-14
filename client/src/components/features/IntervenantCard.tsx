@@ -80,19 +80,19 @@ export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCa
     switch (status) {
       case "approved":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Approuvé
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-[#ebf2fa] text-[#6d74b5]">
+            Vérifié
           </span>
         );
       case "pending":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700">
             En attente
           </span>
         );
       case "rejected":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-700">
             Rejeté
           </span>
         );
@@ -148,7 +148,7 @@ export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCa
   const profileImageUrl = getProfileImageUrl();
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow relative">
+    <Card className="p-5 hover:shadow-xl transition-all duration-300 relative group hover:-translate-y-1">
       {/* Bouton favori pour les écoles */}
       {isEcole && intervenant.status === "approved" && (
         <button
@@ -157,7 +157,7 @@ export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCa
           className={`absolute top-4 right-4 p-2 rounded-full transition-all z-10 ${
             isFavorite
               ? "bg-rose-100 text-rose-600 hover:bg-rose-200"
-              : "bg-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-500"
+              : "bg-[#ebf2fa] text-[#1c2942]/40 hover:bg-rose-50 hover:text-rose-500"
           } ${isLoadingFavorite ? "opacity-50 cursor-not-allowed" : ""}`}
           title={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
         >
@@ -167,38 +167,35 @@ export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCa
         </button>
       )}
 
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          {profileImageUrl ? (
-            <img
-              src={profileImageUrl}
-              alt={`Photo de profil de ${fullName}`}
-              className="w-12 h-12 rounded-full object-cover border-2 border-indigo-100"
-              onError={(e) => {
-                // Fallback sur l'icône si l'image ne charge pas
-                e.currentTarget.style.display = "none";
-                const fallback = e.currentTarget
-                  .nextElementSibling as HTMLElement;
-                if (fallback) fallback.style.display = "flex";
-              }}
-            />
-          ) : null}
-          <div
-            className={`w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center ${
-              profileImageUrl ? "hidden" : ""
-            }`}
-          >
-            <User className="w-6 h-6 text-indigo-600" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg text-gray-900">{fullName}</h3>
-            {getStatusBadge(intervenant.status)}
-          </div>
+      {/* En-tête avec avatar */}
+      <div className="flex items-center gap-3 mb-4">
+        {profileImageUrl ? (
+          <img
+            src={profileImageUrl}
+            alt={`Photo de profil de ${fullName}`}
+            className="w-12 h-12 rounded-xl object-cover border-2 border-[#ebf2fa] shadow-sm"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+              if (fallback) fallback.style.display = "flex";
+            }}
+          />
+        ) : null}
+        <div
+          className={`w-12 h-12 rounded-xl bg-[#ebf2fa] flex items-center justify-center shadow-sm ${
+            profileImageUrl ? "hidden" : ""
+          }`}
+        >
+          <User className="w-6 h-6 text-[#6d74b5]" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-[#1c2942] truncate">{fullName}</h3>
+          {getStatusBadge(intervenant.status)}
         </div>
       </div>
 
       {intervenant.bio && (
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+        <p className="text-[#1c2942]/70 text-sm mb-4 line-clamp-3">
           {intervenant.bio}
         </p>
       )}
@@ -209,7 +206,7 @@ export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCa
           {intervenant.expertises.slice(0, 3).map((expertise, idx) => (
             <span
               key={idx}
-              className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium"
+              className="px-2 py-0.5 bg-[#ebf2fa] text-[#6d74b5] rounded-full text-xs font-medium"
             >
               {expertise}
             </span>
@@ -224,19 +221,19 @@ export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCa
 
       <div className="space-y-2 mb-4">
         {intervenant.city && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-[#1c2942]/60">
             <MapPin className="w-4 h-4" />
             <span>{intervenant.city}</span>
           </div>
         )}
         {intervenant.yearsExperience && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-[#1c2942]/60">
             <Award className="w-4 h-4" />
             <span>{intervenant.yearsExperience} ans d'expérience</span>
           </div>
         )}
         {intervenant.user?.email && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-[#1c2942]/60">
             <Mail className="w-4 h-4" />
             <span className="truncate">{intervenant.user.email}</span>
           </div>
@@ -244,23 +241,53 @@ export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCa
       </div>
 
       {intervenant.disponibility && (
-        <div className="pt-4 border-t border-gray-200 mb-4">
-          <span className="text-xs text-gray-500">
-            {typeof intervenant.disponibility === "boolean" &&
-            intervenant.disponibility
-              ? "Disponible"
-              : typeof intervenant.disponibility === "object"
-              ? "Disponibilités configurées"
-              : "Non disponible"}
-          </span>
+        <div className="pt-4 border-t border-[#1c2942]/10 mb-4">
+          {(() => {
+            const dispo = intervenant.disponibility as { isAvailable?: boolean; unavailableUntil?: string; notes?: string } | boolean;
+            if (typeof dispo === "boolean") {
+              return (
+                <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-full ${
+                  dispo ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                }`}>
+                  {dispo ? "✓ Disponible" : "✗ Non disponible"}
+                </span>
+              );
+            }
+            if (typeof dispo === "object") {
+              const isAvailable = dispo.isAvailable ?? true;
+              const unavailableUntil = dispo.unavailableUntil;
+
+              if (isAvailable) {
+                return (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                    ✓ Disponible
+                  </span>
+                );
+              }
+
+              return (
+                <div className="space-y-1">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-full bg-amber-100 text-amber-700">
+                    ⏳ Indisponible
+                  </span>
+                  {unavailableUntil && (
+                    <p className="text-xs text-gray-500">
+                      Disponible le {new Date(unavailableUntil).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+                    </p>
+                  )}
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
       )}
 
       {/* Boutons d'action */}
-      <div className="pt-4 border-t border-gray-200 space-y-2">
-        {/* Lien vers le profil complet */}
+      <div className="pt-4 border-t border-[#1c2942]/10 flex flex-col gap-2">
+        {/* Bouton vers le profil complet */}
         {intervenant.status === "approved" && (
-          <Link to={`/intervenants/${intervenant.id}`}>
+          <Link to={`/intervenants/${intervenant.id}`} className="w-full">
             <Button
               variant="primary"
               className="w-full flex items-center justify-center gap-2"

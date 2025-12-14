@@ -7,7 +7,6 @@ import { Alert } from "@/components/ui/Alert";
 import { loginFormFields } from "@/config/loginFormConfig";
 import { useState } from "react";
 import { FormField } from "@/components/shared/FormField";
-import { motion } from "motion/react";
 import { LogIn, ArrowLeft, Shield, Sparkles } from "lucide-react";
 
 interface LoginFormData {
@@ -51,97 +50,91 @@ export function LoginForm() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Decorative */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-mesh relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
-        </div>
+      {/* Left Side - Image */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[#1c2942] relative overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop')`,
+          }}
+        />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-[#1c2942]/80" />
 
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-white">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="flex items-center gap-3 mb-8">
-              <img src="/logo.svg" alt="Vizion Academy" className="w-12 h-12" />
-              <div>
-                <span className="text-2xl font-bold block">Vizion</span>
-                <span className="text-sm text-indigo-300">Academy</span>
-              </div>
-            </div>
+          <div className="flex items-center gap-3 mb-8">
+            <img
+              src="/logo.svg"
+              alt="Vizion Academy"
+              className="h-12 w-auto"
+            />
+          </div>
 
-            <h1 className="text-4xl xl:text-5xl font-extrabold mb-6 leading-tight">
-              Connectez-vous à votre{" "}
-              <span className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
-                espace personnel
-              </span>
-            </h1>
+          <h1 className="text-4xl xl:text-5xl font-extrabold mb-6 leading-tight">
+            Connectez-vous à votre{" "}
+            <span className="text-[#ebf2fa]">espace personnel</span>
+          </h1>
 
-            <p className="text-lg text-indigo-100/80 mb-10 max-w-md">
-              Accédez à vos missions, gérez votre profil et connectez-vous avec
-              les meilleures écoles et intervenants.
-            </p>
+          <p className="text-lg text-white/70 mb-10 max-w-md">
+            Accédez à vos missions, gérez votre profil et connectez-vous avec
+            les meilleures écoles et intervenants.
+          </p>
 
-            <div className="space-y-4">
-              {[
-                { icon: <Shield className="w-5 h-5" />, text: "Connexion sécurisée" },
-                { icon: <Sparkles className="w-5 h-5" />, text: "Accès instantané au dashboard" },
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-                    {item.icon}
-                  </div>
-                  <span className="text-indigo-100">{item.text}</span>
+          <div className="space-y-4">
+            {[
+              {
+                icon: <Shield className="w-5 h-5" />,
+                text: "Connexion sécurisée",
+              },
+              {
+                icon: <Sparkles className="w-5 h-5" />,
+                text: "Accès instantané au dashboard",
+              },
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#6d74b5]/30 rounded-xl flex items-center justify-center">
+                  {item.icon}
                 </div>
-              ))}
-            </div>
-          </motion.div>
+                <span className="text-white/80">{item.text}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-gray-50">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
-        >
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-[#ebf2fa]">
+        <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-3">
-              <img src="/logo.svg" alt="Vizion Academy" className="w-10 h-10" />
-              <div className="text-left">
-                <span className="text-xl font-bold text-gray-900 block">Vizion</span>
-                <span className="text-xs text-indigo-600">Academy</span>
-              </div>
+              <img
+                src="/logo.svg"
+                alt="Vizion Academy"
+                className="h-10 w-auto"
+              />
             </Link>
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
+            <h2 className="text-3xl font-extrabold text-[#1c2942] mb-2">
               Bienvenue !
             </h2>
-            <p className="text-gray-600">
+            <p className="text-[#1c2942]/60">
               Connectez-vous pour accéder à votre espace
             </p>
           </div>
 
           {displayError && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6"
-            >
+            <div className="mb-6">
               <Alert type="error" onClose={() => setLocalError(null)}>
                 {displayError}
               </Alert>
-            </motion.div>
+            </div>
           )}
 
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+          <div className="bg-white rounded-2xl shadow-lg border border-[#1c2942]/10 p-8">
             <FormProvider {...methods}>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-5">
@@ -155,15 +148,15 @@ export function LoginForm() {
                     <input
                       type="checkbox"
                       {...register("rememberMe")}
-                      className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                      className="w-4 h-4 rounded border-[#1c2942]/30 text-[#6d74b5] focus:ring-[#6d74b5] cursor-pointer"
                     />
-                    <span className="ml-2 text-gray-600 group-hover:text-gray-900 transition-colors">
+                    <span className="ml-2 text-[#1c2942]/70 group-hover:text-[#1c2942] transition-colors">
                       Se souvenir de moi
                     </span>
                   </label>
                   <Link
                     to="/forgot-password"
-                    className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+                    className="font-medium text-[#6d74b5] hover:text-[#1c2942] transition-colors"
                   >
                     Mot de passe oublié ?
                   </Link>
@@ -171,7 +164,7 @@ export function LoginForm() {
 
                 <Button
                   type="submit"
-                  variant="gradient"
+                  variant="primary"
                   size="lg"
                   isLoading={isLoading}
                   fullWidth
@@ -182,14 +175,14 @@ export function LoginForm() {
               </form>
             </FormProvider>
 
-            <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-              <p className="text-sm text-gray-600">
+            <div className="mt-6 pt-6 border-t border-[#1c2942]/10 text-center">
+              <p className="text-sm text-[#1c2942]/60">
                 Pas encore de compte ?{" "}
                 <Link
-                  to="/register"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
+                  to="/register/intervenant"
+                  className="font-semibold text-[#6d74b5] hover:text-[#1c2942] transition-colors"
                 >
-                  Créer un compte
+                  S'inscrire comme intervenant
                 </Link>
               </p>
             </div>
@@ -198,24 +191,27 @@ export function LoginForm() {
           <div className="mt-8 text-center">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors group"
+              className="inline-flex items-center gap-2 text-sm text-[#1c2942]/50 hover:text-[#1c2942] transition-colors group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               Retour à l'accueil
             </Link>
           </div>
 
-          <p className="mt-6 text-center text-xs text-gray-400">
+          <p className="mt-6 text-center text-xs text-[#1c2942]/40">
             En vous connectant, vous acceptez nos{" "}
-            <a href="#" className="text-indigo-600 hover:underline">
+            <Link to="/cgu" className="text-[#6d74b5] hover:underline">
               CGU
-            </a>{" "}
+            </Link>{" "}
             et notre{" "}
-            <a href="#" className="text-indigo-600 hover:underline">
+            <Link
+              to="/politique-confidentialite"
+              className="text-[#6d74b5] hover:underline"
+            >
               politique de confidentialité
-            </a>
+            </Link>
           </p>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

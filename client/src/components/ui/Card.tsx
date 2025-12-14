@@ -17,11 +17,11 @@ export function Card({
   padding = "none",
 }: CardProps) {
   const variants = {
-    default: "bg-white border border-gray-200/80",
-    elevated: "bg-white shadow-lg shadow-gray-200/50",
-    outlined: "bg-white border-2 border-gray-200",
+    default: "bg-white border border-[#1c2942]/10",
+    elevated: "bg-white shadow-lg shadow-[#1c2942]/10",
+    outlined: "bg-white border-2 border-[#1c2942]/20",
     glass: "glass",
-    gradient: "bg-gradient-to-br from-white to-gray-50 border border-gray-200/50",
+    gradient: "bg-gradient-to-br from-white to-[#ebf2fa] border border-[#1c2942]/10",
   };
 
   const paddings = {
@@ -32,7 +32,7 @@ export function Card({
   };
 
   const hoverStyles = hover
-    ? "transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-200 hover:-translate-y-1 cursor-pointer"
+    ? "transition-all duration-300 hover:shadow-xl hover:shadow-[#1c2942]/10 hover:border-[#6d74b5]/30 hover:-translate-y-1 cursor-pointer"
     : "";
 
   return (
