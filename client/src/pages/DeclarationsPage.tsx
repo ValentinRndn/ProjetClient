@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
-import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import {
   getDeclarations,
@@ -34,7 +32,6 @@ import {
   Calculator,
   AlertCircle,
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
 
 export default function DeclarationsPage() {
   const [declarations, setDeclarations] = useState<Declaration[]>([]);
@@ -167,21 +164,30 @@ export default function DeclarationsPage() {
     switch (status) {
       case "validee":
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
+          <span
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
+            style={{ backgroundColor: "#d1fae5", color: "#065f46" }}
+          >
             <CheckCircle className="w-3 h-3" />
             Validée
           </span>
         );
       case "transmise":
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+          <span
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
+            style={{ backgroundColor: "#dbeafe", color: "#1e40af" }}
+          >
             <CheckCircle className="w-3 h-3" />
             Transmise
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+          <span
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
+            style={{ backgroundColor: "#fef3c7", color: "#92400e" }}
+          >
             <Edit3 className="w-3 h-3" />
             Brouillon
           </span>
@@ -189,266 +195,278 @@ export default function DeclarationsPage() {
     }
   };
 
-  // Calculer les cotisations estimées en temps réel
   const estimatedCotisations = formData.chiffreAffaires
     ? Math.round(parseFloat(formData.chiffreAffaires) * 0.22 * 100) / 100
     : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-mesh">
-        <PageContainer maxWidth="7xl" className="py-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+    <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+      {/* Header avec bannière */}
+      <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+          <Link
+            to="/dashboard/intervenant"
+            className="inline-flex items-center gap-2 text-sm mb-3 transition-colors hover:opacity-80"
+            style={{ color: "rgba(235, 242, 250, 0.7)" }}
           >
-            <Link
-              to="/dashboard/intervenant"
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour au tableau de bord
-            </Link>
+            <ArrowLeft className="w-4 h-4" />
+            Retour au tableau de bord
+          </Link>
 
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div className="text-white">
-                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-4">
-                  <Calculator className="w-4 h-4 text-amber-300" />
-                  <span className="text-sm font-medium">Déclarations URSSAF</span>
-                </div>
-
-                <h1 className="text-4xl font-extrabold mb-2">
-                  Mes déclarations d'activité
-                </h1>
-                <p className="text-lg text-indigo-100/80">
-                  Gérez vos déclarations mensuelles et suivez vos cotisations
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#6d74b5" }}
+              >
+                <Calculator className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Mes Déclarations</h1>
+                <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  Gérez vos déclarations d'activité URSSAF
                 </p>
               </div>
-
-              <Button
-                onClick={() => setShowForm(true)}
-                className="bg-white text-indigo-600 hover:bg-indigo-50"
-              >
-                <Plus className="w-5 h-5" />
-                Nouvelle déclaration
-              </Button>
             </div>
 
-            {/* Totaux de l'année */}
-            {totaux && (
-              <div className="flex flex-wrap gap-4 mt-8">
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4">
-                  <div className="flex items-center gap-2 text-amber-300 mb-1">
-                    <Euro className="w-5 h-5" />
-                    <span className="text-2xl font-bold">
-                      {formatMontant(totaux.chiffreAffaires)}
-                    </span>
-                  </div>
-                  <span className="text-sm text-indigo-100/70">CA {totaux.annee}</span>
-                </div>
+            <Button
+              onClick={() => setShowForm(true)}
+              className="bg-[#6d74b5] hover:bg-[#5a61a0]"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nouvelle déclaration
+            </Button>
+          </div>
 
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4">
-                  <div className="flex items-center gap-2 text-amber-300 mb-1">
-                    <Briefcase className="w-5 h-5" />
-                    <span className="text-2xl font-bold">{totaux.nbMissions}</span>
-                  </div>
-                  <span className="text-sm text-indigo-100/70">Missions</span>
-                </div>
-
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4">
-                  <div className="flex items-center gap-2 text-amber-300 mb-1">
-                    <Clock className="w-5 h-5" />
-                    <span className="text-2xl font-bold">{totaux.nbHeures}h</span>
-                  </div>
-                  <span className="text-sm text-indigo-100/70">Heures</span>
-                </div>
-
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4">
-                  <div className="flex items-center gap-2 text-rose-300 mb-1">
-                    <TrendingUp className="w-5 h-5" />
-                    <span className="text-2xl font-bold">
-                      {formatMontant(totaux.cotisationsSociales + totaux.contributionFormation)}
-                    </span>
-                  </div>
-                  <span className="text-sm text-indigo-100/70">Cotisations</span>
-                </div>
+          {/* Stats inline */}
+          {totaux && (
+            <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-white/20">
+              <div
+                className="px-3 py-1.5 rounded-lg"
+                style={{ backgroundColor: "rgba(16, 185, 129, 0.2)" }}
+              >
+                <Euro className="w-4 h-4 inline mr-1" style={{ color: "#10b981" }} />
+                <span className="font-bold" style={{ color: "#10b981" }}>
+                  {formatMontant(totaux.chiffreAffaires)}
+                </span>
+                <span className="text-sm ml-2" style={{ color: "#10b981" }}>
+                  CA {totaux.annee}
+                </span>
               </div>
-            )}
-          </motion.div>
-        </PageContainer>
+              <div
+                className="px-3 py-1.5 rounded-lg"
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+              >
+                <Briefcase className="w-4 h-4 inline mr-1" style={{ color: "rgba(235, 242, 250, 0.7)" }} />
+                <span className="font-bold text-white">{totaux.nbMissions}</span>
+                <span className="text-sm ml-2" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  Missions
+                </span>
+              </div>
+              <div
+                className="px-3 py-1.5 rounded-lg"
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+              >
+                <Clock className="w-4 h-4 inline mr-1" style={{ color: "rgba(235, 242, 250, 0.7)" }} />
+                <span className="font-bold text-white">{totaux.nbHeures}h</span>
+                <span className="text-sm ml-2" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  Heures
+                </span>
+              </div>
+              <div
+                className="px-3 py-1.5 rounded-lg"
+                style={{ backgroundColor: "rgba(239, 68, 68, 0.2)" }}
+              >
+                <TrendingUp className="w-4 h-4 inline mr-1" style={{ color: "#f87171" }} />
+                <span className="font-bold" style={{ color: "#f87171" }}>
+                  {formatMontant(totaux.cotisationsSociales + totaux.contributionFormation)}
+                </span>
+                <span className="text-sm ml-2" style={{ color: "#f87171" }}>
+                  Cotisations
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      <PageContainer maxWidth="7xl" className="py-8 -mt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Messages */}
         {error && (
-          <Alert type="error" className="mb-6" onClose={() => setError(null)}>
-            {error}
-          </Alert>
+          <div className="mb-6">
+            <Alert type="error" onClose={() => setError(null)}>
+              {error}
+            </Alert>
+          </div>
         )}
         {success && (
-          <Alert type="success" className="mb-6" onClose={() => setSuccess(null)}>
-            {success}
-          </Alert>
+          <div className="mb-6">
+            <Alert type="success" onClose={() => setSuccess(null)}>
+              {success}
+            </Alert>
+          </div>
         )}
 
         {/* Formulaire */}
-        <AnimatePresence>
-          {showForm && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mb-8"
-            >
-              <Card className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">
-                  {editingId ? "Modifier la déclaration" : "Nouvelle déclaration"}
-                </h2>
+        {showForm && (
+          <div className="mb-8 rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-xl font-bold mb-6" style={{ color: "#1c2942" }}>
+              {editingId ? "Modifier la déclaration" : "Nouvelle déclaration"}
+            </h2>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
+                    Période <span style={{ color: "#dc2626" }}>*</span>
+                  </label>
+                  <select
+                    value={formData.periode}
+                    onChange={(e) =>
+                      setFormData({ ...formData, periode: e.target.value })
+                    }
+                    required
+                    disabled={!!editingId}
+                    className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2"
+                    style={{ borderColor: "#ebf2fa" }}
+                  >
+                    <option value="">Sélectionner une période</option>
+                    {periodes.map((p) => (
+                      <option key={p.value} value={p.value}>
+                        {p.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
+                    Chiffre d'affaires (€)
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.chiffreAffaires}
+                    onChange={(e) =>
+                      setFormData({ ...formData, chiffreAffaires: e.target.value })
+                    }
+                    placeholder="0.00"
+                    style={{ borderColor: "#ebf2fa" }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
+                    Nombre de missions
+                  </label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.nbMissions}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nbMissions: e.target.value })
+                    }
+                    placeholder="0"
+                    style={{ borderColor: "#ebf2fa" }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
+                    Nombre d'heures
+                  </label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.nbHeures}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nbHeures: e.target.value })
+                    }
+                    placeholder="0"
+                    style={{ borderColor: "#ebf2fa" }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
+                    Frais professionnels (€)
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.fraisPro}
+                    onChange={(e) =>
+                      setFormData({ ...formData, fraisPro: e.target.value })
+                    }
+                    placeholder="0.00"
+                    style={{ borderColor: "#ebf2fa" }}
+                  />
+                </div>
+
+                <div className="lg:col-span-3">
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
+                    Notes
+                  </label>
+                  <textarea
+                    value={formData.notes}
+                    onChange={(e) =>
+                      setFormData({ ...formData, notes: e.target.value })
+                    }
+                    rows={2}
+                    className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 resize-none"
+                    style={{ borderColor: "#ebf2fa" }}
+                    placeholder="Notes personnelles..."
+                  />
+                </div>
+              </div>
+
+              {/* Estimation des cotisations */}
+              {formData.chiffreAffaires && parseFloat(formData.chiffreAffaires) > 0 && (
+                <div
+                  className="rounded-xl p-4"
+                  style={{ backgroundColor: "#fef3c7", border: "1px solid #fcd34d" }}
+                >
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 mt-0.5" style={{ color: "#d97706" }} />
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Période <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={formData.periode}
-                        onChange={(e) =>
-                          setFormData({ ...formData, periode: e.target.value })
-                        }
-                        required
-                        disabled={!!editingId}
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      >
-                        <option value="">Sélectionner une période</option>
-                        {periodes.map((p) => (
-                          <option key={p.value} value={p.value}>
-                            {p.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Chiffre d'affaires (€)
-                      </label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.chiffreAffaires}
-                        onChange={(e) =>
-                          setFormData({ ...formData, chiffreAffaires: e.target.value })
-                        }
-                        placeholder="0.00"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Nombre de missions
-                      </label>
-                      <Input
-                        type="number"
-                        min="0"
-                        value={formData.nbMissions}
-                        onChange={(e) =>
-                          setFormData({ ...formData, nbMissions: e.target.value })
-                        }
-                        placeholder="0"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Nombre d'heures
-                      </label>
-                      <Input
-                        type="number"
-                        min="0"
-                        value={formData.nbHeures}
-                        onChange={(e) =>
-                          setFormData({ ...formData, nbHeures: e.target.value })
-                        }
-                        placeholder="0"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Frais professionnels (€)
-                      </label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.fraisPro}
-                        onChange={(e) =>
-                          setFormData({ ...formData, fraisPro: e.target.value })
-                        }
-                        placeholder="0.00"
-                      />
-                    </div>
-
-                    <div className="lg:col-span-3">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Notes
-                      </label>
-                      <textarea
-                        value={formData.notes}
-                        onChange={(e) =>
-                          setFormData({ ...formData, notes: e.target.value })
-                        }
-                        rows={2}
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                        placeholder="Notes personnelles..."
-                      />
+                      <p className="font-medium" style={{ color: "#92400e" }}>
+                        Cotisations estimées : {formatMontant(estimatedCotisations * 100)}
+                      </p>
+                      <p className="text-sm mt-1" style={{ color: "#a16207" }}>
+                        Basé sur le taux de 22% pour les prestations de services (auto-entrepreneur).
+                      </p>
                     </div>
                   </div>
+                </div>
+              )}
 
-                  {/* Estimation des cotisations */}
-                  {formData.chiffreAffaires && parseFloat(formData.chiffreAffaires) > 0 && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                      <div className="flex items-start gap-3">
-                        <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
-                        <div>
-                          <p className="font-medium text-amber-800">
-                            Cotisations estimées : {formatMontant(estimatedCotisations * 100)}
-                          </p>
-                          <p className="text-sm text-amber-700 mt-1">
-                            Basé sur le taux de 22% pour les prestations de services (auto-entrepreneur).
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex gap-3">
-                    <Button type="submit" variant="primary">
-                      <Save className="w-4 h-4" />
-                      {editingId ? "Mettre à jour" : "Enregistrer"}
-                    </Button>
-                    <Button type="button" variant="outline" onClick={resetForm}>
-                      <X className="w-4 h-4" />
-                      Annuler
-                    </Button>
-                  </div>
-                </form>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <div className="flex gap-3">
+                <Button type="submit" variant="primary" className="bg-[#6d74b5] hover:bg-[#5a61a0]">
+                  <Save className="w-4 h-4 mr-2" />
+                  {editingId ? "Mettre à jour" : "Enregistrer"}
+                </Button>
+                <Button type="button" variant="secondary" onClick={resetForm} style={{ borderColor: "#ebf2fa" }}>
+                  <X className="w-4 h-4 mr-2" />
+                  Annuler
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
 
         {/* Filtre par année */}
-        <div className="flex items-center gap-4 mb-6">
-          <label className="text-sm font-medium text-gray-700">Année :</label>
+        <div
+          className="flex items-center gap-4 mb-6 p-4 rounded-xl"
+          style={{ backgroundColor: "#ffffff" }}
+        >
+          <label className="text-sm font-medium" style={{ color: "#1c2942" }}>Année :</label>
           <select
             value={selectedAnnee}
             onChange={(e) => setSelectedAnnee(Number(e.target.value))}
-            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-4 py-2 border rounded-xl focus:outline-none focus:ring-2"
+            style={{ borderColor: "#ebf2fa" }}
           >
             {[2024, 2025, 2026].map((annee) => (
               <option key={annee} value={annee}>
@@ -464,115 +482,124 @@ export default function DeclarationsPage() {
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-gray-100 p-6 animate-pulse"
+                className="rounded-xl p-6 animate-pulse"
+                style={{ backgroundColor: "#ffffff" }}
               >
                 <div className="flex justify-between items-start">
                   <div className="space-y-2">
-                    <div className="h-6 bg-gray-200 rounded w-32" />
-                    <div className="h-4 bg-gray-200 rounded w-24" />
+                    <div className="h-6 rounded w-32" style={{ backgroundColor: "#ebf2fa" }} />
+                    <div className="h-4 rounded w-24" style={{ backgroundColor: "#ebf2fa" }} />
                   </div>
-                  <div className="h-8 bg-gray-200 rounded w-24" />
+                  <div className="h-8 rounded w-24" style={{ backgroundColor: "#ebf2fa" }} />
                 </div>
               </div>
             ))}
           </div>
         ) : declarations.length === 0 ? (
-          <Card className="p-12 text-center">
-            <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-8 h-8 text-indigo-600" />
+          <div
+            className="rounded-xl p-12 text-center"
+            style={{ backgroundColor: "#ffffff" }}
+          >
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ backgroundColor: "#ebf2fa" }}
+            >
+              <FileText className="w-8 h-8" style={{ color: "#6d74b5" }} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+            <h3 className="text-xl font-bold mb-2" style={{ color: "#1c2942" }}>
               Aucune déclaration
             </h3>
-            <p className="text-gray-500 mb-6">
+            <p className="mb-6" style={{ color: "#6d74b5" }}>
               Commencez par créer votre première déclaration d'activité.
             </p>
-            <Button onClick={() => setShowForm(true)} variant="primary">
-              <Plus className="w-4 h-4" />
+            <Button onClick={() => setShowForm(true)} variant="primary" className="bg-[#6d74b5] hover:bg-[#5a61a0]">
+              <Plus className="w-4 h-4 mr-2" />
               Créer une déclaration
             </Button>
-          </Card>
+          </div>
         ) : (
           <div className="space-y-4">
-            {declarations.map((declaration, index) => (
-              <motion.div
+            {declarations.map((declaration) => (
+              <div
                 key={declaration.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
+                className="rounded-xl p-6"
+                style={{ backgroundColor: "#ffffff" }}
               >
-                <Card className="p-6 hover:shadow-lg transition-shadow">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center shrink-0">
-                        <Calendar className="w-6 h-6 text-indigo-600" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-3 mb-1">
-                          <h3 className="font-semibold text-lg text-gray-900">
-                            {formatPeriode(declaration.periode)}
-                          </h3>
-                          {getStatusBadge(declaration.status)}
-                        </div>
-                        <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Euro className="w-4 h-4" />
-                            CA : {formatMontant(declaration.chiffreAffaires)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Briefcase className="w-4 h-4" />
-                            {declaration.nbMissions} missions
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {declaration.nbHeures}h
-                          </span>
-                        </div>
-                        {declaration.cotisationsSociales > 0 && (
-                          <p className="text-sm text-rose-600 mt-1">
-                            Cotisations : {formatMontant(declaration.cotisationsSociales + declaration.contributionFormation)}
-                          </p>
-                        )}
-                      </div>
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: "#ebf2fa" }}
+                    >
+                      <Calendar className="w-6 h-6" style={{ color: "#6d74b5" }} />
                     </div>
-
-                    <div className="flex gap-2">
-                      {declaration.status === "brouillon" && (
-                        <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEdit(declaration)}
-                          >
-                            <Edit3 className="w-4 h-4" />
-                            Modifier
-                          </Button>
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => handleValider(declaration.id)}
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                            Valider
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-rose-600 border-rose-200 hover:bg-rose-50"
-                            onClick={() => handleDelete(declaration.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="font-semibold text-lg" style={{ color: "#1c2942" }}>
+                          {formatPeriode(declaration.periode)}
+                        </h3>
+                        {getStatusBadge(declaration.status)}
+                      </div>
+                      <div className="flex flex-wrap gap-4 text-sm" style={{ color: "#6d74b5" }}>
+                        <span className="flex items-center gap-1">
+                          <Euro className="w-4 h-4" />
+                          CA : {formatMontant(declaration.chiffreAffaires)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Briefcase className="w-4 h-4" />
+                          {declaration.nbMissions} missions
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {declaration.nbHeures}h
+                        </span>
+                      </div>
+                      {declaration.cotisationsSociales > 0 && (
+                        <p className="text-sm mt-1" style={{ color: "#dc2626" }}>
+                          Cotisations : {formatMontant(declaration.cotisationsSociales + declaration.contributionFormation)}
+                        </p>
                       )}
                     </div>
                   </div>
-                </Card>
-              </motion.div>
+
+                  <div className="flex gap-2">
+                    {declaration.status === "brouillon" && (
+                      <>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleEdit(declaration)}
+                          style={{ borderColor: "#ebf2fa" }}
+                        >
+                          <Edit3 className="w-4 h-4 mr-1" />
+                          Modifier
+                        </Button>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleValider(declaration.id)}
+                          className="bg-emerald-500 hover:bg-emerald-600"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          Valider
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleDelete(declaration.id)}
+                          style={{ borderColor: "#fecaca", color: "#dc2626" }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
-      </PageContainer>
+      </div>
     </div>
   );
 }

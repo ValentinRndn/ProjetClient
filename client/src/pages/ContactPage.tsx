@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { PageContainer } from "@/components/ui/PageContainer";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
-import { Mail, Phone, MapPin, Send, CheckCircle, MessageSquare, Clock, ArrowRight, Building2, Handshake, HelpCircle, MoreHorizontal } from "lucide-react";
-import { motion } from "motion/react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Send,
+  CheckCircle,
+  MessageSquare,
+  Clock,
+  ArrowRight,
+  Handshake,
+  HelpCircle,
+  MoreHorizontal,
+} from "lucide-react";
 import { submitContactForm, type ContactType } from "@/services/contact";
 
 interface ContactFormData {
@@ -50,19 +59,38 @@ export default function ContactPage() {
     } catch (err: unknown) {
       const errorMessage =
         err && typeof err === "object" && "response" in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
           : "Erreur lors de l'envoi du message. Veuillez réessayer.";
-      setError(errorMessage || "Erreur lors de l'envoi du message. Veuillez réessayer.");
+      setError(
+        errorMessage || "Erreur lors de l'envoi du message. Veuillez réessayer."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const requestTypes = [
-    { value: "contact", label: "Question générale", icon: MessageSquare, color: "from-indigo-500 to-purple-600" },
-    { value: "partenariat", label: "Demande de partenariat", icon: Handshake, color: "from-emerald-500 to-teal-600" },
-    { value: "support", label: "Support technique", icon: HelpCircle, color: "from-amber-500 to-orange-600" },
-    { value: "autre", label: "Autre demande", icon: MoreHorizontal, color: "from-gray-500 to-slate-600" },
+    {
+      value: "contact",
+      label: "Question générale",
+      icon: MessageSquare,
+    },
+    {
+      value: "partenariat",
+      label: "Demande de partenariat",
+      icon: Handshake,
+    },
+    {
+      value: "support",
+      label: "Support technique",
+      icon: HelpCircle,
+    },
+    {
+      value: "autre",
+      label: "Autre demande",
+      icon: MoreHorizontal,
+    },
   ];
 
   const contactInfo = [
@@ -71,132 +99,132 @@ export default function ContactPage() {
       title: "Email",
       value: "secretariat@vizionacademy.fr",
       href: "mailto:secretariat@vizionacademy.fr",
-      color: "from-indigo-500 to-purple-600",
     },
     {
       icon: <Phone className="w-5 h-5" />,
       title: "Téléphone",
       value: "06 59 19 65 50",
       href: "tel:0659196550",
-      color: "from-emerald-500 to-teal-600",
     },
     {
       icon: <MapPin className="w-5 h-5" />,
       title: "Adresse",
       value: "Paris, France",
-      color: "from-amber-500 to-orange-600",
     },
     {
       icon: <Clock className="w-5 h-5" />,
       title: "Réponse",
       value: "Sous 24-48h",
-      color: "from-blue-500 to-cyan-600",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-mesh text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center"
-          >
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-xl rounded-full px-5 py-2.5 mb-6 border border-white/20">
-              <MessageSquare className="w-4 h-4" />
-              <span className="text-sm font-medium">Parlons de votre projet</span>
+    <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+      {/* Header compact */}
+      <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: "#6d74b5" }}
+            >
+              <MessageSquare className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 tracking-tight">
-              Contactez-nous
-            </h1>
-            <p className="text-lg sm:text-xl text-indigo-100/90 max-w-2xl mx-auto">
-              Une question ? Un projet ? Notre équipe est à votre écoute
-              et vous répondra dans les plus brefs délais.
-            </p>
-          </motion.div>
+            <div>
+              <h1 className="text-xl font-bold text-white">Contactez-nous</h1>
+              <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                Notre équipe est à votre écoute
+              </p>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50 to-transparent" />
-      </section>
-
-      <PageContainer maxWidth="6xl" className="py-12 -mt-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Contact Info Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {contactInfo.map((info, index) => (
             <div
               key={index}
-              className="group relative bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-lg hover:border-indigo-100 transition-all duration-300"
+              className="rounded-xl p-5 shadow-sm"
+              style={{ backgroundColor: "#ffffff" }}
             >
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${info.color} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
+              <div
+                className="w-11 h-11 rounded-lg flex items-center justify-center text-white mb-3"
+                style={{ backgroundColor: "#6d74b5" }}
+              >
                 {info.icon}
               </div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">{info.title}</h3>
+              <h3
+                className="text-sm font-medium mb-1"
+                style={{ color: "#6d74b5" }}
+              >
+                {info.title}
+              </h3>
               {info.href ? (
                 <a
                   href={info.href}
-                  className="text-gray-900 font-semibold hover:text-indigo-600 transition-colors break-all sm:break-normal text-sm sm:text-base"
+                  className="font-semibold text-sm hover:opacity-80 transition-opacity break-all sm:break-normal"
+                  style={{ color: "#1c2942" }}
                 >
                   {info.value}
                 </a>
               ) : (
-                <p className="text-gray-900 font-semibold text-sm sm:text-base">{info.value}</p>
+                <p
+                  className="font-semibold text-sm"
+                  style={{ color: "#1c2942" }}
+                >
+                  {info.value}
+                </p>
               )}
             </div>
           ))}
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Left Side - Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="lg:col-span-2 space-y-6"
-          >
-            <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-8 text-white">
-              <h2 className="text-2xl font-bold mb-4">Besoin d'aide ?</h2>
-              <p className="text-indigo-100 mb-6">
+          <div className="lg:col-span-2 space-y-5">
+            <div
+              className="rounded-xl p-6 text-white"
+              style={{ backgroundColor: "#1c2942" }}
+            >
+              <h2 className="text-xl font-bold mb-3">Besoin d'aide ?</h2>
+              <p className="text-sm mb-5" style={{ color: "#ebf2fa" }}>
                 Notre équipe est disponible pour répondre à toutes vos questions
                 concernant notre plateforme et nos services.
               </p>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4" />
+              <div className="space-y-3">
+                {[
+                  "Réponse garantie sous 48h",
+                  "Support personnalisé",
+                  "Accompagnement dédié",
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <div
+                      className="w-7 h-7 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: "#6d74b5" }}
+                    >
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm" style={{ color: "#ebf2fa" }}>
+                      {item}
+                    </span>
                   </div>
-                  <span className="text-sm">Réponse garantie sous 48h</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4" />
-                  </div>
-                  <span className="text-sm">Support personnalisé</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4" />
-                  </div>
-                  <span className="text-sm">Accompagnement dédié</span>
-                </div>
+                ))}
               </div>
             </div>
 
-            <Card variant="outlined" className="p-6">
-              <h3 className="font-semibold text-gray-900 mb-3">FAQ Rapide</h3>
-              <div className="space-y-3">
+            <div
+              className="rounded-xl p-5"
+              style={{ backgroundColor: "#ffffff" }}
+            >
+              <h3
+                className="font-semibold mb-3"
+                style={{ color: "#1c2942" }}
+              >
+                FAQ Rapide
+              </h3>
+              <div className="space-y-2">
                 {[
                   "Comment devenir intervenant ?",
                   "Comment inscrire mon école ?",
@@ -205,67 +233,84 @@ export default function ContactPage() {
                   <a
                     key={idx}
                     href="#"
-                    className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-indigo-50 group transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg transition-colors"
+                    style={{ backgroundColor: "#ebf2fa" }}
                   >
-                    <span className="text-sm text-gray-700 group-hover:text-indigo-700">{question}</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+                    <span className="text-sm" style={{ color: "#1c2942" }}>
+                      {question}
+                    </span>
+                    <ArrowRight
+                      className="w-4 h-4"
+                      style={{ color: "#6d74b5" }}
+                    />
                   </a>
                 ))}
               </div>
-            </Card>
-          </motion.div>
+            </div>
+          </div>
 
           {/* Formulaire */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="lg:col-span-3"
-          >
-            <Card variant="elevated" className="p-8">
+          <div className="lg:col-span-3">
+            <div
+              className="rounded-xl shadow-sm p-6"
+              style={{ backgroundColor: "#ffffff" }}
+            >
               {success ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-12"
-                >
-                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30">
-                    <CheckCircle className="w-10 h-10 text-white" />
+                <div className="text-center py-10">
+                  <div
+                    className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-5"
+                    style={{ backgroundColor: "#6d74b5" }}
+                  >
+                    <CheckCircle className="w-8 h-8 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                  <h2
+                    className="text-2xl font-bold mb-3"
+                    style={{ color: "#1c2942" }}
+                  >
                     Message envoyé !
                   </h2>
-                  <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                    Merci pour votre message. Notre équipe vous répondra dans les plus
-                    brefs délais.
+                  <p className="mb-6 max-w-md mx-auto" style={{ color: "#6d74b5" }}>
+                    Merci pour votre message. Notre équipe vous répondra dans
+                    les plus brefs délais.
                   </p>
-                  <Button onClick={() => setSuccess(false)} variant="secondary">
+                  <Button
+                    onClick={() => setSuccess(false)}
+                    variant="secondary"
+                    style={{ backgroundColor: "#ebf2fa", color: "#1c2942" }}
+                  >
                     Envoyer un autre message
                   </Button>
-                </motion.div>
+                </div>
               ) : (
                 <>
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  <div className="mb-6">
+                    <h2
+                      className="text-xl font-bold mb-2"
+                      style={{ color: "#1c2942" }}
+                    >
                       Envoyez-nous un message
                     </h2>
-                    <p className="text-gray-600">
-                      Remplissez le formulaire ci-dessous et nous vous répondrons rapidement.
+                    <p className="text-sm" style={{ color: "#6d74b5" }}>
+                      Remplissez le formulaire ci-dessous et nous vous
+                      répondrons rapidement.
                     </p>
                   </div>
 
                   {error && (
-                    <div className="mb-6">
+                    <div className="mb-5">
                       <Alert type="error" onClose={() => setError(null)}>
                         {error}
                       </Alert>
                     </div>
                   )}
 
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     {/* Type de demande */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                      <label
+                        className="block text-sm font-medium mb-3"
+                        style={{ color: "#1c2942" }}
+                      >
                         Type de demande <span className="text-red-500">*</span>
                       </label>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -275,11 +320,13 @@ export default function ContactPage() {
                           return (
                             <label
                               key={type.value}
-                              className={`relative flex flex-col items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                                isSelected
-                                  ? "border-indigo-500 bg-indigo-50"
-                                  : "border-gray-200 hover:border-gray-300 bg-white"
-                              }`}
+                              className="relative flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all"
+                              style={{
+                                borderColor: isSelected ? "#6d74b5" : "#ebf2fa",
+                                backgroundColor: isSelected
+                                  ? "#ebf2fa"
+                                  : "#ffffff",
+                              }}
                             >
                               <input
                                 type="radio"
@@ -288,15 +335,24 @@ export default function ContactPage() {
                                 className="sr-only"
                               />
                               <div
-                                className={`w-10 h-10 rounded-lg bg-gradient-to-br ${type.color} flex items-center justify-center text-white mb-2`}
+                                className="w-9 h-9 rounded-lg flex items-center justify-center text-white mb-2"
+                                style={{ backgroundColor: "#6d74b5" }}
                               >
-                                <Icon className="w-5 h-5" />
+                                <Icon className="w-4 h-4" />
                               </div>
-                              <span className={`text-xs text-center font-medium ${isSelected ? "text-indigo-700" : "text-gray-600"}`}>
+                              <span
+                                className="text-xs text-center font-medium"
+                                style={{
+                                  color: isSelected ? "#1c2942" : "#6d74b5",
+                                }}
+                              >
                                 {type.label}
                               </span>
                               {isSelected && (
-                                <div className="absolute top-2 right-2 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center">
+                                <div
+                                  className="absolute top-2 right-2 w-4 h-4 rounded-full flex items-center justify-center"
+                                  style={{ backgroundColor: "#6d74b5" }}
+                                >
                                   <CheckCircle className="w-3 h-3 text-white" />
                                 </div>
                               )}
@@ -306,9 +362,12 @@ export default function ContactPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          className="block text-sm font-medium mb-2"
+                          style={{ color: "#1c2942" }}
+                        >
                           Nom complet <span className="text-red-500">*</span>
                         </label>
                         <Input
@@ -316,16 +375,22 @@ export default function ContactPage() {
                             required: "Le nom est obligatoire",
                           })}
                           placeholder="Jean Dupont"
-                          className={errors.name ? "border-red-500 focus:ring-red-500" : ""}
+                          className="h-11 rounded-lg"
+                          style={{
+                            borderColor: errors.name ? "#ef4444" : "#ebf2fa",
+                          }}
                         />
                         {errors.name && (
-                          <p className="text-red-500 text-sm mt-1.5">
+                          <p className="text-red-500 text-sm mt-1">
                             {errors.name.message}
                           </p>
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          className="block text-sm font-medium mb-2"
+                          style={{ color: "#1c2942" }}
+                        >
                           Email <span className="text-red-500">*</span>
                         </label>
                         <Input
@@ -338,10 +403,13 @@ export default function ContactPage() {
                             },
                           })}
                           placeholder="jean@exemple.fr"
-                          className={errors.email ? "border-red-500 focus:ring-red-500" : ""}
+                          className="h-11 rounded-lg"
+                          style={{
+                            borderColor: errors.email ? "#ef4444" : "#ebf2fa",
+                          }}
                         />
                         {errors.email && (
-                          <p className="text-red-500 text-sm mt-1.5">
+                          <p className="text-red-500 text-sm mt-1">
                             {errors.email.message}
                           </p>
                         )}
@@ -349,32 +417,52 @@ export default function ContactPage() {
                     </div>
 
                     {/* Champs optionnels pour partenariat */}
-                    {(selectedType === "partenariat" || selectedType === "contact") && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {(selectedType === "partenariat" ||
+                      selectedType === "contact") && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label
+                            className="block text-sm font-medium mb-2"
+                            style={{ color: "#1c2942" }}
+                          >
                             Téléphone
                           </label>
                           <Input
                             {...register("phone")}
                             placeholder="06 12 34 56 78"
                             type="tel"
+                            className="h-11 rounded-lg"
+                            style={{ borderColor: "#ebf2fa" }}
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {selectedType === "partenariat" ? "École / Entreprise" : "Organisation"}
+                          <label
+                            className="block text-sm font-medium mb-2"
+                            style={{ color: "#1c2942" }}
+                          >
+                            {selectedType === "partenariat"
+                              ? "École / Entreprise"
+                              : "Organisation"}
                           </label>
                           <Input
                             {...register("company")}
-                            placeholder={selectedType === "partenariat" ? "Nom de votre école" : "Nom de votre organisation"}
+                            placeholder={
+                              selectedType === "partenariat"
+                                ? "Nom de votre école"
+                                : "Nom de votre organisation"
+                            }
+                            className="h-11 rounded-lg"
+                            style={{ borderColor: "#ebf2fa" }}
                           />
                         </div>
                       </div>
                     )}
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1c2942" }}
+                      >
                         Sujet <span className="text-red-500">*</span>
                       </label>
                       <Input
@@ -382,17 +470,23 @@ export default function ContactPage() {
                           required: "Le sujet est obligatoire",
                         })}
                         placeholder="Objet de votre message"
-                        className={errors.subject ? "border-red-500 focus:ring-red-500" : ""}
+                        className="h-11 rounded-lg"
+                        style={{
+                          borderColor: errors.subject ? "#ef4444" : "#ebf2fa",
+                        }}
                       />
                       {errors.subject && (
-                        <p className="text-red-500 text-sm mt-1.5">
+                        <p className="text-red-500 text-sm mt-1">
                           {errors.subject.message}
                         </p>
                       )}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1c2942" }}
+                      >
                         Message <span className="text-red-500">*</span>
                       </label>
                       <textarea
@@ -400,17 +494,21 @@ export default function ContactPage() {
                           required: "Le message est obligatoire",
                           minLength: {
                             value: 10,
-                            message: "Le message doit faire au moins 10 caractères",
+                            message:
+                              "Le message doit faire au moins 10 caractères",
                           },
                         })}
-                        rows={5}
+                        rows={4}
                         placeholder="Décrivez votre demande..."
-                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition resize-none ${
-                          errors.message ? "border-red-500" : "border-gray-200"
-                        }`}
+                        className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition resize-none"
+                        style={{
+                          borderWidth: "1px",
+                          borderColor: errors.message ? "#ef4444" : "#ebf2fa",
+                          color: "#1c2942",
+                        }}
                       />
                       {errors.message && (
-                        <p className="text-red-500 text-sm mt-1.5">
+                        <p className="text-red-500 text-sm mt-1">
                           {errors.message.message}
                         </p>
                       )}
@@ -418,10 +516,12 @@ export default function ContactPage() {
 
                     <Button
                       type="submit"
-                      variant="gradient"
+                      variant="primary"
                       size="lg"
                       isLoading={isLoading}
                       fullWidth
+                      className="h-12 rounded-lg"
+                      style={{ backgroundColor: "#6d74b5", color: "#ffffff" }}
                     >
                       <Send className="w-4 h-4" />
                       Envoyer le message
@@ -429,10 +529,10 @@ export default function ContactPage() {
                   </form>
                 </>
               )}
-            </Card>
-          </motion.div>
+            </div>
+          </div>
         </div>
-      </PageContainer>
+      </div>
     </div>
   );
 }

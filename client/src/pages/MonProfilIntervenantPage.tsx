@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { getIntervenantById, updateIntervenant, uploadDocument, fetchDocumentAsBlob, type Document, type UpdateIntervenantData } from "@/services/intervenants";
-import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import {
@@ -58,7 +57,6 @@ export default function MonProfilIntervenantPage() {
   }, [user]);
 
   const fetchIntervenant = async () => {
-    // Si pas d'intervenant.id et qu'on n'a pas encore essayé de rafraîchir, on rafraîchit
     if (!user?.intervenant?.id) {
       if (!hasTriedRefresh && user?.role === "INTERVENANT") {
         setHasTriedRefresh(true);
@@ -146,7 +144,6 @@ export default function MonProfilIntervenantPage() {
       setError(null);
       await uploadDocument(user.intervenant.id, file, "PROFILE_IMAGE");
       setSuccess("Photo de profil mise à jour !");
-      // Recharger les données de l'intervenant
       const data = await getIntervenantById(user.intervenant.id);
       setIntervenant(data);
       await loadProfileImage(data);
@@ -180,63 +177,156 @@ export default function MonProfilIntervenantPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#ebf2fa]">
-        <PageContainer maxWidth="4xl" className="py-8">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-white rounded w-1/3"></div>
-            <div className="bg-white rounded-2xl p-8 space-y-6">
-              <div className="h-32 w-32 bg-[#ebf2fa] rounded-full mx-auto"></div>
-              <div className="h-10 bg-[#ebf2fa] rounded"></div>
-              <div className="h-10 bg-[#ebf2fa] rounded"></div>
-              <div className="h-32 bg-[#ebf2fa] rounded"></div>
+      <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+        <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+            <div className="h-4 w-32 rounded mb-3" style={{ backgroundColor: "rgba(255,255,255,0.1)" }}></div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg" style={{ backgroundColor: "#6d74b5" }}></div>
+              <div>
+                <div className="h-6 w-40 rounded mb-2" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}></div>
+                <div className="h-4 w-64 rounded" style={{ backgroundColor: "rgba(255,255,255,0.1)" }}></div>
+              </div>
             </div>
           </div>
-        </PageContainer>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="animate-pulse space-y-6">
+            <div className="rounded-xl p-8 space-y-6" style={{ backgroundColor: "#ffffff" }}>
+              <div className="h-32 w-32 rounded-full mx-auto" style={{ backgroundColor: "#ebf2fa" }}></div>
+              <div className="h-10 rounded" style={{ backgroundColor: "#ebf2fa" }}></div>
+              <div className="h-10 rounded" style={{ backgroundColor: "#ebf2fa" }}></div>
+              <div className="h-32 rounded" style={{ backgroundColor: "#ebf2fa" }}></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!intervenant) {
     return (
-      <div className="min-h-screen bg-[#ebf2fa]">
-        <PageContainer maxWidth="4xl" className="py-8">
-          <Alert type="error">Profil intervenant non trouvé</Alert>
-          <Link to="/dashboard" className="mt-4 inline-block">
-            <Button variant="outline">
+      <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+        <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+            <Link
+              to="/dashboard/intervenant"
+              className="inline-flex items-center gap-2 text-sm mb-3 transition-colors hover:opacity-80"
+              style={{ color: "rgba(235, 242, 250, 0.7)" }}
+            >
               <ArrowLeft className="w-4 h-4" />
-              Retour au dashboard
-            </Button>
-          </Link>
-        </PageContainer>
+              Retour au tableau de bord
+            </Link>
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#6d74b5" }}
+              >
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Mon Profil Public</h1>
+                <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  Profil intervenant non trouvé
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <Alert type="error">Profil intervenant non trouvé</Alert>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#ebf2fa]">
-      <PageContainer maxWidth="4xl" className="py-8">
-        {/* Header */}
-        <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 mb-6">
+    <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+      {/* Header avec bannière */}
+      <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
           <Link
             to="/dashboard/intervenant"
-            className="inline-flex items-center gap-2 text-[#1c2942]/60 hover:text-[#1c2942] mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-sm mb-3 transition-colors hover:opacity-80"
+            style={{ color: "rgba(235, 242, 250, 0.7)" }}
           >
             <ArrowLeft className="w-4 h-4" />
             Retour au tableau de bord
           </Link>
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-[#1c2942] rounded-xl flex items-center justify-center">
-              <User className="w-6 h-6 text-white" />
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#6d74b5" }}
+              >
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Mon Profil Public</h1>
+                <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  Complétez votre profil pour augmenter votre visibilité
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-[#1c2942]">Mon Profil Public</h1>
-              <p className="text-sm text-[#1c2942]/60">
-                Complétez votre profil pour augmenter votre visibilité auprès des écoles
-              </p>
-            </div>
+
+            {intervenant?.status === "approved" && (
+              <Link to={`/intervenants/${intervenant.id}`}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  style={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderColor: "rgba(255, 255, 255, 0.2)", color: "#ffffff" }}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Voir mon profil public
+                </Button>
+              </Link>
+            )}
+          </div>
+
+          {/* Stats inline */}
+          <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-white/20">
+            {[
+              { value: expertises.length, label: "Expertises" },
+              { value: intervenant?.yearsExperience || 0, label: "Années d'exp." },
+              { value: intervenant?.status === "approved" ? "Approuvé" : "En attente", label: "Statut", isStatus: true },
+            ].map((stat, idx) => (
+              <div
+                key={idx}
+                className="px-3 py-1.5 rounded-lg"
+                style={{
+                  backgroundColor: stat.isStatus && intervenant?.status === "approved"
+                    ? "rgba(16, 185, 129, 0.2)"
+                    : "rgba(255, 255, 255, 0.1)"
+                }}
+              >
+                <span
+                  className="font-bold"
+                  style={{
+                    color: stat.isStatus && intervenant?.status === "approved"
+                      ? "#10b981"
+                      : "#ffffff"
+                  }}
+                >
+                  {stat.value}
+                </span>
+                <span
+                  className="text-sm ml-2"
+                  style={{
+                    color: stat.isStatus && intervenant?.status === "approved"
+                      ? "#10b981"
+                      : "rgba(235, 242, 250, 0.7)"
+                  }}
+                >
+                  {stat.label}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {error && (
           <div className="mb-6">
             <Alert type="error" onClose={() => setError(null)}>{error}</Alert>
@@ -251,9 +341,9 @@ export default function MonProfilIntervenantPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Photo de profil */}
-          <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6">
-            <h2 className="text-lg font-bold text-[#1c2942] mb-6 flex items-center gap-2">
-              <Camera className="w-5 h-5 text-[#6d74b5]" />
+          <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <Camera className="w-5 h-5" style={{ color: "#6d74b5" }} />
               Photo de profil
             </h2>
 
@@ -263,14 +353,21 @@ export default function MonProfilIntervenantPage() {
                   <img
                     src={profileImageUrl}
                     alt="Photo de profil"
-                    className="w-32 h-32 rounded-full object-cover border-4 border-[#ebf2fa]"
+                    className="w-32 h-32 rounded-full object-cover border-4"
+                    style={{ borderColor: "#ebf2fa" }}
                   />
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-[#ebf2fa] flex items-center justify-center">
-                    <User className="w-16 h-16 text-[#6d74b5]" />
+                  <div
+                    className="w-32 h-32 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: "#ebf2fa" }}
+                  >
+                    <User className="w-16 h-16" style={{ color: "#6d74b5" }} />
                   </div>
                 )}
-                <label className="absolute bottom-0 right-0 w-10 h-10 bg-[#6d74b5] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#5a61a0] transition-colors">
+                <label
+                  className="absolute bottom-0 right-0 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
+                  style={{ backgroundColor: "#6d74b5" }}
+                >
                   <Camera className="w-5 h-5 text-white" />
                   <input
                     type="file"
@@ -282,10 +379,10 @@ export default function MonProfilIntervenantPage() {
                 </label>
               </div>
               <div className="text-center md:text-left">
-                <p className="text-[#1c2942]/70">
+                <p style={{ color: "#1c2942" }}>
                   Uploadez une photo professionnelle pour personnaliser votre profil.
                 </p>
-                <p className="text-sm text-[#1c2942]/50 mt-1">
+                <p className="text-sm mt-1" style={{ color: "#6d74b5" }}>
                   Formats acceptés : JPG, PNG. Taille max : 5 Mo
                 </p>
               </div>
@@ -293,71 +390,76 @@ export default function MonProfilIntervenantPage() {
           </div>
 
           {/* Informations personnelles */}
-          <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6">
-            <h2 className="text-lg font-bold text-[#1c2942] mb-6 flex items-center gap-2">
-              <User className="w-5 h-5 text-[#6d74b5]" />
+          <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <User className="w-5 h-5" style={{ color: "#6d74b5" }} />
               Informations personnelles
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-[#1c2942] mb-2">Prénom</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>Prénom</label>
                 <input
                   type="text"
                   {...register("firstName")}
-                  className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
                   placeholder="Jean"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#1c2942] mb-2">Nom</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>Nom</label>
                 <input
                   type="text"
                   {...register("lastName")}
-                  className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
                   placeholder="Dupont"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#1c2942] mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
                   <Phone className="w-4 h-4 inline mr-1" />
                   Téléphone
                 </label>
                 <input
                   type="tel"
                   {...register("phone")}
-                  className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
                   placeholder="06 12 34 56 78"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#1c2942] mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
                   <MapPin className="w-4 h-4 inline mr-1" />
                   Ville
                 </label>
                 <input
                   type="text"
                   {...register("city")}
-                  className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
                   placeholder="Paris"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-[#1c2942] mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
                   <FileText className="w-4 h-4 inline mr-1" />
                   Biographie
                 </label>
                 <textarea
                   {...register("bio")}
                   rows={5}
-                  className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all resize-none"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all resize-none"
+                  style={{ borderColor: "#ebf2fa" }}
                   placeholder="Présentez-vous en quelques lignes : votre parcours, vos compétences, ce qui vous passionne..."
                 />
-                <p className="text-sm text-[#1c2942]/50 mt-1">
+                <p className="text-sm mt-1" style={{ color: "#6d74b5" }}>
                   Une bonne biographie augmente vos chances d'être contacté
                 </p>
               </div>
@@ -365,38 +467,40 @@ export default function MonProfilIntervenantPage() {
           </div>
 
           {/* Informations professionnelles */}
-          <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6">
-            <h2 className="text-lg font-bold text-[#1c2942] mb-6 flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-[#6d74b5]" />
+          <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <Briefcase className="w-5 h-5" style={{ color: "#6d74b5" }} />
               Informations professionnelles
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-[#1c2942] mb-2">Numéro SIRET</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>Numéro SIRET</label>
                 <input
                   type="text"
                   {...register("siret")}
                   maxLength={14}
-                  className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all font-mono"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all font-mono"
+                  style={{ borderColor: "#ebf2fa" }}
                   placeholder="12345678901234"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#1c2942] mb-2">Années d'expérience</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>Années d'expérience</label>
                 <input
                   type="number"
                   {...register("yearsExperience")}
                   min={0}
                   max={60}
-                  className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
                   placeholder="5"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-[#1c2942] mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
                   <Award className="w-4 h-4 inline mr-1" />
                   Domaines d'expertise
                 </label>
@@ -404,13 +508,15 @@ export default function MonProfilIntervenantPage() {
                   {expertises.map((exp, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#ebf2fa] text-[#6d74b5] rounded-full text-sm font-medium"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium"
+                      style={{ backgroundColor: "#ebf2fa", color: "#6d74b5" }}
                     >
                       {exp}
                       <button
                         type="button"
                         onClick={() => removeExpertise(idx)}
-                        className="w-4 h-4 rounded-full hover:bg-[#6d74b5]/20 flex items-center justify-center"
+                        className="w-4 h-4 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: "transparent" }}
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -423,11 +529,12 @@ export default function MonProfilIntervenantPage() {
                     value={newExpertise}
                     onChange={(e) => setNewExpertise(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addExpertise())}
-                    className="flex-1 px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all"
+                    className="flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                    style={{ borderColor: "#ebf2fa" }}
                     placeholder="Ajouter une expertise (ex: Marketing Digital)"
                   />
-                  <Button type="button" onClick={addExpertise} variant="outline">
-                    <Plus className="w-4 h-4" />
+                  <Button type="button" onClick={addExpertise} variant="secondary" style={{ borderColor: "#ebf2fa" }}>
+                    <Plus className="w-4 h-4 mr-1" />
                     Ajouter
                   </Button>
                 </div>
@@ -436,52 +543,55 @@ export default function MonProfilIntervenantPage() {
           </div>
 
           {/* Liens et médias */}
-          <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6">
-            <h2 className="text-lg font-bold text-[#1c2942] mb-6 flex items-center gap-2">
-              <LinkIcon className="w-5 h-5 text-[#6d74b5]" />
+          <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <LinkIcon className="w-5 h-5" style={{ color: "#6d74b5" }} />
               Liens et médias
             </h2>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-[#1c2942] mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
                   <Play className="w-4 h-4 inline mr-1" />
                   Vidéo de présentation (YouTube/Vimeo)
                 </label>
                 <input
                   type="url"
                   {...register("videoUrl")}
-                  className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
                   placeholder="https://www.youtube.com/watch?v=..."
                 />
-                <p className="text-sm text-[#1c2942]/50 mt-1">
+                <p className="text-sm mt-1" style={{ color: "#6d74b5" }}>
                   Une vidéo de présentation peut augmenter considérablement votre attractivité
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-[#1c2942] mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
                     <Linkedin className="w-4 h-4 inline mr-1" />
                     Profil LinkedIn
                   </label>
                   <input
                     type="url"
                     {...register("linkedinUrl")}
-                    className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                    style={{ borderColor: "#ebf2fa" }}
                     placeholder="https://linkedin.com/in/..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#1c2942] mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
                     <Globe className="w-4 h-4 inline mr-1" />
                     Site web personnel
                   </label>
                   <input
                     type="url"
                     {...register("website")}
-                    className="w-full px-4 py-3 border border-[#1c2942]/10 rounded-xl focus:ring-2 focus:ring-[#6d74b5] focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                    style={{ borderColor: "#ebf2fa" }}
                     placeholder="https://www.monsite.com"
                   />
                 </div>
@@ -490,40 +600,33 @@ export default function MonProfilIntervenantPage() {
           </div>
 
           {/* Bouton de sauvegarde */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white rounded-2xl border border-[#1c2942]/10 p-6">
+          <div
+            className="flex flex-col sm:flex-row gap-4 justify-between items-center rounded-xl p-6"
+            style={{ backgroundColor: "#ffffff" }}
+          >
             <div className="text-center sm:text-left">
-              <p className="text-[#1c2942]/60">
+              <p style={{ color: "#6d74b5" }}>
                 {isDirty || expertises.length !== (intervenant?.expertises?.length || 0)
                   ? "Vous avez des modifications non sauvegardées"
                   : "Toutes vos modifications sont sauvegardées"}
               </p>
             </div>
-            <div className="flex gap-3">
-              {intervenant?.status === "approved" && (
-                <Link to={`/intervenants/${intervenant.id}`}>
-                  <Button type="button" variant="outline">
-                    <Eye className="w-4 h-4" />
-                    Voir mon profil public
-                  </Button>
-                </Link>
+            <Button type="submit" disabled={isSaving} className="bg-[#6d74b5] hover:bg-[#5a61a0]">
+              {isSaving ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Sauvegarde...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Save className="w-4 h-4" />
+                  Sauvegarder
+                </span>
               )}
-              <Button type="submit" disabled={isSaving} className="bg-[#6d74b5] hover:bg-[#5a61a0]">
-                {isSaving ? (
-                  <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Sauvegarde...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <Save className="w-4 h-4" />
-                    Sauvegarder
-                  </span>
-                )}
-              </Button>
-            </div>
+            </Button>
           </div>
         </form>
-      </PageContainer>
+      </div>
     </div>
   );
 }

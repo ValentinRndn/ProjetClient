@@ -31,12 +31,12 @@ export function PageContainer({
   return (
     <div
       className={cn(
-        "w-full py-12 px-4 sm:px-6 lg:px-8",
-        center ? "min-h-screen flex items-center justify-center" : "",
+        "w-full px-4 sm:px-6 lg:px-8",
+        center ? "min-h-screen flex items-center justify-center py-12" : "py-6",
         className
       )}
     >
-      <div className={cn("w-full", maxWidths[maxWidth])}>{children}</div>
+      <div className={cn("w-full mx-auto", maxWidths[maxWidth])}>{children}</div>
     </div>
   );
 }

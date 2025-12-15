@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { getIntervenantById, uploadDocument, deleteDocument, fetchDocumentAsBlob, type Document } from "@/services/intervenants";
-import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import {
@@ -19,7 +18,6 @@ import {
   FileCheck,
   Camera,
   FolderOpen,
-  Download,
   AlertTriangle,
 } from "lucide-react";
 import { Link } from "react-router";
@@ -217,88 +215,159 @@ export default function OnboardingDocumentsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#ebf2fa]">
-        <PageContainer maxWidth="4xl" className="py-8">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-white rounded w-1/3"></div>
-            <div className="bg-white rounded-2xl p-8 space-y-4">
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="h-24 bg-[#ebf2fa] rounded-xl"></div>
-              ))}
+      <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+        <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+            <div className="h-4 w-32 rounded mb-3" style={{ backgroundColor: "rgba(255,255,255,0.1)" }}></div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg" style={{ backgroundColor: "#6d74b5" }}></div>
+              <div>
+                <div className="h-6 w-48 rounded mb-2" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}></div>
+                <div className="h-4 w-72 rounded" style={{ backgroundColor: "rgba(255,255,255,0.1)" }}></div>
+              </div>
             </div>
           </div>
-        </PageContainer>
+        </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="animate-pulse space-y-3">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="h-24 rounded-xl" style={{ backgroundColor: "#ffffff" }}></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!intervenant) {
     return (
-      <div className="min-h-screen bg-[#ebf2fa]">
-        <PageContainer maxWidth="4xl" className="py-8">
+      <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+        <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+            <Link
+              to="/dashboard/intervenant"
+              className="inline-flex items-center gap-2 text-sm mb-3 transition-colors hover:opacity-80"
+              style={{ color: "rgba(235, 242, 250, 0.7)" }}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour au tableau de bord
+            </Link>
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#6d74b5" }}
+              >
+                <FolderOpen className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Mon Dossier</h1>
+                <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  Profil intervenant non trouvé
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Alert type="error">Profil intervenant non trouvé</Alert>
-        </PageContainer>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#ebf2fa]">
-      <PageContainer maxWidth="4xl" className="py-8">
-        {/* Header compact */}
-        <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 mb-6">
+    <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+      {/* Header avec bannière */}
+      <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
           <Link
             to="/dashboard/intervenant"
-            className="inline-flex items-center gap-2 text-[#1c2942]/60 hover:text-[#6d74b5] mb-4 transition-colors text-sm"
+            className="inline-flex items-center gap-2 text-sm mb-3 transition-colors hover:opacity-80"
+            style={{ color: "rgba(235, 242, 250, 0.7)" }}
           >
             <ArrowLeft className="w-4 h-4" />
             Retour au tableau de bord
           </Link>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#1c2942] rounded-xl flex items-center justify-center">
-                <FolderOpen className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#6d74b5" }}
+              >
+                <FolderOpen className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-[#1c2942]">Dossier de candidature</h1>
-                <p className="text-sm text-[#1c2942]/60">Complétez votre dossier pour valider votre inscription</p>
+                <h1 className="text-xl font-bold text-white">Mon Dossier</h1>
+                <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  Complétez votre dossier pour valider votre inscription
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* Stats */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-4 py-2 bg-[#ebf2fa] rounded-lg">
-                <FileText className="w-4 h-4 text-[#6d74b5]" />
-                <span className="font-bold text-[#1c2942]">{stats.completed}/{stats.total}</span>
-                <span className="text-sm text-[#1c2942]/60">requis</span>
-              </div>
+          {/* Stats inline */}
+          <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-white/20">
+            <div
+              className="px-3 py-1.5 rounded-lg"
+              style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+            >
+              <span className="font-bold text-white">{stats.completed}/{stats.total}</span>
+              <span className="text-sm ml-2" style={{ color: "rgba(235, 242, 250, 0.7)" }}>documents requis</span>
+            </div>
+            <div
+              className="px-3 py-1.5 rounded-lg"
+              style={{
+                backgroundColor: stats.percentage === 100
+                  ? "rgba(16, 185, 129, 0.2)"
+                  : stats.percentage >= 50
+                    ? "rgba(251, 191, 36, 0.2)"
+                    : "rgba(239, 68, 68, 0.2)"
+              }}
+            >
+              <span
+                className="font-bold"
+                style={{
+                  color: stats.percentage === 100
+                    ? "#10b981"
+                    : stats.percentage >= 50
+                      ? "#fbbf24"
+                      : "#ef4444"
+                }}
+              >
+                {stats.percentage}%
+              </span>
+              <span
+                className="text-sm ml-2"
+                style={{
+                  color: stats.percentage === 100
+                    ? "#10b981"
+                    : stats.percentage >= 50
+                      ? "#fbbf24"
+                      : "#ef4444"
+                }}
+              >
+                complet
+              </span>
             </div>
           </div>
 
           {/* Progress bar */}
-          <div className="mt-6 pt-4 border-t border-[#1c2942]/10">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-[#1c2942]/60">Progression du dossier</span>
-              <span className="font-medium text-[#1c2942]">{stats.percentage}%</span>
-            </div>
-            <div className="h-2 bg-[#ebf2fa] rounded-full overflow-hidden">
+          <div className="mt-4">
+            <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}>
               <div
-                className={`h-full rounded-full transition-all duration-500 ${
-                  stats.percentage === 100 ? "bg-emerald-500" : "bg-[#6d74b5]"
-                }`}
-                style={{ width: `${stats.percentage}%` }}
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${stats.percentage}%`,
+                  backgroundColor: stats.percentage === 100 ? "#10b981" : "#6d74b5"
+                }}
               />
             </div>
-            {stats.percentage === 100 && (
-              <p className="text-emerald-600 text-sm mt-2 flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                Tous les documents requis sont téléversés !
-              </p>
-            )}
           </div>
         </div>
+      </div>
 
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Alerts */}
         {error && (
           <div className="mb-6">
@@ -313,13 +382,16 @@ export default function OnboardingDocumentsPage() {
         )}
 
         {/* Help box */}
-        <div className="bg-[#6d74b5]/10 border border-[#6d74b5]/20 rounded-2xl p-4 mb-6">
+        <div
+          className="rounded-xl p-4 mb-6"
+          style={{ backgroundColor: "rgba(109, 116, 181, 0.1)", border: "1px solid rgba(109, 116, 181, 0.2)" }}
+        >
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-[#6d74b5] mt-0.5 shrink-0" />
+            <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "#6d74b5" }} />
             <div>
-              <p className="text-sm text-[#1c2942]">
-                Les documents marqués <span className="font-semibold text-amber-600">Obligatoire</span> doivent être fournis pour valider votre profil.
-                Les documents <span className="font-semibold text-red-600">sensibles</span> sont stockés de manière sécurisée.
+              <p className="text-sm" style={{ color: "#1c2942" }}>
+                Les documents marqués <span className="font-semibold" style={{ color: "#d97706" }}>Obligatoire</span> doivent être fournis pour valider votre profil.
+                Les documents <span className="font-semibold" style={{ color: "#dc2626" }}>sensibles</span> sont stockés de manière sécurisée.
               </p>
             </div>
           </div>
@@ -336,44 +408,57 @@ export default function OnboardingDocumentsPage() {
             return (
               <div
                 key={req.type}
-                className={`bg-white rounded-2xl border transition-all ${
-                  hasDoc
-                    ? "border-emerald-200"
+                className="rounded-xl transition-all"
+                style={{
+                  backgroundColor: "#ffffff",
+                  border: hasDoc
+                    ? "1px solid #10b981"
                     : req.required
-                      ? "border-amber-200"
-                      : "border-[#1c2942]/10"
-                }`}
+                      ? "1px solid #fbbf24"
+                      : "1px solid #ebf2fa"
+                }}
               >
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4 flex-1 min-w-0">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        hasDoc
-                          ? "bg-emerald-100 text-emerald-600"
-                          : "bg-[#ebf2fa] text-[#6d74b5]"
-                      }`}>
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                        style={{
+                          backgroundColor: hasDoc ? "#d1fae5" : "#ebf2fa",
+                          color: hasDoc ? "#10b981" : "#6d74b5"
+                        }}
+                      >
                         {hasDoc ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-[#1c2942]">{req.label}</h3>
+                          <h3 className="font-semibold" style={{ color: "#1c2942" }}>{req.label}</h3>
                           {req.required ? (
-                            <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                            <span
+                              className="px-2 py-0.5 text-xs font-medium rounded-full"
+                              style={{ backgroundColor: "#fef3c7", color: "#92400e" }}
+                            >
                               Obligatoire
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 bg-[#ebf2fa] text-[#1c2942]/50 text-xs font-medium rounded-full">
+                            <span
+                              className="px-2 py-0.5 text-xs font-medium rounded-full"
+                              style={{ backgroundColor: "#ebf2fa", color: "#6d74b5" }}
+                            >
                               Optionnel
                             </span>
                           )}
                           {req.sensitive && (
-                            <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded-full flex items-center gap-1">
+                            <span
+                              className="px-2 py-0.5 text-xs font-medium rounded-full flex items-center gap-1"
+                              style={{ backgroundColor: "#fef2f2", color: "#b91c1c" }}
+                            >
                               <Shield className="w-3 h-3" />
                               Sensible
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-[#1c2942]/60">{req.description}</p>
+                        <p className="text-sm" style={{ color: "#6d74b5" }}>{req.description}</p>
 
                         {/* Uploaded documents */}
                         {docsOfType.length > 0 && (
@@ -381,25 +466,28 @@ export default function OnboardingDocumentsPage() {
                             {docsOfType.map(doc => (
                               <div
                                 key={doc.id}
-                                className="flex items-center justify-between p-3 bg-[#ebf2fa] rounded-xl"
+                                className="flex items-center justify-between p-3 rounded-xl"
+                                style={{ backgroundColor: "#ebf2fa" }}
                               >
                                 <div className="flex items-center gap-2 min-w-0">
-                                  <FileText className="w-4 h-4 text-[#6d74b5] shrink-0" />
-                                  <span className="text-sm text-[#1c2942] truncate">
+                                  <FileText className="w-4 h-4 shrink-0" style={{ color: "#6d74b5" }} />
+                                  <span className="text-sm truncate" style={{ color: "#1c2942" }}>
                                     {doc.fileName}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-1 shrink-0">
                                   <button
                                     onClick={() => handleView(doc.id)}
-                                    className="p-2 text-[#1c2942]/50 hover:text-[#6d74b5] hover:bg-white rounded-lg transition-colors"
+                                    className="p-2 rounded-lg transition-colors"
+                                    style={{ color: "#6d74b5" }}
                                     title="Voir"
                                   >
                                     <Eye className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={() => handleDelete(doc.id)}
-                                    className="p-2 text-[#1c2942]/50 hover:text-red-600 hover:bg-white rounded-lg transition-colors"
+                                    className="p-2 rounded-lg transition-colors"
+                                    style={{ color: "#dc2626" }}
                                     title="Supprimer"
                                   >
                                     <Trash2 className="w-4 h-4" />
@@ -415,14 +503,20 @@ export default function OnboardingDocumentsPage() {
                     {/* Upload button */}
                     <div className="shrink-0">
                       {(!hasDoc || req.multiple) && (
-                        <label className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl cursor-pointer transition-all text-sm font-medium ${
-                          isUploading
-                            ? "bg-[#ebf2fa] text-[#1c2942]/40 cursor-not-allowed"
-                            : "bg-[#6d74b5] text-white hover:bg-[#5a61a0]"
-                        }`}>
+                        <label
+                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl cursor-pointer transition-all text-sm font-medium"
+                          style={{
+                            backgroundColor: isUploading ? "#ebf2fa" : "#6d74b5",
+                            color: isUploading ? "#6d74b5" : "#ffffff",
+                            cursor: isUploading ? "not-allowed" : "pointer"
+                          }}
+                        >
                           {isUploading ? (
                             <>
-                              <div className="w-4 h-4 border-2 border-[#1c2942]/20 border-t-[#1c2942]/60 rounded-full animate-spin" />
+                              <div
+                                className="w-4 h-4 border-2 rounded-full animate-spin"
+                                style={{ borderColor: "#ebf2fa", borderTopColor: "#6d74b5" }}
+                              />
                               Upload...
                             </>
                           ) : (
@@ -449,34 +543,37 @@ export default function OnboardingDocumentsPage() {
         </div>
 
         {/* Bottom actions */}
-        <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white rounded-2xl border border-[#1c2942]/10 p-6">
+        <div
+          className="mt-6 flex flex-col sm:flex-row gap-4 justify-between items-center rounded-xl p-6"
+          style={{ backgroundColor: "#ffffff" }}
+        >
           <div className="text-center sm:text-left">
             {stats.percentage === 100 ? (
-              <p className="text-emerald-600 font-medium flex items-center gap-2">
+              <p className="font-medium flex items-center gap-2" style={{ color: "#10b981" }}>
                 <CheckCircle className="w-5 h-5" />
                 Votre dossier est complet !
               </p>
             ) : (
-              <p className="text-[#1c2942]/60">
-                Il vous reste <span className="font-semibold text-amber-600">{stats.total - stats.completed} document(s)</span> à téléverser
+              <p style={{ color: "#6d74b5" }}>
+                Il vous reste <span className="font-semibold" style={{ color: "#d97706" }}>{stats.total - stats.completed} document(s)</span> à téléverser
               </p>
             )}
           </div>
           <div className="flex gap-3">
             <Link to="/dashboard/intervenant/profil">
-              <Button variant="outline" className="rounded-xl">
-                <ArrowLeft className="w-4 h-4" />
+              <Button variant="secondary" style={{ borderColor: "#ebf2fa" }}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
                 Mon profil
               </Button>
             </Link>
             <Link to="/dashboard/intervenant">
-              <Button variant="primary" className="bg-[#6d74b5] hover:bg-[#5a61a0] rounded-xl">
+              <Button variant="primary" className="bg-[#6d74b5] hover:bg-[#5a61a0]">
                 Tableau de bord
               </Button>
             </Link>
           </div>
         </div>
-      </PageContainer>
+      </div>
     </div>
   );
 }

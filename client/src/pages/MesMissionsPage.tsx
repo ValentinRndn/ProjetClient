@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getMyEcoleMissions, getAllMissions, type Mission, type MissionStatus, deleteMission, updateMissionStatus } from "@/services/missions";
-import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
@@ -105,18 +104,23 @@ export default function MesMissionsPage() {
     : "Gérez vos missions et suivez les candidatures";
 
   return (
-    <div className="min-h-screen bg-[#ebf2fa]">
-      <PageContainer maxWidth="7xl" className="py-8">
-        {/* Header compact */}
-        <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 mb-6">
+    <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+      {/* Header compact */}
+      <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#1c2942] rounded-xl flex items-center justify-center">
-                <Briefcase className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#6d74b5" }}
+              >
+                <Briefcase className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-[#1c2942]">{pageTitle}</h1>
-                <p className="text-sm text-[#1c2942]/60">{pageDescription}</p>
+                <h1 className="text-xl font-bold text-white">{pageTitle}</h1>
+                <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  {pageDescription}
+                </p>
               </div>
             </div>
 
@@ -132,21 +136,23 @@ export default function MesMissionsPage() {
           </div>
 
           {/* Stats inline */}
-          <div className="flex flex-wrap gap-6 mt-4 pt-4 border-t border-[#1c2942]/10">
+          <div className="flex flex-wrap gap-6 mt-4 pt-4 border-t border-white/20">
             {[
               { icon: <Target className="w-4 h-4" />, value: activeCount, label: "Actives" },
               { icon: <CheckCircle className="w-4 h-4" />, value: completedCount, label: "Terminées" },
               { icon: <User className="w-4 h-4" />, value: assignedCount, label: "Assignées" },
             ].map((stat, idx) => (
               <div key={idx} className="flex items-center gap-2">
-                <span className="text-[#6d74b5]">{stat.icon}</span>
-                <span className="font-bold text-[#1c2942]">{stat.value}</span>
-                <span className="text-sm text-[#1c2942]/60">{stat.label}</span>
+                <span style={{ color: "rgba(235, 242, 250, 0.7)" }}>{stat.icon}</span>
+                <span className="font-bold text-white">{stat.value}</span>
+                <span className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>{stat.label}</span>
               </div>
             ))}
           </div>
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Alerts */}
         {error && (
           <div className="mb-6">
@@ -358,7 +364,7 @@ export default function MesMissionsPage() {
             ))}
           </div>
         )}
-      </PageContainer>
+      </div>
     </div>
   );
 }

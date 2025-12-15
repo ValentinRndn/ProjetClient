@@ -4,10 +4,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { getIntervenantById, updateIntervenant } from "@/services/intervenants";
-import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
-import { motion } from "motion/react";
 import {
   Calendar,
   Clock,
@@ -23,7 +21,7 @@ import { Link } from "react-router";
 
 interface Disponibility {
   isAvailable: boolean;
-  unavailableUntil?: string; // ISO date string
+  unavailableUntil?: string;
   notes?: string;
 }
 
@@ -53,7 +51,6 @@ export default function DisponibilitesPage() {
       setError(null);
       const data = await getIntervenantById(user.intervenant.id);
 
-      // Parse disponibility from JSON
       const disponibility = data.disponibility as Disponibility | null;
       if (disponibility) {
         setIsAvailable(disponibility.isAvailable ?? true);
@@ -105,7 +102,6 @@ export default function DisponibilitesPage() {
     });
   };
 
-  // Calculer le nombre de jours restants d'indisponibilité
   const getDaysUntilAvailable = () => {
     if (!unavailableUntil) return null;
     const endDate = new Date(unavailableUntil);
@@ -117,16 +113,29 @@ export default function DisponibilitesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <PageContainer maxWidth="2xl">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-            <div className="bg-white rounded-2xl p-8 space-y-4">
-              <div className="h-24 bg-gray-200 rounded-xl"></div>
-              <div className="h-24 bg-gray-200 rounded-xl"></div>
+      <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+        <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+            <div className="h-4 w-32 rounded mb-3" style={{ backgroundColor: "rgba(255,255,255,0.1)" }}></div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg" style={{ backgroundColor: "#6d74b5" }}></div>
+              <div>
+                <div className="h-6 w-48 rounded mb-2" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}></div>
+                <div className="h-4 w-64 rounded" style={{ backgroundColor: "rgba(255,255,255,0.1)" }}></div>
+              </div>
             </div>
           </div>
-        </PageContainer>
+        </div>
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="animate-pulse space-y-6">
+            <div className="rounded-xl p-8" style={{ backgroundColor: "#ffffff" }}>
+              <div className="h-24 rounded-xl" style={{ backgroundColor: "#ebf2fa" }}></div>
+            </div>
+            <div className="rounded-xl p-8" style={{ backgroundColor: "#ffffff" }}>
+              <div className="h-24 rounded-xl" style={{ backgroundColor: "#ebf2fa" }}></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -134,49 +143,102 @@ export default function DisponibilitesPage() {
   const daysUntilAvailable = getDaysUntilAvailable();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-mesh">
-        <PageContainer maxWidth="2xl" className="py-8">
+    <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+      {/* Header avec bannière */}
+      <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
           <Link
             to="/dashboard/intervenant"
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-sm mb-3 transition-colors hover:opacity-80"
+            style={{ color: "rgba(235, 242, 250, 0.7)" }}
           >
             <ArrowLeft className="w-4 h-4" />
             Retour au tableau de bord
           </Link>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Calendar className="w-8 h-8" />
-            Gestion des disponibilités
-          </h1>
-          <p className="text-white/80 mt-2">
-            Indiquez aux écoles si vous êtes disponible pour de nouvelles missions
-          </p>
-        </PageContainer>
+
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: "#6d74b5" }}
+            >
+              <Calendar className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-white">Mes Disponibilités</h1>
+              <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                Indiquez aux écoles si vous êtes disponible
+              </p>
+            </div>
+          </div>
+
+          {/* Stats inline */}
+          <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-white/20">
+            <div
+              className="px-3 py-1.5 rounded-lg"
+              style={{
+                backgroundColor: isAvailable
+                  ? "rgba(16, 185, 129, 0.2)"
+                  : "rgba(251, 191, 36, 0.2)"
+              }}
+            >
+              {isAvailable ? (
+                <CalendarCheck className="w-4 h-4 inline mr-2" style={{ color: "#10b981" }} />
+              ) : (
+                <CalendarOff className="w-4 h-4 inline mr-2" style={{ color: "#fbbf24" }} />
+              )}
+              <span
+                className="font-bold"
+                style={{ color: isAvailable ? "#10b981" : "#fbbf24" }}
+              >
+                {isAvailable ? "Disponible" : "Indisponible"}
+              </span>
+            </div>
+            {!isAvailable && daysUntilAvailable !== null && daysUntilAvailable > 0 && (
+              <div
+                className="px-3 py-1.5 rounded-lg"
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+              >
+                <Clock className="w-4 h-4 inline mr-2" style={{ color: "rgba(235, 242, 250, 0.7)" }} />
+                <span className="font-bold text-white">{daysUntilAvailable}</span>
+                <span className="text-sm ml-2" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  jour{daysUntilAvailable > 1 ? "s" : ""} restant{daysUntilAvailable > 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      <PageContainer maxWidth="2xl" className="py-8 -mt-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {error && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <div className="mb-6">
             <Alert type="error" onClose={() => setError(null)}>{error}</Alert>
-          </motion.div>
+          </div>
         )}
 
         {success && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <div className="mb-6">
             <Alert type="success" onClose={() => setSuccess(null)}>{success}</Alert>
-          </motion.div>
+          </div>
         )}
 
         {/* Info box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-              <Info className="w-6 h-6 text-blue-600" />
+        <div
+          className="rounded-xl p-4 mb-6"
+          style={{ backgroundColor: "rgba(109, 116, 181, 0.1)", border: "1px solid rgba(109, 116, 181, 0.2)" }}
+        >
+          <div className="flex items-start gap-3">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ backgroundColor: "#ebf2fa" }}
+            >
+              <Info className="w-5 h-5" style={{ color: "#6d74b5" }} />
             </div>
             <div>
-              <h3 className="font-bold text-blue-900 mb-1">À quoi servent les disponibilités ?</h3>
-              <p className="text-blue-700 text-sm">
+              <h3 className="font-bold mb-1" style={{ color: "#1c2942" }}>
+                À quoi servent les disponibilités ?
+              </h3>
+              <p className="text-sm" style={{ color: "#6d74b5" }}>
                 Les écoles peuvent voir votre statut de disponibilité sur votre profil.
                 Si vous êtes indisponible, la date de fin sera affichée pour qu'elles puissent
                 vous contacter au bon moment.
@@ -185,38 +247,38 @@ export default function DisponibilitesPage() {
           </div>
         </div>
 
-        {/* Status actuel */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 mb-6"
-        >
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Statut actuel</h2>
+        {/* Statut actuel */}
+        <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: "#ffffff" }}>
+          <h2 className="text-xl font-bold mb-6" style={{ color: "#1c2942" }}>Statut actuel</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Option Disponible */}
             <button
               type="button"
               onClick={() => setIsAvailable(true)}
-              className={`p-6 rounded-2xl border-2 transition-all text-left ${
-                isAvailable
-                  ? "border-emerald-500 bg-emerald-50"
-                  : "border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/50"
-              }`}
+              className="p-6 rounded-xl text-left transition-all"
+              style={{
+                border: isAvailable ? "2px solid #10b981" : "2px solid #ebf2fa",
+                backgroundColor: isAvailable ? "#ecfdf5" : "#ffffff"
+              }}
             >
               <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                  isAvailable ? "bg-emerald-500 text-white" : "bg-gray-100 text-gray-400"
-                }`}>
+                <div
+                  className="w-14 h-14 rounded-xl flex items-center justify-center"
+                  style={{
+                    backgroundColor: isAvailable ? "#10b981" : "#ebf2fa",
+                    color: isAvailable ? "#ffffff" : "#6d74b5"
+                  }}
+                >
                   <CalendarCheck className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900">Disponible</h3>
-                  <p className="text-gray-500 text-sm">Je suis ouvert aux nouvelles missions</p>
+                  <h3 className="font-bold text-lg" style={{ color: "#1c2942" }}>Disponible</h3>
+                  <p className="text-sm" style={{ color: "#6d74b5" }}>Je suis ouvert aux nouvelles missions</p>
                 </div>
               </div>
               {isAvailable && (
-                <div className="mt-4 flex items-center gap-2 text-emerald-600">
+                <div className="mt-4 flex items-center gap-2" style={{ color: "#10b981" }}>
                   <CheckCircle className="w-5 h-5" />
                   <span className="font-medium">Statut actif</span>
                 </div>
@@ -227,48 +289,48 @@ export default function DisponibilitesPage() {
             <button
               type="button"
               onClick={() => setIsAvailable(false)}
-              className={`p-6 rounded-2xl border-2 transition-all text-left ${
-                !isAvailable
-                  ? "border-amber-500 bg-amber-50"
-                  : "border-gray-200 hover:border-amber-300 hover:bg-amber-50/50"
-              }`}
+              className="p-6 rounded-xl text-left transition-all"
+              style={{
+                border: !isAvailable ? "2px solid #f59e0b" : "2px solid #ebf2fa",
+                backgroundColor: !isAvailable ? "#fffbeb" : "#ffffff"
+              }}
             >
               <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                  !isAvailable ? "bg-amber-500 text-white" : "bg-gray-100 text-gray-400"
-                }`}>
+                <div
+                  className="w-14 h-14 rounded-xl flex items-center justify-center"
+                  style={{
+                    backgroundColor: !isAvailable ? "#f59e0b" : "#ebf2fa",
+                    color: !isAvailable ? "#ffffff" : "#6d74b5"
+                  }}
+                >
                   <CalendarOff className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900">Indisponible</h3>
-                  <p className="text-gray-500 text-sm">Je ne prends pas de missions actuellement</p>
+                  <h3 className="font-bold text-lg" style={{ color: "#1c2942" }}>Indisponible</h3>
+                  <p className="text-sm" style={{ color: "#6d74b5" }}>Je ne prends pas de missions actuellement</p>
                 </div>
               </div>
               {!isAvailable && (
-                <div className="mt-4 flex items-center gap-2 text-amber-600">
+                <div className="mt-4 flex items-center gap-2" style={{ color: "#f59e0b" }}>
                   <XCircle className="w-5 h-5" />
                   <span className="font-medium">Statut actif</span>
                 </div>
               )}
             </button>
           </div>
-        </motion.div>
+        </div>
 
         {/* Date de fin d'indisponibilité */}
         {!isAvailable && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 mb-6"
-          >
-            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-amber-600" />
+          <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <Clock className="w-5 h-5" style={{ color: "#f59e0b" }} />
               Jusqu'à quand êtes-vous indisponible ?
             </h2>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
                   Date de retour de disponibilité
                 </label>
                 <input
@@ -276,12 +338,13 @@ export default function DisponibilitesPage() {
                   value={unavailableUntil}
                   onChange={(e) => setUnavailableUntil(e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
                 />
                 {unavailableUntil && (
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm mt-2" style={{ color: "#6d74b5" }}>
                     Vous serez affiché comme disponible à partir du{" "}
-                    <span className="font-medium text-amber-600">
+                    <span className="font-medium" style={{ color: "#f59e0b" }}>
                       {formatDate(unavailableUntil)}
                     </span>
                   </p>
@@ -289,16 +352,21 @@ export default function DisponibilitesPage() {
               </div>
 
               {daysUntilAvailable !== null && daysUntilAvailable > 0 && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                  <p className="text-amber-800">
+                <div
+                  className="rounded-xl p-4"
+                  style={{ backgroundColor: "#fffbeb", border: "1px solid #fcd34d" }}
+                >
+                  <p style={{ color: "#92400e" }}>
                     <span className="font-bold text-2xl">{daysUntilAvailable}</span>
-                    <span className="ml-2">jour{daysUntilAvailable > 1 ? "s" : ""} d'indisponibilité restant{daysUntilAvailable > 1 ? "s" : ""}</span>
+                    <span className="ml-2">
+                      jour{daysUntilAvailable > 1 ? "s" : ""} d'indisponibilité restant{daysUntilAvailable > 1 ? "s" : ""}
+                    </span>
                   </p>
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
                   Note (optionnelle)
                 </label>
                 <textarea
@@ -306,24 +374,28 @@ export default function DisponibilitesPage() {
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
                   placeholder="Ex: En formation jusqu'au 15 janvier, disponible pour des missions courtes à partir de cette date."
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all resize-none"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all resize-none"
+                  style={{ borderColor: "#ebf2fa" }}
                 />
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm mt-1" style={{ color: "#6d74b5" }}>
                   Cette note sera visible par les écoles sur votre profil
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Bouton de sauvegarde */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex justify-end"
+        <div
+          className="flex justify-end rounded-xl p-6"
+          style={{ backgroundColor: "#ffffff" }}
         >
-          <Button onClick={handleSave} disabled={isSaving} size="lg">
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            size="lg"
+            className="bg-[#6d74b5] hover:bg-[#5a61a0]"
+          >
             {isSaving ? (
               <span className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -336,8 +408,8 @@ export default function DisponibilitesPage() {
               </span>
             )}
           </Button>
-        </motion.div>
-      </PageContainer>
+        </div>
+      </div>
     </div>
   );
 }

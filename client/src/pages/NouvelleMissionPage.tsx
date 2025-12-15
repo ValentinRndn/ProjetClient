@@ -2,13 +2,21 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { createMission } from "@/services/missions";
-import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
-import { ArrowLeft, Briefcase, Calendar, Euro, FileText, Sparkles, CheckCircle, Users, Target } from "lucide-react";
+import {
+  ArrowLeft,
+  Briefcase,
+  Calendar,
+  Euro,
+  FileText,
+  CheckCircle,
+  Users,
+  Target,
+  Lightbulb,
+} from "lucide-react";
 import { Link } from "react-router";
-import { motion } from "motion/react";
 
 interface MissionFormData {
   title: string;
@@ -40,14 +48,15 @@ export default function NouvelleMissionPage() {
         description: data.description || undefined,
         startDate: data.startDate || undefined,
         endDate: data.endDate || undefined,
-        priceCents: data.priceCents ? Math.round(parseFloat(data.priceCents) * 100) : undefined,
+        priceCents: data.priceCents
+          ? Math.round(parseFloat(data.priceCents) * 100)
+          : undefined,
         status: "ACTIVE" as const,
       };
 
       await createMission(missionData);
       setSuccess(true);
 
-      // Rediriger vers le dashboard école après 2 secondes
       setTimeout(() => {
         navigate("/dashboard/ecole");
       }, 2000);
@@ -65,123 +74,103 @@ export default function NouvelleMissionPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-12 text-center max-w-md w-full"
+      <div
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{ backgroundColor: "#ebf2fa" }}
+      >
+        <div
+          className="rounded-xl shadow-lg p-10 text-center max-w-md w-full"
+          style={{ backgroundColor: "#ffffff" }}
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30"
+          <div
+            className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-5"
+            style={{ backgroundColor: "#6d74b5" }}
           >
-            <CheckCircle className="w-10 h-10 text-white" />
-          </motion.div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            <CheckCircle className="w-8 h-8 text-white" />
+          </div>
+          <h2
+            className="text-2xl font-bold mb-3"
+            style={{ color: "#1c2942" }}
+          >
             Mission créée avec succès !
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="mb-6" style={{ color: "#6d74b5" }}>
             Votre mission est maintenant visible par les intervenants qualifiés.
           </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-            <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
+          <div className="flex items-center justify-center gap-2 text-sm" style={{ color: "#6d74b5" }}>
+            <div
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{ backgroundColor: "#6d74b5" }}
+            />
             Redirection vers votre dashboard...
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-mesh overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
-        </div>
-
-        {/* Grid pattern */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
-          }}
-        />
-
-        <PageContainer maxWidth="5xl" className="relative z-10 py-12 md:py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-white"
+    <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+      {/* Header compact */}
+      <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+          <Link
+            to="/mes-missions"
+            className="inline-flex items-center gap-2 text-sm mb-3 transition-colors hover:opacity-80"
+            style={{ color: "rgba(235, 242, 250, 0.7)" }}
           >
-            <Link
-              to="/mes-missions"
-              className="inline-flex items-center gap-2 text-indigo-200 hover:text-white transition-colors mb-6 group"
+            <ArrowLeft className="w-4 h-4" />
+            Retour à mes missions
+          </Link>
+
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: "#6d74b5" }}
             >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Retour à mes missions
-            </Link>
-
-            <div className="flex items-center gap-2 mb-4">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
-                <Sparkles className="w-4 h-4 text-amber-300" />
-                <span className="text-sm font-medium">Nouvelle mission</span>
-              </div>
+              <Briefcase className="w-5 h-5 text-white" />
             </div>
-
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
-              Proposer une{" "}
-              <span className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
-                Mission
-              </span>
-            </h1>
-
-            <p className="text-lg text-indigo-100/80 max-w-2xl">
-              Décrivez votre besoin d'intervention et trouvez l'expert idéal parmi notre réseau d'intervenants qualifiés.
-            </p>
-          </motion.div>
-        </PageContainer>
-
-        {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50 to-transparent" />
+            <div>
+              <h1 className="text-xl font-bold text-white">
+                Proposer une mission
+              </h1>
+              <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                Décrivez votre besoin et trouvez l'expert idéal
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <PageContainer maxWidth="5xl" className="py-8 -mt-8 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
+          <div className="mb-6">
             <Alert type="error" onClose={() => setError(null)}>
               {error}
             </Alert>
-          </motion.div>
+          </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Form */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="lg:col-span-2"
-          >
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Formulaire */}
+          <div className="lg:col-span-2">
+            <div
+              className="rounded-xl shadow-sm p-6"
+              style={{ backgroundColor: "#ffffff" }}
+            >
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 {/* Titre */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label
+                    className="block text-sm font-semibold mb-2"
+                    style={{ color: "#1c2942" }}
+                  >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                        <FileText className="w-4 h-4 text-indigo-600" />
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: "#ebf2fa" }}
+                      >
+                        <FileText className="w-4 h-4" style={{ color: "#6d74b5" }} />
                       </div>
                       Titre de la mission *
                     </div>
@@ -195,10 +184,14 @@ export default function NouvelleMissionPage() {
                       },
                     })}
                     placeholder="Ex: Intervention sur l'Intelligence Artificielle"
-                    className={`h-12 rounded-xl ${errors.title ? "border-red-500 focus:ring-red-200" : "border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"}`}
+                    className="h-11 rounded-lg"
+                    style={{
+                      borderColor: errors.title ? "#ef4444" : "#ebf2fa",
+                      backgroundColor: "#ffffff",
+                    }}
                   />
                   {errors.title && (
-                    <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                    <p className="text-red-500 text-sm mt-1.5 flex items-center gap-1">
                       <span className="w-1 h-1 bg-red-500 rounded-full" />
                       {errors.title.message}
                     </p>
@@ -207,24 +200,39 @@ export default function NouvelleMissionPage() {
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label
+                    className="block text-sm font-semibold mb-2"
+                    style={{ color: "#1c2942" }}
+                  >
                     Description de la mission
                   </label>
                   <textarea
                     {...register("description")}
-                    rows={5}
+                    rows={4}
                     placeholder="Décrivez le contenu de l'intervention, le public cible, les objectifs pédagogiques..."
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300 transition resize-none text-gray-900 placeholder:text-gray-400"
+                    className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition resize-none"
+                    style={{
+                      borderWidth: "1px",
+                      borderColor: "#ebf2fa",
+                      color: "#1c2942",
+                      backgroundColor: "#ffffff",
+                    }}
                   />
                 </div>
 
                 {/* Dates */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <label
+                      className="block text-sm font-semibold mb-2"
+                      style={{ color: "#1c2942" }}
+                    >
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                          <Calendar className="w-4 h-4 text-indigo-600" />
+                        <div
+                          className="w-7 h-7 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: "#ebf2fa" }}
+                        >
+                          <Calendar className="w-4 h-4" style={{ color: "#6d74b5" }} />
                         </div>
                         Date de début
                       </div>
@@ -232,14 +240,21 @@ export default function NouvelleMissionPage() {
                     <Input
                       type="date"
                       {...register("startDate")}
-                      className="h-12 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
+                      className="h-11 rounded-lg"
+                      style={{ borderColor: "#ebf2fa" }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <label
+                      className="block text-sm font-semibold mb-2"
+                      style={{ color: "#1c2942" }}
+                    >
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                          <Calendar className="w-4 h-4 text-indigo-600" />
+                        <div
+                          className="w-7 h-7 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: "#ebf2fa" }}
+                        >
+                          <Calendar className="w-4 h-4" style={{ color: "#6d74b5" }} />
                         </div>
                         Date de fin
                       </div>
@@ -247,17 +262,24 @@ export default function NouvelleMissionPage() {
                     <Input
                       type="date"
                       {...register("endDate")}
-                      className="h-12 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
+                      className="h-11 rounded-lg"
+                      style={{ borderColor: "#ebf2fa" }}
                     />
                   </div>
                 </div>
 
                 {/* Budget */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label
+                    className="block text-sm font-semibold mb-2"
+                    style={{ color: "#1c2942" }}
+                  >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                        <Euro className="w-4 h-4 text-amber-600" />
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: "#ebf2fa" }}
+                      >
+                        <Euro className="w-4 h-4" style={{ color: "#6d74b5" }} />
                       </div>
                       Budget (en euros)
                     </div>
@@ -268,20 +290,28 @@ export default function NouvelleMissionPage() {
                     min="0"
                     {...register("priceCents")}
                     placeholder="Ex: 500"
-                    className="h-12 rounded-xl border-gray-200 focus:border-indigo-300 focus:ring-indigo-200"
+                    className="h-11 rounded-lg"
+                    style={{ borderColor: "#ebf2fa" }}
                   />
-                  <p className="text-gray-500 text-sm mt-2">
+                  <p className="text-sm mt-1.5" style={{ color: "#6d74b5" }}>
                     Laissez vide si le budget est à négocier
                   </p>
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-4 pt-6 border-t border-gray-100">
+                <div
+                  className="flex gap-4 pt-5"
+                  style={{ borderTopWidth: "1px", borderColor: "#ebf2fa" }}
+                >
                   <Button
                     type="button"
                     variant="secondary"
                     onClick={() => navigate(-1)}
-                    className="flex-1 h-12 rounded-xl"
+                    className="flex-1 h-11 rounded-lg"
+                    style={{
+                      backgroundColor: "#ebf2fa",
+                      color: "#1c2942",
+                    }}
                   >
                     Annuler
                   </Button>
@@ -289,7 +319,11 @@ export default function NouvelleMissionPage() {
                     type="submit"
                     variant="primary"
                     isLoading={isLoading}
-                    className="flex-1 h-12 rounded-xl"
+                    className="flex-1 h-11 rounded-lg"
+                    style={{
+                      backgroundColor: "#6d74b5",
+                      color: "#ffffff",
+                    }}
                   >
                     <Briefcase className="w-4 h-4" />
                     Publier la mission
@@ -297,22 +331,23 @@ export default function NouvelleMissionPage() {
                 </div>
               </form>
             </div>
-          </motion.div>
+          </div>
 
           {/* Sidebar */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="space-y-6"
-          >
-            {/* Tips card */}
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 p-6">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-indigo-600" />
+          <div className="space-y-5">
+            {/* Conseils */}
+            <div
+              className="rounded-xl p-5"
+              style={{ backgroundColor: "#ffffff" }}
+            >
+              <h3
+                className="font-semibold mb-4 flex items-center gap-2"
+                style={{ color: "#1c2942" }}
+              >
+                <Lightbulb className="w-5 h-5" style={{ color: "#6d74b5" }} />
                 Conseils pour une bonne mission
               </h3>
-              <ul className="space-y-3 text-sm text-gray-600">
+              <ul className="space-y-3 text-sm" style={{ color: "#1c2942" }}>
                 {[
                   "Soyez précis dans votre description",
                   "Indiquez le niveau des étudiants",
@@ -320,37 +355,67 @@ export default function NouvelleMissionPage() {
                   "Précisez les objectifs pédagogiques",
                 ].map((tip, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle
+                      className="w-4 h-4 mt-0.5 flex-shrink-0"
+                      style={{ color: "#6d74b5" }}
+                    />
                     {tip}
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Stats card */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h3 className="font-bold text-gray-900 mb-4">Notre réseau</h3>
+            {/* Stats */}
+            <div
+              className="rounded-xl p-5"
+              style={{ backgroundColor: "#ffffff" }}
+            >
+              <h3
+                className="font-semibold mb-4"
+                style={{ color: "#1c2942" }}
+              >
+                Notre réseau
+              </h3>
               <div className="space-y-4">
                 {[
-                  { icon: <Users className="w-5 h-5 text-indigo-600" />, value: "500+", label: "Intervenants" },
-                  { icon: <Target className="w-5 h-5 text-emerald-600" />, value: "98%", label: "Satisfaction" },
-                  { icon: <Briefcase className="w-5 h-5 text-amber-600" />, value: "1000+", label: "Missions réalisées" },
+                  {
+                    icon: <Users className="w-5 h-5" style={{ color: "#6d74b5" }} />,
+                    value: "500+",
+                    label: "Intervenants",
+                  },
+                  {
+                    icon: <Target className="w-5 h-5" style={{ color: "#6d74b5" }} />,
+                    value: "98%",
+                    label: "Satisfaction",
+                  },
+                  {
+                    icon: <Briefcase className="w-5 h-5" style={{ color: "#6d74b5" }} />,
+                    value: "1000+",
+                    label: "Missions réalisées",
+                  },
                 ].map((stat, idx) => (
                   <div key={idx} className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center">
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: "#ebf2fa" }}
+                    >
                       {stat.icon}
                     </div>
                     <div>
-                      <p className="font-bold text-gray-900">{stat.value}</p>
-                      <p className="text-sm text-gray-500">{stat.label}</p>
+                      <p className="font-bold" style={{ color: "#1c2942" }}>
+                        {stat.value}
+                      </p>
+                      <p className="text-sm" style={{ color: "#6d74b5" }}>
+                        {stat.label}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </PageContainer>
+      </div>
     </div>
   );
 }

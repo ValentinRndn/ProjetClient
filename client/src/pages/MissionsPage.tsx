@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { getAllMissions, getPublicMissions, applyToMission, type Mission, type MissionStatus } from "@/services/missions";
 import { MissionCard } from "@/components/features/MissionCard";
-import { PageContainer } from "@/components/ui/PageContainer";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
-import { Search, Briefcase, Filter, Target, LogIn, UserPlus } from "lucide-react";
+import { Search, Briefcase, Filter, Target, LogIn, UserPlus, ArrowLeft } from "lucide-react";
 import { Link } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
@@ -98,33 +97,78 @@ export default function MissionsPage() {
   });
 
   const activeCount = missions.filter((m) => m.status === "ACTIVE").length;
+  const completedCount = missions.filter((m) => m.status === "COMPLETED").length;
 
   return (
-    <div className="min-h-screen bg-[#ebf2fa]">
-      <PageContainer maxWidth="7xl" className="py-8">
-        {/* Header compact */}
-        <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 mb-6">
+    <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+      {/* Header avec bannière */}
+      <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
+          {isAuthenticated && (
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center gap-2 text-sm mb-3 transition-colors hover:opacity-80"
+              style={{ color: "rgba(235, 242, 250, 0.7)" }}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour au dashboard
+            </Link>
+          )}
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#1c2942] rounded-xl flex items-center justify-center">
-                <Briefcase className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#6d74b5" }}
+              >
+                <Briefcase className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-[#1c2942]">Mur des Missions</h1>
-                <p className="text-sm text-[#1c2942]/60">Découvrez les opportunités d'intervention</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-[#ebf2fa] rounded-lg">
-                <Target className="w-4 h-4 text-[#6d74b5]" />
-                <span className="font-bold text-[#1c2942]">{activeCount}</span>
-                <span className="text-sm text-[#1c2942]/60">actives</span>
+                <h1 className="text-xl font-bold text-white">Mur des Missions</h1>
+                <p className="text-sm" style={{ color: "rgba(235, 242, 250, 0.7)" }}>
+                  Découvrez les opportunités d'intervention
+                </p>
               </div>
             </div>
           </div>
-        </div>
 
+          {/* Stats inline */}
+          <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-white/20">
+            {[
+              { icon: <Target className="w-4 h-4" />, value: activeCount, label: "Actives", highlight: activeCount > 0 },
+              { icon: <Briefcase className="w-4 h-4" />, value: completedCount, label: "Terminées" },
+              { icon: <Briefcase className="w-4 h-4" />, value: missions.length, label: "Total" },
+            ].map((stat, idx) => (
+              <div
+                key={idx}
+                className="px-3 py-1.5 rounded-lg"
+                style={{ backgroundColor: stat.highlight ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.1)" }}
+              >
+                <span
+                  className="mr-2"
+                  style={{ color: stat.highlight ? "#10b981" : "rgba(235, 242, 250, 0.7)" }}
+                >
+                  {stat.icon}
+                </span>
+                <span
+                  className="font-bold"
+                  style={{ color: stat.highlight ? "#10b981" : "#ffffff" }}
+                >
+                  {stat.value}
+                </span>
+                <span
+                  className="text-sm ml-2"
+                  style={{ color: stat.highlight ? "#10b981" : "rgba(235, 242, 250, 0.7)" }}
+                >
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Alerts */}
         {error && (
           <div className="mb-6">
@@ -143,32 +187,41 @@ export default function MissionsPage() {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-4 mb-6">
+        <div
+          className="rounded-xl p-4 mb-6"
+          style={{ backgroundColor: "#ffffff" }}
+        >
           <div className={`grid grid-cols-1 ${isAuthenticated ? "md:grid-cols-4" : "md:grid-cols-1"} gap-4`}>
             <div className={`relative ${isAuthenticated ? "md:col-span-2" : ""}`}>
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#1c2942]/40 w-5 h-5" />
+              <Search
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5"
+                style={{ color: "#6d74b5" }}
+              />
               <Input
                 type="text"
                 placeholder="Rechercher par titre, description, école..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 rounded-xl border-[#1c2942]/10 focus:border-[#6d74b5] focus:ring-[#6d74b5]/20"
+                className="pl-12 h-12 rounded-xl"
+                style={{ borderColor: "#ebf2fa" }}
               />
             </div>
             {isAuthenticated && (
               <div className="flex gap-2 md:col-span-2">
                 <Button
-                  variant={statusFilter === "ACTIVE" ? "primary" : "outline"}
+                  variant={statusFilter === "ACTIVE" ? "primary" : "secondary"}
                   onClick={() => setStatusFilter("ACTIVE")}
                   className={`flex-1 h-12 rounded-xl ${statusFilter === "ACTIVE" ? "bg-[#6d74b5] hover:bg-[#5a61a0]" : ""}`}
+                  style={statusFilter !== "ACTIVE" ? { borderColor: "#ebf2fa" } : {}}
                 >
-                  <Filter className="w-4 h-4" />
+                  <Filter className="w-4 h-4 mr-2" />
                   Actives
                 </Button>
                 <Button
-                  variant={statusFilter === "all" ? "primary" : "outline"}
+                  variant={statusFilter === "all" ? "primary" : "secondary"}
                   onClick={() => setStatusFilter("all")}
                   className={`flex-1 h-12 rounded-xl ${statusFilter === "all" ? "bg-[#6d74b5] hover:bg-[#5a61a0]" : ""}`}
+                  style={statusFilter !== "all" ? { borderColor: "#ebf2fa" } : {}}
                 >
                   Toutes
                 </Button>
@@ -179,7 +232,7 @@ export default function MissionsPage() {
 
         {/* Results count */}
         <div className="flex items-center justify-between mb-6">
-          <span className="text-[#1c2942]/60 font-medium">
+          <span style={{ color: "#6d74b5" }} className="font-medium">
             {filteredMissions.length} mission{filteredMissions.length > 1 ? "s" : ""} trouvée{filteredMissions.length > 1 ? "s" : ""}
           </span>
         </div>
@@ -188,30 +241,40 @@ export default function MissionsPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-[#1c2942]/10 p-6 animate-pulse">
+              <div
+                key={i}
+                className="rounded-xl p-6 animate-pulse"
+                style={{ backgroundColor: "#ffffff" }}
+              >
                 <div className="flex gap-2 mb-4">
-                  <div className="h-6 bg-[#ebf2fa] rounded-full w-20"></div>
-                  <div className="h-6 bg-[#ebf2fa] rounded-full w-16"></div>
+                  <div className="h-6 rounded-full w-20" style={{ backgroundColor: "#ebf2fa" }}></div>
+                  <div className="h-6 rounded-full w-16" style={{ backgroundColor: "#ebf2fa" }}></div>
                 </div>
-                <div className="h-6 bg-[#ebf2fa] rounded w-3/4 mb-4"></div>
-                <div className="h-4 bg-[#ebf2fa] rounded w-1/2 mb-4"></div>
-                <div className="h-16 bg-[#ebf2fa] rounded mb-4"></div>
-                <div className="flex justify-between items-center pt-4 border-t border-[#1c2942]/10">
-                  <div className="h-4 bg-[#ebf2fa] rounded w-24"></div>
-                  <div className="h-9 bg-[#ebf2fa] rounded-lg w-24"></div>
+                <div className="h-6 rounded w-3/4 mb-4" style={{ backgroundColor: "#ebf2fa" }}></div>
+                <div className="h-4 rounded w-1/2 mb-4" style={{ backgroundColor: "#ebf2fa" }}></div>
+                <div className="h-16 rounded mb-4" style={{ backgroundColor: "#ebf2fa" }}></div>
+                <div className="flex justify-between items-center pt-4 border-t" style={{ borderColor: "#ebf2fa" }}>
+                  <div className="h-4 rounded w-24" style={{ backgroundColor: "#ebf2fa" }}></div>
+                  <div className="h-9 rounded-lg w-24" style={{ backgroundColor: "#ebf2fa" }}></div>
                 </div>
               </div>
             ))}
           </div>
         ) : filteredMissions.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#1c2942]/10 p-16 text-center">
-            <div className="w-20 h-20 bg-[#ebf2fa] rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Briefcase className="w-10 h-10 text-[#6d74b5]" />
+          <div
+            className="rounded-xl p-16 text-center"
+            style={{ backgroundColor: "#ffffff" }}
+          >
+            <div
+              className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
+              style={{ backgroundColor: "#ebf2fa" }}
+            >
+              <Briefcase className="w-10 h-10" style={{ color: "#6d74b5" }} />
             </div>
-            <h3 className="text-2xl font-bold text-[#1c2942] mb-3">
+            <h3 className="text-2xl font-bold mb-3" style={{ color: "#1c2942" }}>
               Aucune mission trouvée
             </h3>
-            <p className="text-[#1c2942]/60 max-w-md mx-auto">
+            <p className="max-w-md mx-auto" style={{ color: "#6d74b5" }}>
               {searchQuery
                 ? "Essayez de modifier vos critères de recherche pour découvrir plus d'opportunités"
                 : "Il n'y a pas de missions disponibles pour le moment. Revenez bientôt !"}
@@ -233,30 +296,33 @@ export default function MissionsPage() {
 
         {/* CTA pour les visiteurs non connectés */}
         {!isAuthenticated && (
-          <div className="mt-8 bg-white rounded-2xl border border-[#1c2942]/10 p-8 text-center">
-            <h2 className="text-xl font-bold text-[#1c2942] mb-2">
+          <div
+            className="mt-8 rounded-xl p-8 text-center"
+            style={{ backgroundColor: "#ffffff" }}
+          >
+            <h2 className="text-xl font-bold mb-2" style={{ color: "#1c2942" }}>
               Intéressé par ces missions ?
             </h2>
-            <p className="text-[#1c2942]/60 max-w-xl mx-auto mb-6">
+            <p className="max-w-xl mx-auto mb-6" style={{ color: "#6d74b5" }}>
               Créez votre compte intervenant gratuitement et postulez directement aux missions qui vous intéressent.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register/intervenant">
                 <Button variant="primary" size="lg" className="bg-[#6d74b5] hover:bg-[#5a61a0]">
-                  <UserPlus className="w-5 h-5" />
+                  <UserPlus className="w-5 h-5 mr-2" />
                   Devenir intervenant
                 </Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="lg">
-                  <LogIn className="w-5 h-5" />
+                <Button variant="secondary" size="lg" style={{ borderColor: "#ebf2fa" }}>
+                  <LogIn className="w-5 h-5 mr-2" />
                   Se connecter
                 </Button>
               </Link>
             </div>
           </div>
         )}
-      </PageContainer>
+      </div>
     </div>
   );
 }
