@@ -26,11 +26,16 @@ import MonProfilIntervenantPage from "./pages/MonProfilIntervenantPage";
 import OnboardingDocumentsPage from "./pages/OnboardingDocumentsPage";
 import FacturesPage from "./pages/FacturesPage";
 import DisponibilitesPage from "./pages/DisponibilitesPage";
+import CollaborationsPage from "./pages/CollaborationsPage";
+import NouvelleCollaborationPage from "./pages/NouvelleCollaborationPage";
+import CollaborationDetailPage from "./pages/CollaborationDetailPage";
 import ContactPage from "./pages/ContactPage";
 import DevenirIntervenantPage from "./pages/DevenirIntervenantPage";
 import MentionsLegalesPage from "./pages/MentionsLegalesPage";
 import CGUPage from "./pages/CGUPage";
 import ChallengesPage from "./pages/ChallengesPage";
+import TousLesChallengesPage from "./pages/TousLesChallengesPage";
+import EspaceEcolesPage from "./pages/EspaceEcolesPage";
 import NavLayout from "./components/layouts/DefaultLayout";
 
 function App() {
@@ -136,6 +141,22 @@ function App() {
         element={
           <NavLayout>
             <ChallengesPage />
+          </NavLayout>
+        }
+      />
+      <Route
+        path="/espace-ecoles"
+        element={
+          <NavLayout>
+            <EspaceEcolesPage />
+          </NavLayout>
+        }
+      />
+      <Route
+        path="/tous-les-challenges"
+        element={
+          <NavLayout>
+            <TousLesChallengesPage />
           </NavLayout>
         }
       />
@@ -325,6 +346,38 @@ function App() {
           <ProtectedRoute requiredRole="ECOLE">
             <NavLayout>
               <FacturesPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Routes Collaborations (accessibles aux écoles et intervenants) */}
+      <Route
+        path="/collaborations"
+        element={
+          <ProtectedRoute requiredRole={["ECOLE", "INTERVENANT"]}>
+            <NavLayout>
+              <CollaborationsPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/collaborations/nouvelle"
+        element={
+          <ProtectedRoute requiredRole={["ECOLE", "INTERVENANT"]}>
+            <NavLayout>
+              <NouvelleCollaborationPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/collaborations/:id"
+        element={
+          <ProtectedRoute requiredRole={["ECOLE", "INTERVENANT"]}>
+            <NavLayout>
+              <CollaborationDetailPage />
             </NavLayout>
           </ProtectedRoute>
         }

@@ -34,7 +34,7 @@ interface PartnerLogosSliderProps {
 }
 
 export default function PartnerLogosSlider({
-  title = "+ de 350 établissements",
+  title = "+ de 35 établissements",
   subtitle = "recrutent leurs intervenants avec Vizion Academy"
 }: PartnerLogosSliderProps) {
   // Dupliquer les logos pour créer l'effet infini

@@ -1,92 +1,82 @@
 /**
- * Page de présentation des Challenges
+ * Page de présentation de l'espace Écoles
  */
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/Button";
 import {
-  Trophy,
+  GraduationCap,
   Users,
-  Clock,
-  Sparkles,
+  CheckCircle,
+  FileText,
+  Trophy,
+  HeadphonesIcon,
   ArrowRight,
+  Building2,
+  Clock,
+  Shield,
+  Sparkles,
   Target,
   Zap,
-  Lightbulb,
-  CheckCircle,
-  Play,
-  GraduationCap,
-  Rocket,
-  Star,
-  HeadphonesIcon,
 } from "lucide-react";
 
 const avantages = [
   {
-    icon: <Lightbulb className="w-6 h-6" />,
-    title: "Expériences immersives",
-    description: "Des challenges engageants qui plongent les étudiants dans des situations concrètes et stimulantes.",
-  },
-  {
-    icon: <Target className="w-6 h-6" />,
-    title: "Clé en main",
-    description: "Tout est préparé : livrables, grilles d'évaluation, supports pédagogiques et planning.",
-  },
-  {
     icon: <Users className="w-6 h-6" />,
-    title: "Travail en équipe",
-    description: "Des projets collaboratifs qui développent les soft skills et l'esprit d'équipe.",
-  },
-  {
-    icon: <Rocket className="w-6 h-6" />,
-    title: "Thématiques actuelles",
-    description: "IA, entrepreneuriat, RSE, digital... Des sujets en phase avec le monde professionnel.",
+    title: "Réseau d'experts vérifiés",
+    description: "Accédez à des intervenants qualifiés et sélectionnés pour leur expertise et leur pédagogie.",
   },
   {
     icon: <Trophy className="w-6 h-6" />,
-    title: "Compétition saine",
-    description: "Des lots et récompenses pour motiver les étudiants et valoriser leurs efforts.",
+    title: "Challenges clés en main",
+    description: "Des projets pédagogiques innovants prêts à lancer pour dynamiser vos formations.",
+  },
+  {
+    icon: <FileText className="w-6 h-6" />,
+    title: "Gestion administrative simplifiée",
+    description: "Nous prenons en charge la facturation des intervenants. 0 facture à gérer pour vous.",
+  },
+  {
+    icon: <Clock className="w-6 h-6" />,
+    title: "Gain de temps",
+    description: "Trouvez le bon intervenant en quelques clics grâce à notre moteur de recherche avancé.",
+  },
+  {
+    icon: <Shield className="w-6 h-6" />,
+    title: "Intervenants certifiés",
+    description: "Tous nos experts sont vérifiés et leurs compétences validées par notre équipe.",
   },
   {
     icon: <HeadphonesIcon className="w-6 h-6" />,
-    title: "Accompagnement expert",
-    description: "Des intervenants professionnels pour guider et coacher les participants.",
+    title: "Support dédié",
+    description: "Une équipe à votre écoute pour vous accompagner tout au long de vos projets.",
   },
 ];
 
 const etapes = [
   {
     numero: "01",
-    titre: "Choisissez votre challenge",
-    description: "Parcourez notre catalogue et sélectionnez le challenge adapté à vos objectifs pédagogiques.",
+    titre: "Créez votre compte",
+    description: "Inscrivez votre établissement en quelques minutes et accédez à la plateforme.",
   },
   {
     numero: "02",
-    titre: "On planifie ensemble",
-    description: "Nous adaptons le challenge à votre calendrier, vos effectifs et vos contraintes.",
+    titre: "Recherchez un intervenant",
+    description: "Parcourez notre réseau d'experts par domaine, disponibilité ou localisation.",
   },
   {
     numero: "03",
-    titre: "Lancement du challenge",
-    description: "Vos étudiants vivent une expérience unique avec nos intervenants experts.",
+    titre: "Contactez et collaborez",
+    description: "Échangez directement avec les intervenants et déclarez vos collaborations.",
   },
   {
     numero: "04",
-    titre: "Évaluation et restitution",
-    description: "Jurys, pitchs, remise des prix... Une conclusion mémorable pour les participants.",
+    titre: "On s'occupe du reste",
+    description: "Facturation, mandats, administratif... Nous gérons tout pour vous.",
   },
 ];
 
-const thematiques = [
-  "Entrepreneuriat",
-  "Intelligence Artificielle",
-  "Innovation",
-  "Art & Créativité",
-  "Marketing Digital",
-  "RSE & Développement Durable",
-];
-
-export default function ChallengesPage() {
+export default function EspaceEcolesPage() {
   const navigate = useNavigate();
 
   return (
@@ -100,7 +90,7 @@ export default function ChallengesPage() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop')`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop')`,
           }}
         />
         {/* Color Overlay */}
@@ -120,30 +110,29 @@ export default function ChallengesPage() {
               transition={{ duration: 0.6 }}
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-white/10 text-white border border-white/20">
-                <Trophy className="w-4 h-4" />
-                Challenges Pédagogiques
+                <GraduationCap className="w-4 h-4" />
+                Espace Écoles
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
-                Des{" "}
+                Trouvez les{" "}
                 <span className="bg-gradient-to-r from-[#6d74b5] to-[#fdf1f7] bg-clip-text text-transparent">
-                  expériences uniques
+                  meilleurs experts
                 </span>{" "}
-                pour vos étudiants
+                pour vos formations
               </h1>
 
               <p className="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed">
-                Transformez l'apprentissage avec nos challenges immersifs clé en main.
-                Des projets engageants sur des thématiques actuelles pour développer
-                les compétences de vos étudiants.
+                Vizion Academy connecte votre établissement avec un réseau d'intervenants
+                qualifiés. Simplifiez votre gestion et offrez des formations d'excellence à vos étudiants.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
-                  onClick={() => navigate("/tous-les-challenges")}
+                  onClick={() => navigate("/intervenants")}
                   className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white px-8 py-3"
                 >
-                  Voir tous les challenges
+                  Voir les intervenants
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
                 <Button
@@ -155,77 +144,15 @@ export default function ChallengesPage() {
                 </Button>
               </div>
             </motion.div>
+
           </div>
-        </div>
-      </section>
-
-      {/* Section Vidéo */}
-      <section
-        className="py-20"
-        style={{ background: "linear-gradient(180deg, white 0%, #ebf2fa 100%)" }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-[#6d74b5]/10 text-[#6d74b5] border border-[#6d74b5]/20"
-            >
-              <Play className="w-4 h-4" />
-              Découvrez en vidéo
-            </motion.div>
-
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
-            >
-              Nos challenges en{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
-                action
-              </span>
-            </motion.h2>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-lg text-[#1c2942]/70 max-w-2xl mx-auto"
-            >
-              Découvrez comment nos challenges transforment l'expérience d'apprentissage
-            </motion.p>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-[#1c2942]">
-              <div className="aspect-video">
-                <iframe
-                  src="https://www.youtube.com/embed/GQXFJCZ4W0s"
-                  title="Vizion Academy - Challenges Pédagogiques"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                />
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 
       {/* Avantages Section */}
       <section
         className="py-20"
-        style={{ background: "linear-gradient(180deg, #ebf2fa 0%, white 100%)" }}
+        style={{ background: "linear-gradient(180deg, white 0%, #ebf2fa 100%)" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -246,9 +173,9 @@ export default function ChallengesPage() {
               transition={{ delay: 0.1 }}
               className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
             >
-              Pourquoi choisir nos{" "}
+              Pourquoi choisir{" "}
               <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
-                challenges
+                Vizion Academy
               </span>{" "}
               ?
             </motion.h2>
@@ -260,7 +187,7 @@ export default function ChallengesPage() {
               transition={{ delay: 0.2 }}
               className="text-lg text-[#1c2942]/70 max-w-2xl mx-auto"
             >
-              Des expériences pédagogiques innovantes conçues pour engager vos étudiants
+              Une plateforme conçue pour simplifier la vie des établissements d'enseignement
             </motion.p>
           </div>
 
@@ -279,54 +206,6 @@ export default function ChallengesPage() {
                 </div>
                 <h3 className="text-lg font-bold text-[#1c2942] mb-2">{avantage.title}</h3>
                 <p className="text-[#1c2942]/70">{avantage.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Thématiques Section */}
-      <section
-        className="py-20"
-        style={{ background: "linear-gradient(180deg, white 0%, #fdf1f7 50%, white 100%)" }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-white text-[#6d74b5] border border-[#6d74b5]/20"
-            >
-              <GraduationCap className="w-4 h-4" />
-              Nos thématiques
-            </motion.div>
-
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
-            >
-              Des sujets en phase avec{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
-                le monde pro
-              </span>
-            </motion.h2>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-4">
-            {thematiques.map((theme, index) => (
-              <motion.div
-                key={theme}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="px-6 py-3 bg-white rounded-full shadow-md border border-[#6d74b5]/10 text-[#1c2942] font-medium hover:shadow-lg transition-shadow"
-              >
-                {theme}
               </motion.div>
             ))}
           </div>
@@ -357,9 +236,9 @@ export default function ChallengesPage() {
               transition={{ delay: 0.1 }}
               className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
             >
-              Lancez un challenge en{" "}
+              Démarrez en{" "}
               <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
-                4 étapes
+                4 étapes simples
               </span>
             </motion.h2>
           </div>
@@ -405,20 +284,20 @@ export default function ChallengesPage() {
             </div>
 
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Prêt à dynamiser vos formations ?
+              Prêt à transformer vos formations ?
             </h2>
 
             <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-              Contactez-nous pour discuter de vos besoins et découvrir le challenge
-              idéal pour vos étudiants.
+              Rejoignez les établissements qui font confiance à Vizion Academy pour
+              trouver les meilleurs intervenants et proposer des expériences pédagogiques uniques.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                onClick={() => navigate("/tous-les-challenges")}
+                onClick={() => navigate("/intervenants")}
                 className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white px-8 py-3"
               >
-                Explorer les challenges
+                Découvrir nos intervenants
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button
@@ -426,7 +305,7 @@ export default function ChallengesPage() {
                 variant="outline"
                 className="border-white/30 text-white hover:bg-white/10 px-8 py-3"
               >
-                Demander un devis
+                Nous contacter
               </Button>
             </div>
           </motion.div>

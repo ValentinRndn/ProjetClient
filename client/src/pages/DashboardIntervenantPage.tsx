@@ -20,6 +20,7 @@ import {
   Receipt,
   CalendarClock,
   AlertTriangle,
+  Handshake,
 } from "lucide-react";
 import { Alert } from "@/components/ui/Alert";
 import { Link } from "react-router";
@@ -303,6 +304,18 @@ export default function DashboardIntervenantPage() {
                         <span className="font-semibold text-[#1c2942]">Voir les missions</span>
                       </div>
                       <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/collaborations" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                          <Handshake className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Mes collaborations</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>
 

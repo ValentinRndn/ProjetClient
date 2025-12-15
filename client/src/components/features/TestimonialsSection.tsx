@@ -59,7 +59,7 @@ export default function TestimonialsSection() {
   const currentTestimonial = testimonials[currentIndex];
 
   return (
-    <section className="py-20 bg-[#ebf2fa]">
+    <section className="py-20" style={{ background: "linear-gradient(135deg, #ebf2fa 0%, #fdf1f7 100%)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -165,22 +165,6 @@ export default function TestimonialsSection() {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 max-w-4xl mx-auto">
-          {[
-            { value: "98%", label: "Taux de satisfaction" },
-            { value: "350+", label: "Écoles partenaires" },
-            { value: "5000+", label: "Étudiants formés" },
-            { value: "4.8/5", label: "Note moyenne" },
-          ].map((stat, index) => (
-            <div key={index} className="text-center">
-              <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
-                {stat.value}
-              </p>
-              <p className="text-sm text-[#1c2942]/60">{stat.label}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );

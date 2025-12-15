@@ -74,7 +74,7 @@ export default function VizionAcademy() {
     {
       icon: <Award className="w-6 h-6 text-bleu-intense" />,
       title: "Mandats de facturation pour tous les intervenants",
-      description: "Facilitez à tous pour vos experts"
+      description: "0 facture à faire"
     },
     {
       icon: <HeadphonesIcon className="w-6 h-6 text-bleu-intense" />,

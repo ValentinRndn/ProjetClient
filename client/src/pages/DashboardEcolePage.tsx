@@ -18,6 +18,7 @@ import {
   History,
   Heart,
   Mail,
+  Handshake,
 } from "lucide-react";
 
 export default function DashboardEcolePage() {
@@ -76,12 +77,26 @@ export default function DashboardEcolePage() {
               </div>
             </div>
 
-            <Link to="/nouvelle-mission">
-              <Button variant="primary" size="md" className="bg-[#6d74b5] hover:bg-[#5a61a0]">
-                <Plus className="w-4 h-4" />
-                Nouvelle mission
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/intervenants">
+                <Button variant="outline" size="md" className="border-[#1c2942]/20 text-[#1c2942] hover:bg-[#ebf2fa]">
+                  <Users className="w-4 h-4" />
+                  Trouver un intervenant
+                </Button>
+              </Link>
+              <Link to="/collaborations">
+                <Button variant="outline" size="md" className="border-[#1c2942]/20 text-[#1c2942] hover:bg-[#ebf2fa]">
+                  <Handshake className="w-4 h-4" />
+                  Mes collaborations
+                </Button>
+              </Link>
+              <Link to="/nouvelle-mission">
+                <Button variant="primary" size="md" className="bg-[#6d74b5] hover:bg-[#5a61a0]">
+                  <Plus className="w-4 h-4" />
+                  Nouvelle mission
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Stats inline */}
@@ -208,6 +223,18 @@ export default function DashboardEcolePage() {
                         <span className="font-semibold text-[#1c2942]">Trouver un intervenant</span>
                       </div>
                       <ArrowRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/collaborations" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                          <Handshake className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Mes collaborations</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>
 

@@ -30,12 +30,12 @@ export default function WhyChooseUs() {
     {
       icon: <FileText className="w-6 h-6 text-[#6d74b5]" />,
       title: "Prise en charge de la facturation des intervenants",
-      description: "Simplifiez votre gestion administrative",
+      description: "0 facture à faire",
     },
     {
       icon: <Award className="w-6 h-6 text-[#6d74b5]" />,
       title: "Mandats de facturation pour tous les intervenants",
-      description: "Facilitez à tous pour vos experts",
+      description: "0 facture à faire",
     },
     {
       icon: <HeadphonesIcon className="w-6 h-6 text-[#6d74b5]" />,

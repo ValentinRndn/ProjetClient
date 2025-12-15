@@ -105,7 +105,7 @@ const CONTRACT_TERMS = [
   {
     title: "Responsabilité civile professionnelle",
     description:
-      "Une assurance RC Pro est obligatoire pour couvrir votre activité d'intervention en établissement.",
+      "Une assurance RC Pro ou une attestation de couverture est obligatoire pour couvrir votre activité d'intervention en établissement.",
   },
   {
     title: "Disponibilité et engagement",
@@ -116,11 +116,6 @@ const CONTRACT_TERMS = [
     title: "Confidentialité",
     description:
       "Vous vous engagez à respecter la confidentialité des informations relatives aux établissements et aux étudiants.",
-  },
-  {
-    title: "Facturation via la plateforme",
-    description:
-      "La facturation des missions s'effectue via Vizion Academy. Des frais de service de 10% sont appliqués sur chaque mission.",
   },
   {
     title: "Validation du profil",

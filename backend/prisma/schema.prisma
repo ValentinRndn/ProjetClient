@@ -111,6 +111,9 @@ model Ecole {
   // Relation One-to-Many avec ProfilConsultation (consultations effectuées)
   profilConsultations ProfilConsultation[]
 
+  // Relation One-to-Many avec Collaboration
+  collaborations Collaboration[]
+
   @@index([userId])
 }
 
@@ -173,6 +176,9 @@ model Intervenant {
 
   // Relation One-to-Many avec ProfilConsultation (consultations reçues)
   consultations ProfilConsultation[]
+
+  // Relation One-to-Many avec Collaboration
+  collaborations Collaboration[]
 
   @@index([userId])
   @@index([status])
@@ -590,5 +596,44 @@ model AuditLog {
   @@index([action])
   @@index([entity])
   @@index([entityId])
+  @@index([createdAt])
+}
+
+// ============================================
+// MODEL : Collaboration
+// Déclaration de collaboration entre école et intervenant
+// ============================================
+model Collaboration {
+  id                    String    @id @default(uuid())
+  ecoleId               String
+  intervenantId         String
+
+  // Informations de la collaboration
+  titre                 String
+  description           String?   @db.Text
+  dateDebut             DateTime?
+  dateFin               DateTime?
+  montantHT             Int?      // Montant en centimes
+
+  // Statut et validation
+  status                String    @default("brouillon") // brouillon, en_cours, terminee, annulee
+  createdBy             String    // "ecole" ou "intervenant"
+  validatedByEcole      Boolean   @default(false)
+  validatedByIntervenant Boolean  @default(false)
+
+  // Notes partagées
+  notes                 String?   @db.Text
+
+  // Dates
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Relations
+  ecole                 Ecole       @relation(fields: [ecoleId], references: [id], onDelete: Cascade)
+  intervenant           Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
+
+  @@index([ecoleId])
+  @@index([intervenantId])
+  @@index([status])
   @@index([createdAt])
 }

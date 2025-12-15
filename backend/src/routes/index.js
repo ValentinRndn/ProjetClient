@@ -19,6 +19,7 @@ import facturesRoutes from "./factures.routes.js";
 import trackingRoutes from "./tracking.routes.js";
 import notificationsRoutes from "./notifications.routes.js";
 import backofficeRoutes from "./backoffice.routes.js";
+import collaborationsRoutes from "./collaborations.routes.js";
 
 const router = Router();
 
@@ -60,5 +61,8 @@ router.use("/notifications", notificationsRoutes);
 
 // Routes back-office (admin: thématiques, partenaires, témoignages, FAQ, audit)
 router.use("/backoffice", backofficeRoutes);
+
+// Routes collaborations (écoles + intervenants)
+router.use("/collaborations", collaborationsRoutes);
 
 export default router;

@@ -89,6 +89,14 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       }
       items={[
         <NavLink
+          key="presentation"
+          to="/espace-ecoles"
+          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
+        >
+          <span className="font-medium text-[#1c2942]">Présentation</span>
+          <span className="text-xs text-[#1c2942]/50">Découvrez notre offre pour les écoles</span>
+        </NavLink>,
+        <NavLink
           key="intervenants"
           to="/intervenants"
           className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
@@ -118,8 +126,16 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       }
       items={[
         <NavLink
-          key="challenges"
+          key="presentation-challenges"
           to="/challenges"
+          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
+        >
+          <span className="font-medium text-[#1c2942]">Présentation</span>
+          <span className="text-xs text-[#1c2942]/50">Découvrez notre offre de challenges</span>
+        </NavLink>,
+        <NavLink
+          key="tous-challenges"
+          to="/tous-les-challenges"
           className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
         >
           <span className="font-medium text-[#1c2942]">Voir tous les challenges</span>
@@ -138,6 +154,14 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         </span>
       }
       items={[
+        <NavLink
+          key="presentation-intervenants"
+          to="/intervenants"
+          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
+        >
+          <span className="font-medium text-[#1c2942]">Présentation</span>
+          <span className="text-xs text-[#1c2942]/50">Découvrez notre réseau d'experts</span>
+        </NavLink>,
         <NavLink
           key="missions"
           to="/missions"
