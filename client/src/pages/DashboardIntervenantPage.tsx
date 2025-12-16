@@ -21,6 +21,7 @@ import {
   CalendarClock,
   AlertTriangle,
   Handshake,
+  Trophy,
 } from "lucide-react";
 import { Alert } from "@/components/ui/Alert";
 import { Link } from "react-router";
@@ -316,6 +317,18 @@ export default function DashboardIntervenantPage() {
                         <span className="font-semibold text-[#1c2942]">Mes collaborations</span>
                       </div>
                       <ArrowRight className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/mes-challenges" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                          <Trophy className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Mes challenges</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>
 
