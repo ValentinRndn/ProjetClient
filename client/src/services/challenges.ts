@@ -2,7 +2,7 @@
  * Service de gestion des Challenges pédagogiques
  */
 
-import api from "./api";
+import api from "@/lib/api";
 
 export interface Challenge {
   id: string;
