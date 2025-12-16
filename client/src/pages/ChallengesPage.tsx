@@ -17,6 +17,14 @@ import {
   GraduationCap,
   Rocket,
   HeadphonesIcon,
+  Megaphone,
+  Cpu,
+  Leaf,
+  MessageCircle,
+  Monitor,
+  Palette,
+  Languages,
+  PiggyBank,
 } from "lucide-react";
 
 const avantages = [
@@ -76,12 +84,16 @@ const etapes = [
 ];
 
 const thematiques = [
-  "Entrepreneuriat",
-  "Intelligence Artificielle",
-  "Innovation",
-  "Art & Créativité",
-  "Marketing Digital",
-  "RSE & Développement Durable",
+  { name: "Marketing", icon: <Megaphone className="w-6 h-6" /> },
+  { name: "Intelligences artificielles", icon: <Cpu className="w-6 h-6" /> },
+  { name: "RSE", icon: <Leaf className="w-6 h-6" /> },
+  { name: "Communication", icon: <MessageCircle className="w-6 h-6" /> },
+  { name: "Entrepreneuriat", icon: <Rocket className="w-6 h-6" /> },
+  { name: "Digital", icon: <Monitor className="w-6 h-6" /> },
+  { name: "Créativité", icon: <Lightbulb className="w-6 h-6" /> },
+  { name: "Art", icon: <Palette className="w-6 h-6" /> },
+  { name: "Langues étrangères", icon: <Languages className="w-6 h-6" /> },
+  { name: "Finance", icon: <PiggyBank className="w-6 h-6" /> },
 ];
 
 export default function ChallengesPage() {
@@ -326,22 +338,26 @@ export default function ChallengesPage() {
             </motion.h2>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {thematiques.map((theme, index) => (
               <motion.div
-                key={theme}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                key={theme.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="px-6 py-3 rounded-full font-medium border transition-all hover:scale-105"
+                transition={{ delay: index * 0.05 }}
+                className="p-5 rounded-2xl text-center border transition-all hover:scale-105"
                 style={{
                   backgroundColor: "rgba(219, 186, 207, 0.1)",
-                  color: "#ffffff",
                   borderColor: "rgba(219, 186, 207, 0.3)"
                 }}
               >
-                {theme}
+                <div className="mb-3 flex justify-center" style={{ color: "#dbbacf" }}>
+                  {theme.icon}
+                </div>
+                <h3 className="font-semibold text-white text-sm">
+                  {theme.name}
+                </h3>
               </motion.div>
             ))}
           </div>
