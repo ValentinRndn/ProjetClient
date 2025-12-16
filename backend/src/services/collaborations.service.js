@@ -6,6 +6,56 @@
 import prisma from '../../prisma.js';
 
 /**
+ * Génère un numéro de facture unique
+ */
+async function generateFactureNumero() {
+  const year = new Date().getFullYear();
+  const count = await prisma.facture.count({
+    where: {
+      numero: { startsWith: `FAC-${year}` },
+    },
+  });
+  return `FAC-${year}-${String(count + 1).padStart(4, '0')}`;
+}
+
+/**
+ * Créer une facture automatiquement pour une collaboration validée
+ */
+async function createFactureForCollaboration(collaboration) {
+  // Ne créer la facture que s'il y a un montant défini
+  if (!collaboration.montantHT || collaboration.montantHT <= 0) {
+    return null;
+  }
+
+  const numero = await generateFactureNumero();
+  const tva = Math.round(collaboration.montantHT * 0.20); // TVA 20%
+  const montantTTC = collaboration.montantHT + tva;
+
+  // L'intervenant facture l'école
+  const facture = await prisma.facture.create({
+    data: {
+      numero,
+      type: 'ecole',
+      emetteurType: 'intervenant',
+      emetteurId: collaboration.intervenantId,
+      destinataireType: 'ecole',
+      destinataireId: collaboration.ecoleId,
+      montantHT: collaboration.montantHT,
+      tva,
+      montantTTC,
+      description: `Collaboration: ${collaboration.titre}`,
+      status: 'brouillon',
+      dateEcheance: collaboration.dateFin
+        ? new Date(new Date(collaboration.dateFin).getTime() + 30 * 24 * 60 * 60 * 1000) // +30 jours après fin
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 jours par défaut
+      collaborationId: collaboration.id,
+    },
+  });
+
+  return facture;
+}
+
+/**
  * Créer une nouvelle collaboration
  */
 export async function createCollaboration(data, userId, userRole) {
@@ -248,7 +298,9 @@ export async function validateCollaboration(id, userId, userRole) {
     (updateData.validatedByEcole || collaboration.validatedByEcole) &&
     (updateData.validatedByIntervenant || collaboration.validatedByIntervenant);
 
-  if (willBeValidatedByBoth && collaboration.status === 'brouillon') {
+  const isBecomingActive = willBeValidatedByBoth && collaboration.status === 'brouillon';
+
+  if (isBecomingActive) {
     updateData.status = 'en_cours';
   }
 
@@ -267,6 +319,19 @@ export async function validateCollaboration(id, userId, userRole) {
       },
     },
   });
+
+  // Si la collaboration vient d'être validée par les deux parties, créer la facture
+  if (isBecomingActive) {
+    try {
+      const facture = await createFactureForCollaboration(updated);
+      if (facture) {
+        updated.facture = facture;
+      }
+    } catch (error) {
+      console.error('Erreur lors de la création de la facture:', error);
+      // On ne bloque pas la validation si la facture échoue
+    }
+  }
 
   return updated;
 }

@@ -36,6 +36,27 @@ export const updateIntervenantSchema = Joi.object({
     Joi.object()
   ).optional(),
 
+  // Nouveaux champs profil enrichi
+  diplomas: Joi.array().items(Joi.string().max(200)).max(20).optional(),
+  availabilityModes: Joi.array().items(Joi.string().valid('presentiel', 'hybride', 'distanciel')).optional(),
+  availabilityLocation: Joi.string().max(200).optional().allow(''),
+  experiences: Joi.array().items(
+    Joi.object({
+      title: Joi.string().max(200).required(),
+      company: Joi.string().max(200).required(),
+      startDate: Joi.string().required(),
+      endDate: Joi.string().optional().allow(''),
+      description: Joi.string().max(2000).optional().allow('')
+    })
+  ).max(20).optional(),
+  softwares: Joi.array().items(Joi.string().max(100)).max(30).optional(),
+  languages: Joi.array().items(
+    Joi.object({
+      language: Joi.string().max(100).required(),
+      level: Joi.string().valid('debutant', 'intermediaire', 'avance', 'natif').required()
+    })
+  ).max(10).optional(),
+
   // Champs hérités
   specialite: Joi.string().max(200).optional().allow(''),
   tarifHoraire: Joi.number().positive().optional().allow(null)

@@ -156,6 +156,13 @@ model Intervenant {
   phone        String?  // Téléphone
   city         String?  // Ville
   yearsExperience Int?  // Années d'expérience
+  // Champs supplémentaires pour profil enrichi
+  diplomas     String[] @default([])  // Liste des diplômes (texte)
+  availabilityModes String[] @default([])  // Modes de disponibilité: "presentiel", "hybride", "distanciel"
+  availabilityLocation String?  // Localisation pour présentiel (ex: "Lyon")
+  experiences  Json?    // Expériences professionnelles [{title, company, startDate, endDate, description}]
+  softwares    String[] @default([])  // Logiciels maîtrisés
+  languages    Json?    // Langues [{language, level}] - level: "debutant", "intermediaire", "avance", "natif"
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -348,6 +355,10 @@ model Facture {
   missionId       String?
   mission         Mission? @relation(fields: [missionId], references: [id], onDelete: SetNull)
 
+  // Référence collaboration (pour factures auto-générées)
+  collaborationId String?
+  collaboration   Collaboration? @relation(fields: [collaborationId], references: [id], onDelete: SetNull)
+
   // Montants (en centimes)
   montantHT       Int      // Montant hors taxes
   tva             Int      @default(0) // TVA applicable (0 si auto-entrepreneur)
@@ -380,6 +391,7 @@ model Facture {
   @@index([emetteurId])
   @@index([destinataireId])
   @@index([missionId])
+  @@index([collaborationId])
   @@index([dateEmission])
 }
 
@@ -631,6 +643,9 @@ model Collaboration {
   // Relations
   ecole                 Ecole       @relation(fields: [ecoleId], references: [id], onDelete: Cascade)
   intervenant           Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
+
+  // Factures liées à cette collaboration
+  factures              Facture[]
 
   @@index([ecoleId])
   @@index([intervenantId])

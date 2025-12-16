@@ -8,12 +8,7 @@ import {
   LogOutIcon,
   Mail,
   Phone,
-  PlusIcon,
-  TargetIcon,
-  UserIcon,
   LayoutDashboardIcon,
-  UsersIcon,
-  ShieldIcon,
   MapPin,
   ArrowRight,
   Linkedin,
@@ -25,9 +20,8 @@ import {
 import { PropsWithChildren } from "react";
 
 export default function DefaultLayout({ children }: PropsWithChildren) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const role = user?.role;
 
   // Boutons du header (identiques pour tous)
   const headerButtons = [
@@ -66,8 +60,8 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       : []),
   ];
 
-  // Navigation pour les visiteurs (non connectés) - 3 portes d'entrée avec dropdowns
-  const visitorNavItems = [
+  // Navigation principale - identique pour tous (connectés ou non)
+  const navItems = [
     <Dropdown
       key="ecole-dropdown"
       className="dropdown-hover"
@@ -181,138 +175,6 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
     />,
   ];
 
-  // Navigation pour les écoles
-  const ecoleNavItems = [
-    <NavLink
-      key="intervenants"
-      to="/intervenants"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
-    >
-      Trouver un intervenant
-    </NavLink>,
-    <NavLink
-      key="nouvelle-mission"
-      to="/nouvelle-mission"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors flex items-center gap-1.5"
-    >
-      <PlusIcon className="w-4 h-4" />
-      Nouvelle mission
-    </NavLink>,
-    <NavLink
-      key="mes-missions"
-      to="/mes-missions"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
-    >
-      Mes missions
-    </NavLink>,
-    <NavLink
-      key="contact"
-      to="/contact"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
-    >
-      Contact
-    </NavLink>,
-  ];
-
-  // Navigation pour les intervenants
-  const intervenantNavItems = [
-    <NavLink
-      key="missions"
-      to="/missions"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors flex items-center gap-1.5"
-    >
-      <TargetIcon className="w-4 h-4" />
-      Missions
-    </NavLink>,
-    <NavLink
-      key="intervenants"
-      to="/intervenants"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
-    >
-      Annuaire
-    </NavLink>,
-    <NavLink
-      key="contact"
-      to="/contact"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
-    >
-      Contact
-    </NavLink>,
-  ];
-
-  // Navigation pour les admins
-  const adminNavItems = [
-    <Dropdown
-      key="admin-dropdown"
-      className="dropdown-hover"
-      trigger={
-        <span className="flex items-center gap-1.5 cursor-pointer font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors">
-          <ShieldIcon className="w-4 h-4" />
-          Administration
-          <ChevronDownIcon className="w-4 h-4" />
-        </span>
-      }
-      items={[
-        <NavLink
-          key="admin-users"
-          to="/dashboard/admin/users"
-          className="flex items-center gap-3 hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
-        >
-          <div className="w-8 h-8 bg-[#ebf2fa] rounded-lg flex items-center justify-center">
-            <UsersIcon className="w-4 h-4 text-[#6d74b5]" />
-          </div>
-          <span className="text-[#1c2942]">Utilisateurs</span>
-        </NavLink>,
-        <NavLink
-          key="admin-intervenants"
-          to="/dashboard/admin/intervenants"
-          className="flex items-center gap-3 hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
-        >
-          <div className="w-8 h-8 bg-[#ebf2fa] rounded-lg flex items-center justify-center">
-            <UserIcon className="w-4 h-4 text-[#6d74b5]" />
-          </div>
-          <span className="text-[#1c2942]">Intervenants</span>
-        </NavLink>,
-      ]}
-    />,
-    <NavLink
-      key="missions"
-      to="/missions"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
-    >
-      Missions
-    </NavLink>,
-    <NavLink
-      key="gestion-missions"
-      to="/gestion-missions"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
-    >
-      Gérer missions
-    </NavLink>,
-    <NavLink
-      key="intervenants"
-      to="/intervenants"
-      className="font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors"
-    >
-      Intervenants
-    </NavLink>,
-  ];
-
-  // Sélection de la navigation selon le rôle
-  const getNavItems = () => {
-    if (!isAuthenticated) return visitorNavItems;
-    switch (role) {
-      case "ADMIN":
-        return adminNavItems;
-      case "ECOLE":
-        return ecoleNavItems;
-      case "INTERVENANT":
-        return intervenantNavItems;
-      default:
-        return visitorNavItems;
-    }
-  };
-
   // Footer sections
   const footerSections = [
     {
@@ -358,7 +220,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
               />
             </Link>,
           ]}
-          navCenter={getNavItems()}
+          navCenter={navItems}
           navEnd={headerButtons}
         />
       </header>

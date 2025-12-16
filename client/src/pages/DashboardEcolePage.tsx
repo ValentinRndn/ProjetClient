@@ -19,6 +19,7 @@ import {
   Heart,
   Mail,
   Handshake,
+  Receipt,
 } from "lucide-react";
 
 export default function DashboardEcolePage() {
@@ -247,6 +248,18 @@ export default function DashboardEcolePage() {
                         <span className="font-semibold text-[#1c2942]">Gérer mes missions</span>
                       </div>
                       <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/dashboard/ecole/factures" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                          <Receipt className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Mes factures</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>
 

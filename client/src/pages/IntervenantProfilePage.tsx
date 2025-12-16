@@ -26,6 +26,11 @@ import {
   Award,
   CheckCircle,
   Heart,
+  GraduationCap,
+  Monitor,
+  Languages,
+  MapPinned,
+  Building2,
 } from "lucide-react";
 
 export default function IntervenantProfilePage() {
@@ -137,6 +142,25 @@ export default function IntervenantProfilePage() {
       return `https://player.vimeo.com/video/${videoId}`;
     }
     return url;
+  };
+
+  const getLanguageLevelLabel = (level: string) => {
+    const labels: Record<string, string> = {
+      debutant: "Débutant",
+      intermediaire: "Intermédiaire",
+      avance: "Avancé",
+      natif: "Natif",
+    };
+    return labels[level] || level;
+  };
+
+  const getAvailabilityModeLabel = (mode: string) => {
+    const labels: Record<string, string> = {
+      presentiel: "Présentiel",
+      hybride: "Hybride",
+      distanciel: "Distanciel",
+    };
+    return labels[mode] || mode;
   };
 
   const profileImageUrl = getProfileImageUrl();
@@ -305,6 +329,124 @@ export default function IntervenantProfilePage() {
                 </div>
               )}
 
+              {/* Disponibilités */}
+              {((intervenant.availabilityModes && intervenant.availabilityModes.length > 0) || intervenant.availabilityLocation) && (
+                <div>
+                  <h2 className="text-lg font-semibold text-[#1c2942] mb-3 flex items-center gap-2">
+                    <MapPinned className="w-5 h-5 text-[#6d74b5]" />
+                    Disponibilités
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {intervenant.availabilityModes?.map((mode, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium"
+                      >
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        {getAvailabilityModeLabel(mode)}
+                        {mode === "presentiel" && intervenant.availabilityLocation && (
+                          <span className="text-emerald-600">({intervenant.availabilityLocation})</span>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Diplômes */}
+              {intervenant.diplomas && intervenant.diplomas.length > 0 && (
+                <div>
+                  <h2 className="text-lg font-semibold text-[#1c2942] mb-3 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 text-[#6d74b5]" />
+                    Diplômes
+                  </h2>
+                  <div className="space-y-2">
+                    {intervenant.diplomas.map((diploma, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 p-3 bg-[#ebf2fa]/50 rounded-xl"
+                      >
+                        <div className="w-8 h-8 bg-[#6d74b5]/10 rounded-lg flex items-center justify-center">
+                          <Award className="w-4 h-4 text-[#6d74b5]" />
+                        </div>
+                        <span className="text-[#1c2942]">{diploma}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Expériences professionnelles */}
+              {intervenant.experiences && intervenant.experiences.length > 0 && (
+                <div>
+                  <h2 className="text-lg font-semibold text-[#1c2942] mb-3 flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-[#6d74b5]" />
+                    Expériences professionnelles
+                  </h2>
+                  <div className="space-y-4">
+                    {intervenant.experiences.map((exp, idx) => (
+                      <div
+                        key={idx}
+                        className="relative pl-6 border-l-2 border-[#6d74b5]/30"
+                      >
+                        <div className="absolute -left-[9px] top-0 w-4 h-4 bg-[#6d74b5] rounded-full"></div>
+                        <div className="bg-[#ebf2fa]/50 rounded-xl p-4">
+                          <h3 className="font-semibold text-[#1c2942]">{exp.title}</h3>
+                          <p className="text-[#6d74b5] text-sm font-medium">{exp.company}</p>
+                          <p className="text-[#1c2942]/50 text-xs mt-1">
+                            {exp.startDate} - {exp.endDate || "Présent"}
+                          </p>
+                          {exp.description && (
+                            <p className="text-[#1c2942]/70 text-sm mt-2">{exp.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Logiciels maîtrisés */}
+              {intervenant.softwares && intervenant.softwares.length > 0 && (
+                <div>
+                  <h2 className="text-lg font-semibold text-[#1c2942] mb-3 flex items-center gap-2">
+                    <Monitor className="w-5 h-5 text-[#6d74b5]" />
+                    Logiciels maîtrisés
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {intervenant.softwares.map((software, idx) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1.5 bg-[#1c2942]/5 text-[#1c2942] rounded-lg text-sm font-medium"
+                      >
+                        {software}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Langues */}
+              {intervenant.languages && intervenant.languages.length > 0 && (
+                <div>
+                  <h2 className="text-lg font-semibold text-[#1c2942] mb-3 flex items-center gap-2">
+                    <Languages className="w-5 h-5 text-[#6d74b5]" />
+                    Langues
+                  </h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {intervenant.languages.map((lang, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 bg-[#ebf2fa]/50 rounded-xl text-center"
+                      >
+                        <p className="font-medium text-[#1c2942]">{lang.language}</p>
+                        <p className="text-xs text-[#6d74b5]">{getLanguageLevelLabel(lang.level)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Vidéo de présentation */}
               {intervenant.videoUrl && (
                 <div>
@@ -324,8 +466,14 @@ export default function IntervenantProfilePage() {
                 </div>
               )}
 
-              {/* Message si pas de bio ni vidéo */}
-              {!intervenant.bio && !intervenant.videoUrl && (
+              {/* Message si pas de contenu principal */}
+              {!intervenant.bio &&
+               !intervenant.videoUrl &&
+               (!intervenant.diplomas || intervenant.diplomas.length === 0) &&
+               (!intervenant.experiences || intervenant.experiences.length === 0) &&
+               (!intervenant.softwares || intervenant.softwares.length === 0) &&
+               (!intervenant.languages || intervenant.languages.length === 0) &&
+               (!intervenant.availabilityModes || intervenant.availabilityModes.length === 0) && (
                 <p className="text-[#1c2942]/50 text-center py-8">
                   Aucune information supplémentaire disponible.
                 </p>

@@ -192,13 +192,27 @@ export default function FacturesPage() {
     }
   };
 
+  // Déterminer le lien de retour selon le rôle
+  const getDashboardLink = () => {
+    switch (user?.role) {
+      case "ADMIN":
+        return "/dashboard/admin";
+      case "ECOLE":
+        return "/dashboard/ecole";
+      case "INTERVENANT":
+        return "/dashboard/intervenant";
+      default:
+        return "/dashboard";
+    }
+  };
+
   return (
     <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
       {/* Header compact */}
       <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">
           <Link
-            to="/dashboard/admin"
+            to={getDashboardLink()}
             className="inline-flex items-center gap-2 text-sm mb-3 transition-colors hover:opacity-80"
             style={{ color: "rgba(235, 242, 250, 0.7)" }}
           >

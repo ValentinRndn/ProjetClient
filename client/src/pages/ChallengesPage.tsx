@@ -1,5 +1,6 @@
 /**
  * Page de présentation des Challenges
+ * Couleurs spécifiques : #28303a (fond sombre), #ffffff (texte), #dbbacf (accent rose)
  */
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
@@ -7,17 +8,14 @@ import { Button } from "@/components/ui/Button";
 import {
   Trophy,
   Users,
-  Clock,
   Sparkles,
   ArrowRight,
   Target,
   Zap,
   Lightbulb,
-  CheckCircle,
   Play,
   GraduationCap,
   Rocket,
-  Star,
   HeadphonesIcon,
 } from "lucide-react";
 
@@ -91,10 +89,10 @@ export default function ChallengesPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
+      {/* Hero Section - Fond sombre #28303a */}
       <section
         className="relative py-20 sm:py-28 overflow-hidden"
-        style={{ backgroundColor: "#1c2942" }}
+        style={{ backgroundColor: "#28303a" }}
       >
         {/* Background Image */}
         <div
@@ -104,12 +102,12 @@ export default function ChallengesPage() {
           }}
         />
         {/* Color Overlay */}
-        <div className="absolute inset-0 bg-[#1c2942]/80" />
+        <div className="absolute inset-0 bg-[#28303a]/85" />
 
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-[#6d74b5]/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#fdf1f7]/10 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#dbbacf]/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#dbbacf]/10 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -125,11 +123,15 @@ export default function ChallengesPage() {
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
-                Des{" "}
-                <span className="bg-gradient-to-r from-[#6d74b5] to-[#fdf1f7] bg-clip-text text-transparent">
-                  expériences uniques
+                Entre{" "}
+                <span style={{ color: "#dbbacf" }}>
+                  immersion
                 </span>{" "}
-                pour vos étudiants
+                et pédagogie, il y a{" "}
+                <span style={{ color: "#dbbacf" }}>
+                  Vizion Academy
+                </span>{" "}
+                !
               </h1>
 
               <p className="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed">
@@ -141,7 +143,8 @@ export default function ChallengesPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   onClick={() => navigate("/tous-les-challenges")}
-                  className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white px-8 py-3"
+                  className="text-[#28303a] px-8 py-3"
+                  style={{ backgroundColor: "#dbbacf" }}
                 >
                   Voir tous les challenges
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -162,7 +165,7 @@ export default function ChallengesPage() {
       {/* Section Vidéo */}
       <section
         className="py-20"
-        style={{ background: "linear-gradient(180deg, white 0%, #ebf2fa 100%)" }}
+        style={{ backgroundColor: "#28303a" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -170,7 +173,8 @@ export default function ChallengesPage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-[#6d74b5]/10 text-[#6d74b5] border border-[#6d74b5]/20"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 border"
+              style={{ backgroundColor: "rgba(219, 186, 207, 0.1)", color: "#dbbacf", borderColor: "rgba(219, 186, 207, 0.3)" }}
             >
               <Play className="w-4 h-4" />
               Découvrez en vidéo
@@ -181,10 +185,10 @@ export default function ChallengesPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
+              className="text-3xl sm:text-4xl font-bold text-white mb-4"
             >
               Nos challenges en{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
+              <span style={{ color: "#dbbacf" }}>
                 action
               </span>
             </motion.h2>
@@ -194,7 +198,7 @@ export default function ChallengesPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-lg text-[#1c2942]/70 max-w-2xl mx-auto"
+              className="text-lg text-white/70 max-w-2xl mx-auto"
             >
               Découvrez comment nos challenges transforment l'expérience d'apprentissage
             </motion.p>
@@ -207,7 +211,7 @@ export default function ChallengesPage() {
             transition={{ delay: 0.3 }}
             className="max-w-4xl mx-auto"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-[#1c2942]">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl" style={{ border: "2px solid rgba(219, 186, 207, 0.3)" }}>
               <div className="aspect-video">
                 <iframe
                   src="https://www.youtube.com/embed/GQXFJCZ4W0s"
@@ -225,7 +229,7 @@ export default function ChallengesPage() {
       {/* Avantages Section */}
       <section
         className="py-20"
-        style={{ background: "linear-gradient(180deg, #ebf2fa 0%, white 100%)" }}
+        style={{ backgroundColor: "#28303a" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -233,7 +237,8 @@ export default function ChallengesPage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-[#6d74b5]/10 text-[#6d74b5] border border-[#6d74b5]/20"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 border"
+              style={{ backgroundColor: "rgba(219, 186, 207, 0.1)", color: "#dbbacf", borderColor: "rgba(219, 186, 207, 0.3)" }}
             >
               <Sparkles className="w-4 h-4" />
               Nos avantages
@@ -244,10 +249,10 @@ export default function ChallengesPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
+              className="text-3xl sm:text-4xl font-bold text-white mb-4"
             >
               Pourquoi choisir nos{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
+              <span style={{ color: "#dbbacf" }}>
                 challenges
               </span>{" "}
               ?
@@ -258,7 +263,7 @@ export default function ChallengesPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-lg text-[#1c2942]/70 max-w-2xl mx-auto"
+              className="text-lg text-white/70 max-w-2xl mx-auto"
             >
               Des expériences pédagogiques innovantes conçues pour engager vos étudiants
             </motion.p>
@@ -272,13 +277,17 @@ export default function ChallengesPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-6 shadow-lg border border-[#ebf2fa] hover:shadow-xl transition-shadow"
+                className="rounded-2xl p-6 border hover:border-[#dbbacf]/50 transition-all"
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderColor: "rgba(255, 255, 255, 0.1)" }}
               >
-                <div className="w-12 h-12 bg-[#6d74b5]/10 rounded-xl flex items-center justify-center text-[#6d74b5] mb-4">
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                  style={{ backgroundColor: "rgba(219, 186, 207, 0.2)", color: "#dbbacf" }}
+                >
                   {avantage.icon}
                 </div>
-                <h3 className="text-lg font-bold text-[#1c2942] mb-2">{avantage.title}</h3>
-                <p className="text-[#1c2942]/70">{avantage.description}</p>
+                <h3 className="text-lg font-bold text-white mb-2">{avantage.title}</h3>
+                <p className="text-white/70">{avantage.description}</p>
               </motion.div>
             ))}
           </div>
@@ -288,7 +297,7 @@ export default function ChallengesPage() {
       {/* Thématiques Section */}
       <section
         className="py-20"
-        style={{ background: "linear-gradient(180deg, white 0%, #fdf1f7 50%, white 100%)" }}
+        style={{ backgroundColor: "#28303a" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -296,7 +305,8 @@ export default function ChallengesPage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-white text-[#6d74b5] border border-[#6d74b5]/20"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 border"
+              style={{ backgroundColor: "rgba(219, 186, 207, 0.1)", color: "#dbbacf", borderColor: "rgba(219, 186, 207, 0.3)" }}
             >
               <GraduationCap className="w-4 h-4" />
               Nos thématiques
@@ -307,10 +317,10 @@ export default function ChallengesPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
+              className="text-3xl sm:text-4xl font-bold text-white mb-4"
             >
               Des sujets en phase avec{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
+              <span style={{ color: "#dbbacf" }}>
                 le monde pro
               </span>
             </motion.h2>
@@ -324,7 +334,12 @@ export default function ChallengesPage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="px-6 py-3 bg-white rounded-full shadow-md border border-[#6d74b5]/10 text-[#1c2942] font-medium hover:shadow-lg transition-shadow"
+                className="px-6 py-3 rounded-full font-medium border transition-all hover:scale-105"
+                style={{
+                  backgroundColor: "rgba(219, 186, 207, 0.1)",
+                  color: "#ffffff",
+                  borderColor: "rgba(219, 186, 207, 0.3)"
+                }}
               >
                 {theme}
               </motion.div>
@@ -336,7 +351,7 @@ export default function ChallengesPage() {
       {/* Comment ça marche Section */}
       <section
         className="py-20"
-        style={{ background: "linear-gradient(135deg, #ebf2fa 0%, #fdf1f7 100%)" }}
+        style={{ backgroundColor: "#28303a" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -344,7 +359,8 @@ export default function ChallengesPage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-white text-[#6d74b5] border border-[#6d74b5]/20"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 border"
+              style={{ backgroundColor: "rgba(219, 186, 207, 0.1)", color: "#dbbacf", borderColor: "rgba(219, 186, 207, 0.3)" }}
             >
               <Target className="w-4 h-4" />
               Comment ça marche
@@ -355,10 +371,10 @@ export default function ChallengesPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
+              className="text-3xl sm:text-4xl font-bold text-white mb-4"
             >
               Lancez un challenge en{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
+              <span style={{ color: "#dbbacf" }}>
                 4 étapes
               </span>
             </motion.h2>
@@ -374,16 +390,19 @@ export default function ChallengesPage() {
                 transition={{ delay: index * 0.1 }}
                 className="relative"
               >
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-white/50 h-full">
-                  <div className="text-4xl font-extrabold text-[#6d74b5]/20 mb-4">
+                <div
+                  className="rounded-2xl p-6 h-full border"
+                  style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderColor: "rgba(255, 255, 255, 0.1)" }}
+                >
+                  <div className="text-4xl font-extrabold mb-4" style={{ color: "rgba(219, 186, 207, 0.4)" }}>
                     {etape.numero}
                   </div>
-                  <h3 className="text-lg font-bold text-[#1c2942] mb-2">{etape.titre}</h3>
-                  <p className="text-[#1c2942]/70 text-sm">{etape.description}</p>
+                  <h3 className="text-lg font-bold text-white mb-2">{etape.titre}</h3>
+                  <p className="text-white/70 text-sm">{etape.description}</p>
                 </div>
                 {index < etapes.length - 1 && (
                   <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2">
-                    <ArrowRight className="w-6 h-6 text-[#6d74b5]/30" />
+                    <ArrowRight className="w-6 h-6" style={{ color: "rgba(219, 186, 207, 0.5)" }} />
                   </div>
                 )}
               </motion.div>
@@ -393,22 +412,28 @@ export default function ChallengesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20" style={{ backgroundColor: "#1c2942" }}>
+      <section
+        className="py-20"
+        style={{ backgroundColor: "#dbbacf" }}
+      >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <div className="w-16 h-16 bg-[#6d74b5] rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+              style={{ backgroundColor: "#28303a" }}
+            >
               <Zap className="w-8 h-8 text-white" />
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#28303a" }}>
               Prêt à dynamiser vos formations ?
             </h2>
 
-            <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: "#28303a", opacity: 0.8 }}>
               Contactez-nous pour discuter de vos besoins et découvrir le challenge
               idéal pour vos étudiants.
             </p>
@@ -416,7 +441,8 @@ export default function ChallengesPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={() => navigate("/tous-les-challenges")}
-                className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white px-8 py-3"
+                className="text-white px-8 py-3"
+                style={{ backgroundColor: "#28303a" }}
               >
                 Explorer les challenges
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -424,7 +450,8 @@ export default function ChallengesPage() {
               <Button
                 onClick={() => navigate("/contact")}
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 px-8 py-3"
+                className="px-8 py-3"
+                style={{ borderColor: "#28303a", color: "#28303a" }}
               >
                 Demander un devis
               </Button>

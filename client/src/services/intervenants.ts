@@ -5,6 +5,19 @@
 
 import apiClient from "@/lib/api";
 
+export interface Experience {
+  title: string;
+  company: string;
+  startDate: string;
+  endDate?: string;
+  description?: string;
+}
+
+export interface Language {
+  language: string;
+  level: "debutant" | "intermediaire" | "avance" | "natif";
+}
+
 export interface Intervenant {
   id: string;
   bio?: string;
@@ -23,6 +36,13 @@ export interface Intervenant {
   phone?: string;
   city?: string;
   yearsExperience?: number;
+  // Champs supplémentaires pour profil enrichi
+  diplomas?: string[];
+  availabilityModes?: string[];  // "presentiel", "hybride", "distanciel"
+  availabilityLocation?: string;
+  experiences?: Experience[];
+  softwares?: string[];
+  languages?: Language[];
   user?: {
     id: string;
     email: string;
@@ -112,6 +132,10 @@ export interface UpdateIntervenantData {
   siret?: string;
   yearsExperience?: number | null;
   expertises?: string[];
+  diplomas?: string[];
+  experiences?: Experience[];
+  softwares?: string[];
+  languages?: Language[];
 
   // Liens et médias
   videoUrl?: string;
@@ -121,6 +145,8 @@ export interface UpdateIntervenantData {
 
   // Disponibilités
   disponibility?: boolean | object;
+  availabilityModes?: string[];
+  availabilityLocation?: string;
 }
 
 /**

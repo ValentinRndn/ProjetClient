@@ -80,7 +80,9 @@ router.get('/', verifyToken, validate({ query: querySchema }), async (req, res, 
     try {
         const userId = req.user.id;
         const userRole = req.user.role;
-        const { type, status, startDate, endDate, page, limit } = req.query;
+        const { type, status, startDate, endDate } = req.query;
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 20;
 
         // Construire les filtres selon le rôle
         const where = {};
@@ -592,15 +594,28 @@ router.get('/:id/pdf', validate({ params: paramsSchema }), verifyToken, async (r
             }
         }
 
-        // Envoyer le fichier
+        // Obtenir la taille du fichier
+        const stat = fs.statSync(pdfPath);
+
+        // Envoyer le fichier avec tous les headers nécessaires
         const fileName = `Facture-${facture.numero}.pdf`;
         res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Length', stat.size);
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        res.setHeader('Cache-Control', 'no-cache');
 
         const fileStream = fs.createReadStream(pdfPath);
+
+        fileStream.on('error', (err) => {
+            logger.error('Error reading PDF file', { error: err.message, pdfPath });
+            if (!res.headersSent) {
+                res.status(500).json({ success: false, message: 'Erreur lors de la lecture du PDF' });
+            }
+        });
+
         fileStream.pipe(res);
 
-        logger.info('PDF downloaded', { factureId: id, userId: req.user?.id });
+        logger.info('PDF downloaded', { factureId: id, userId: req.user?.id, pdfPath });
     } catch (error) {
         logger.error('Error downloading PDF', { error: error.message });
         next(error);

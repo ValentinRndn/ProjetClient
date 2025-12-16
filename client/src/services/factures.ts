@@ -224,8 +224,13 @@ export async function telechargerPDF(id: string, numero: string): Promise<void> 
     responseType: "blob",
   });
 
-  // Créer un lien de téléchargement (response est directement le blob car pas de structure {success, data})
-  const url = window.URL.createObjectURL(new Blob([response]));
+  // La réponse peut être soit directement le blob, soit une réponse Axios avec data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const blobData = (response as any).data || response;
+
+  // Créer un lien de téléchargement
+  const blob = new Blob([blobData], { type: "application/pdf" });
+  const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
   link.setAttribute("download", `Facture-${numero}.pdf`);

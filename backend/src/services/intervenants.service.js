@@ -39,6 +39,13 @@ export async function findAll(options = {}) {
       videoUrl: true,
       linkedinUrl: true,
       website: true,
+      // Nouveaux champs profil enrichi
+      diplomas: true,
+      availabilityModes: true,
+      availabilityLocation: true,
+      experiences: true,
+      softwares: true,
+      languages: true,
       user: {
         select: { id: true, email: true, role: true },
       },
@@ -81,6 +88,13 @@ export async function findById(id) {
       videoUrl: true,
       linkedinUrl: true,
       website: true,
+      // Nouveaux champs profil enrichi
+      diplomas: true,
+      availabilityModes: true,
+      availabilityLocation: true,
+      experiences: true,
+      softwares: true,
+      languages: true,
       user: {
         select: { id: true, email: true, role: true },
       },
@@ -151,6 +165,14 @@ export async function update(id, payload) {
   // Disponibilités et statut
   if (payload.disponibility !== undefined) updateData.disponibility = payload.disponibility;
   if (payload.status !== undefined) updateData.status = payload.status;
+
+  // Nouveaux champs profil enrichi
+  if (payload.diplomas !== undefined) updateData.diplomas = payload.diplomas;
+  if (payload.availabilityModes !== undefined) updateData.availabilityModes = payload.availabilityModes;
+  if (payload.availabilityLocation !== undefined) updateData.availabilityLocation = payload.availabilityLocation;
+  if (payload.experiences !== undefined) updateData.experiences = payload.experiences;
+  if (payload.softwares !== undefined) updateData.softwares = payload.softwares;
+  if (payload.languages !== undefined) updateData.languages = payload.languages;
 
   return prisma.intervenant.update({
     where: { id },

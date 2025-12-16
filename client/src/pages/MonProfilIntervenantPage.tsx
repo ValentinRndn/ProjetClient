@@ -20,7 +20,14 @@ import {
   X,
   Eye,
   ArrowLeft,
+  GraduationCap,
+  Monitor,
+  Languages,
+  MapPinned,
+  Building2,
+  Trash2,
 } from "lucide-react";
+import type { Experience, Language } from "@/services/intervenants";
 import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 
@@ -35,7 +42,21 @@ interface ProfileFormData {
   videoUrl: string;
   linkedinUrl: string;
   website: string;
+  availabilityLocation: string;
 }
+
+const AVAILABILITY_MODES = [
+  { value: "presentiel", label: "Présentiel" },
+  { value: "hybride", label: "Hybride" },
+  { value: "distanciel", label: "Distanciel" },
+];
+
+const LANGUAGE_LEVELS = [
+  { value: "debutant", label: "Débutant" },
+  { value: "intermediaire", label: "Intermédiaire" },
+  { value: "avance", label: "Avancé" },
+  { value: "natif", label: "Natif" },
+];
 
 export default function MonProfilIntervenantPage() {
   const { user, refreshUser } = useAuth();
@@ -49,6 +70,16 @@ export default function MonProfilIntervenantPage() {
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [hasTriedRefresh, setHasTriedRefresh] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+
+  // Nouveaux champs
+  const [diplomas, setDiplomas] = useState<string[]>([]);
+  const [newDiploma, setNewDiploma] = useState("");
+  const [softwares, setSoftwares] = useState<string[]>([]);
+  const [newSoftware, setNewSoftware] = useState("");
+  const [languages, setLanguages] = useState<Language[]>([]);
+  const [newLanguage, setNewLanguage] = useState({ language: "", level: "intermediaire" as Language["level"] });
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [availabilityModes, setAvailabilityModes] = useState<string[]>([]);
 
   const { register, handleSubmit, reset, formState: { isDirty } } = useForm<ProfileFormData>();
 
@@ -77,6 +108,11 @@ export default function MonProfilIntervenantPage() {
       const data = await getIntervenantById(user.intervenant.id);
       setIntervenant(data);
       setExpertises(data.expertises || []);
+      setDiplomas(data.diplomas || []);
+      setSoftwares(data.softwares || []);
+      setLanguages(data.languages || []);
+      setExperiences(data.experiences || []);
+      setAvailabilityModes(data.availabilityModes || []);
       await loadProfileImage(data);
 
       reset({
@@ -90,6 +126,7 @@ export default function MonProfilIntervenantPage() {
         videoUrl: data.videoUrl || "",
         linkedinUrl: data.linkedinUrl || "",
         website: data.website || "",
+        availabilityLocation: data.availabilityLocation || "",
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erreur lors du chargement";
@@ -111,6 +148,11 @@ export default function MonProfilIntervenantPage() {
         ...data,
         yearsExperience: data.yearsExperience ? Number(data.yearsExperience) : null,
         expertises,
+        diplomas,
+        softwares,
+        languages,
+        experiences,
+        availabilityModes,
       };
 
       await updateIntervenant(user.intervenant.id, updateData);
@@ -133,6 +175,66 @@ export default function MonProfilIntervenantPage() {
 
   const removeExpertise = (index: number) => {
     setExpertises(expertises.filter((_, i) => i !== index));
+  };
+
+  // Diplômes
+  const addDiploma = () => {
+    if (newDiploma.trim() && !diplomas.includes(newDiploma.trim())) {
+      setDiplomas([...diplomas, newDiploma.trim()]);
+      setNewDiploma("");
+    }
+  };
+
+  const removeDiploma = (index: number) => {
+    setDiplomas(diplomas.filter((_, i) => i !== index));
+  };
+
+  // Logiciels
+  const addSoftware = () => {
+    if (newSoftware.trim() && !softwares.includes(newSoftware.trim())) {
+      setSoftwares([...softwares, newSoftware.trim()]);
+      setNewSoftware("");
+    }
+  };
+
+  const removeSoftware = (index: number) => {
+    setSoftwares(softwares.filter((_, i) => i !== index));
+  };
+
+  // Langues
+  const addLanguage = () => {
+    if (newLanguage.language.trim() && !languages.some(l => l.language === newLanguage.language.trim())) {
+      setLanguages([...languages, { language: newLanguage.language.trim(), level: newLanguage.level }]);
+      setNewLanguage({ language: "", level: "intermediaire" });
+    }
+  };
+
+  const removeLanguage = (index: number) => {
+    setLanguages(languages.filter((_, i) => i !== index));
+  };
+
+  // Expériences
+  const addExperience = () => {
+    setExperiences([...experiences, { title: "", company: "", startDate: "", endDate: "", description: "" }]);
+  };
+
+  const updateExperience = (index: number, field: keyof Experience, value: string) => {
+    const updated = [...experiences];
+    updated[index] = { ...updated[index], [field]: value };
+    setExperiences(updated);
+  };
+
+  const removeExperience = (index: number) => {
+    setExperiences(experiences.filter((_, i) => i !== index));
+  };
+
+  // Disponibilités
+  const toggleAvailabilityMode = (mode: string) => {
+    if (availabilityModes.includes(mode)) {
+      setAvailabilityModes(availabilityModes.filter(m => m !== mode));
+    } else {
+      setAvailabilityModes([...availabilityModes, mode]);
+    }
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -538,6 +640,310 @@ export default function MonProfilIntervenantPage() {
                     Ajouter
                   </Button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Disponibilités */}
+          <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <MapPinned className="w-5 h-5" style={{ color: "#6d74b5" }} />
+              Disponibilités
+            </h2>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium mb-3" style={{ color: "#1c2942" }}>
+                  Modes d'intervention
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {AVAILABILITY_MODES.map((mode) => (
+                    <button
+                      key={mode.value}
+                      type="button"
+                      onClick={() => toggleAvailabilityMode(mode.value)}
+                      className={`px-4 py-2 rounded-xl border-2 font-medium transition-all ${
+                        availabilityModes.includes(mode.value)
+                          ? "border-[#6d74b5] bg-[#6d74b5] text-white"
+                          : "border-[#ebf2fa] text-[#1c2942] hover:border-[#6d74b5]"
+                      }`}
+                    >
+                      {mode.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {availabilityModes.includes("presentiel") && (
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#1c2942" }}>
+                    <MapPin className="w-4 h-4 inline mr-1" />
+                    Localisation pour le présentiel
+                  </label>
+                  <input
+                    type="text"
+                    {...register("availabilityLocation")}
+                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                    style={{ borderColor: "#ebf2fa" }}
+                    placeholder="Ex: Lyon et sa région"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Diplômes */}
+          <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <GraduationCap className="w-5 h-5" style={{ color: "#6d74b5" }} />
+              Diplômes
+            </h2>
+
+            <div className="space-y-4">
+              {diplomas.map((diploma, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-3 p-3 rounded-xl"
+                  style={{ backgroundColor: "#ebf2fa" }}
+                >
+                  <Award className="w-5 h-5" style={{ color: "#6d74b5" }} />
+                  <span className="flex-1" style={{ color: "#1c2942" }}>{diploma}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeDiploma(idx)}
+                    className="p-1 rounded-lg hover:bg-red-100 text-red-500 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newDiploma}
+                  onChange={(e) => setNewDiploma(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addDiploma())}
+                  className="flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
+                  placeholder="Ex: Master Marketing Digital - Université Paris Dauphine"
+                />
+                <Button type="button" onClick={addDiploma} variant="secondary" style={{ borderColor: "#ebf2fa" }}>
+                  <Plus className="w-4 h-4 mr-1" />
+                  Ajouter
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Expériences professionnelles */}
+          <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <Building2 className="w-5 h-5" style={{ color: "#6d74b5" }} />
+              Expériences professionnelles
+            </h2>
+
+            <div className="space-y-6">
+              {experiences.map((exp, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border-2 relative"
+                  style={{ borderColor: "#ebf2fa" }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => removeExperience(idx)}
+                    className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-red-100 text-red-500 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1" style={{ color: "#1c2942" }}>
+                        Poste / Titre
+                      </label>
+                      <input
+                        type="text"
+                        value={exp.title}
+                        onChange={(e) => updateExperience(idx, "title", e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                        style={{ borderColor: "#ebf2fa" }}
+                        placeholder="Consultant Marketing"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-1" style={{ color: "#1c2942" }}>
+                        Entreprise
+                      </label>
+                      <input
+                        type="text"
+                        value={exp.company}
+                        onChange={(e) => updateExperience(idx, "company", e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                        style={{ borderColor: "#ebf2fa" }}
+                        placeholder="Nom de l'entreprise"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-1" style={{ color: "#1c2942" }}>
+                        Date de début
+                      </label>
+                      <input
+                        type="text"
+                        value={exp.startDate}
+                        onChange={(e) => updateExperience(idx, "startDate", e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                        style={{ borderColor: "#ebf2fa" }}
+                        placeholder="Ex: Janvier 2020"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-1" style={{ color: "#1c2942" }}>
+                        Date de fin (vide si en cours)
+                      </label>
+                      <input
+                        type="text"
+                        value={exp.endDate || ""}
+                        onChange={(e) => updateExperience(idx, "endDate", e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                        style={{ borderColor: "#ebf2fa" }}
+                        placeholder="Ex: Décembre 2023"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium mb-1" style={{ color: "#1c2942" }}>
+                        Description (optionnel)
+                      </label>
+                      <textarea
+                        value={exp.description || ""}
+                        onChange={(e) => updateExperience(idx, "description", e.target.value)}
+                        rows={2}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition-all resize-none"
+                        style={{ borderColor: "#ebf2fa" }}
+                        placeholder="Décrivez brièvement vos missions..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <Button type="button" onClick={addExperience} variant="secondary" className="w-full" style={{ borderColor: "#ebf2fa" }}>
+                <Plus className="w-4 h-4 mr-2" />
+                Ajouter une expérience
+              </Button>
+            </div>
+          </div>
+
+          {/* Logiciels maîtrisés */}
+          <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <Monitor className="w-5 h-5" style={{ color: "#6d74b5" }} />
+              Logiciels maîtrisés
+            </h2>
+
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {softwares.map((software, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium"
+                    style={{ backgroundColor: "#1c2942", color: "#ffffff" }}
+                  >
+                    {software}
+                    <button
+                      type="button"
+                      onClick={() => removeSoftware(idx)}
+                      className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-white/20"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newSoftware}
+                  onChange={(e) => setNewSoftware(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSoftware())}
+                  className="flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
+                  placeholder="Ex: Figma, Excel, Photoshop..."
+                />
+                <Button type="button" onClick={addSoftware} variant="secondary" style={{ borderColor: "#ebf2fa" }}>
+                  <Plus className="w-4 h-4 mr-1" />
+                  Ajouter
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Langues */}
+          <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff" }}>
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#1c2942" }}>
+              <Languages className="w-5 h-5" style={{ color: "#6d74b5" }} />
+              Langues
+            </h2>
+
+            <div className="space-y-4">
+              {languages.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {languages.map((lang, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 rounded-xl flex items-center justify-between"
+                      style={{ backgroundColor: "#ebf2fa" }}
+                    >
+                      <div>
+                        <p className="font-medium" style={{ color: "#1c2942" }}>{lang.language}</p>
+                        <p className="text-xs" style={{ color: "#6d74b5" }}>
+                          {LANGUAGE_LEVELS.find(l => l.value === lang.level)?.label}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeLanguage(idx)}
+                        className="p-1 rounded-lg hover:bg-red-100 text-red-500 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex gap-2 flex-col sm:flex-row">
+                <input
+                  type="text"
+                  value={newLanguage.language}
+                  onChange={(e) => setNewLanguage({ ...newLanguage, language: e.target.value })}
+                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addLanguage())}
+                  className="flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa" }}
+                  placeholder="Ex: Anglais"
+                />
+                <select
+                  value={newLanguage.level}
+                  onChange={(e) => setNewLanguage({ ...newLanguage, level: e.target.value as Language["level"] })}
+                  className="px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                  style={{ borderColor: "#ebf2fa", color: "#1c2942" }}
+                >
+                  {LANGUAGE_LEVELS.map((level) => (
+                    <option key={level.value} value={level.value}>
+                      {level.label}
+                    </option>
+                  ))}
+                </select>
+                <Button type="button" onClick={addLanguage} variant="secondary" style={{ borderColor: "#ebf2fa" }}>
+                  <Plus className="w-4 h-4 mr-1" />
+                  Ajouter
+                </Button>
               </div>
             </div>
           </div>
