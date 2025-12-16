@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllMissions, getPublicMissions, applyToMission, type Mission, type MissionStatus } from "@/services/missions";
+import { getAllMissions, getPublicMissions, applyToMission, getMyCandidatures, type Mission, type MissionStatus, type Candidature } from "@/services/missions";
 import { MissionCard } from "@/components/features/MissionCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -19,10 +19,26 @@ export default function MissionsPage() {
   const [statusFilter, setStatusFilter] = useState<MissionStatus | "all">("ACTIVE");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState<string | null>(null);
+  const [myCandidatures, setMyCandidatures] = useState<Candidature[]>([]);
 
   useEffect(() => {
     fetchMissions();
   }, [statusFilter, isAuthenticated]);
+
+  // Récupérer les candidatures de l'intervenant connecté
+  useEffect(() => {
+    const fetchMyCandidatures = async () => {
+      if (isAuthenticated && user?.role === "INTERVENANT") {
+        try {
+          const candidatures = await getMyCandidatures();
+          setMyCandidatures(candidatures);
+        } catch (err) {
+          console.error("Erreur récupération candidatures:", err);
+        }
+      }
+    };
+    fetchMyCandidatures();
+  }, [isAuthenticated, user?.role]);
 
   const fetchMissions = async () => {
     try {
@@ -67,7 +83,10 @@ export default function MissionsPage() {
     try {
       setIsApplying(missionId);
       setError(null);
-      await applyToMission(missionId);
+      const newCandidature = await applyToMission(missionId);
+
+      // Ajouter la nouvelle candidature à la liste
+      setMyCandidatures(prev => [...prev, newCandidature]);
 
       setSuccessMessage("Votre candidature a été envoyée ! L'école vous contactera si elle accepte votre profil.");
       setTimeout(() => setSuccessMessage(null), 5000);
@@ -94,6 +113,11 @@ export default function MissionsPage() {
 
   const activeCount = missions.filter((m) => m.status === "ACTIVE").length;
   const completedCount = missions.filter((m) => m.status === "COMPLETED").length;
+
+  // Vérifier si l'utilisateur a déjà postulé à une mission
+  const hasAppliedToMission = (missionId: string) => {
+    return myCandidatures.some(c => c.missionId === missionId);
+  };
 
   return (
     <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
@@ -285,6 +309,7 @@ export default function MissionsPage() {
                 onApply={handleApply}
                 showApplyButton={user?.role === "INTERVENANT"}
                 isApplying={isApplying === mission.id}
+                hasApplied={hasAppliedToMission(mission.id)}
               />
             ))}
           </div>

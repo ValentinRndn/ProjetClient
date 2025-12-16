@@ -18,6 +18,7 @@ interface MissionCardProps {
   onApply?: (missionId: string) => void;
   showApplyButton?: boolean;
   isApplying?: boolean;
+  hasApplied?: boolean;
 }
 
 export function MissionCard({
@@ -25,6 +26,7 @@ export function MissionCard({
   onApply,
   showApplyButton = true,
   isApplying = false,
+  hasApplied = false,
 }: MissionCardProps) {
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -140,16 +142,23 @@ export function MissionCard({
           </div>
 
           {showApplyButton && mission.status === "ACTIVE" && !mission.intervenant && onApply && (
-            <Button
-              onClick={() => onApply(mission.id)}
-              variant="primary"
-              size="sm"
-              isLoading={isApplying}
-              className="group/btn"
-            >
-              Postuler
-              <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-            </Button>
+            hasApplied ? (
+              <div className="flex items-center gap-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 px-2.5 py-1.5 rounded-lg">
+                <CheckCircle className="w-3.5 h-3.5" />
+                <span>Candidature envoyée</span>
+              </div>
+            ) : (
+              <Button
+                onClick={() => onApply(mission.id)}
+                variant="primary"
+                size="sm"
+                isLoading={isApplying}
+                className="group/btn"
+              >
+                Postuler
+                <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+              </Button>
+            )
           )}
 
           {mission.intervenant && (
