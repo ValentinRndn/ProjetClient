@@ -60,20 +60,16 @@ export default function MissionsPage() {
       return;
     }
 
-    if (!window.confirm("En postulant, vous serez directement assigné à cette mission. Voulez-vous continuer ?")) {
+    if (!window.confirm("Voulez-vous envoyer votre candidature pour cette mission ? L'école pourra ensuite l'accepter ou la refuser.")) {
       return;
     }
 
     try {
       setIsApplying(missionId);
       setError(null);
-      const updatedMission = await applyToMission(missionId);
+      await applyToMission(missionId);
 
-      setMissions(missions.map(m =>
-        m.id === missionId ? updatedMission : m
-      ));
-
-      setSuccessMessage("Vous avez été assigné à cette mission avec succès !");
+      setSuccessMessage("Votre candidature a été envoyée ! L'école vous contactera si elle accepte votre profil.");
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err: unknown) {
       console.error("Erreur postuler:", err);
