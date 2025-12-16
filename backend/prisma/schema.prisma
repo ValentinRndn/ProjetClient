@@ -190,6 +190,9 @@ model Intervenant {
   // Relation One-to-Many avec Candidature
   candidatures Candidature[]
 
+  // Relation One-to-Many avec Challenge
+  challenges Challenge[]
+
   @@index([userId])
   @@index([status])
 }
@@ -690,5 +693,52 @@ model Collaboration {
   @@index([ecoleId])
   @@index([intervenantId])
   @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================
+// MODEL : Challenge
+// Challenges pédagogiques créés par les intervenants
+// et validés par l'admin avant publication
+// ============================================
+model Challenge {
+  id              String    @id @default(uuid())
+
+  // Informations principales
+  title           String
+  description     String    @db.Text
+  shortDescription String?  // Description courte pour les cartes
+  thematique      String    // Marketing, IA, RSE, etc.
+
+  // Détails du challenge
+  duration        String?   // Ex: "2 jours", "1 semaine"
+  targetAudience  String?   // Ex: "Étudiants en marketing", "BTS Commerce"
+  objectives      String[]  @default([]) // Objectifs pédagogiques
+  deliverables    String[]  @default([]) // Livrables attendus
+  prerequisites   String?   // Prérequis
+
+  // Médias
+  imageUrl        String?   // Image de couverture
+  videoUrl        String?   // Vidéo de présentation
+
+  // Tarification
+  priceCents      Int?      // Prix en centimes (optionnel)
+
+  // Statut de validation
+  status          String    @default("pending") // pending, approved, rejected
+  rejectionReason String?   // Raison du refus si rejeté
+
+  // Dates
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  approvedAt      DateTime? // Date d'approbation par l'admin
+
+  // Relation avec l'intervenant créateur
+  intervenantId   String
+  intervenant     Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
+
+  @@index([intervenantId])
+  @@index([status])
+  @@index([thematique])
   @@index([createdAt])
 }

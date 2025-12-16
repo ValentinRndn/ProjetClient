@@ -37,6 +37,9 @@ import ChallengesPage from "./pages/ChallengesPage";
 import TousLesChallengesPage from "./pages/TousLesChallengesPage";
 import EspaceEcolesPage from "./pages/EspaceEcolesPage";
 import EspaceIntervenantsPage from "./pages/EspaceIntervenantsPage";
+import MesChallengesPage from "./pages/MesChallengesPage";
+import NouveauChallengePage from "./pages/NouveauChallengePage";
+import AdminChallengesPage from "./pages/AdminChallengesPage";
 import NavLayout from "./components/layouts/DefaultLayout";
 
 function App() {
@@ -255,6 +258,16 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/dashboard/admin/challenges"
+        element={
+          <ProtectedRoute requiredRole="ADMIN">
+            <NavLayout>
+              <AdminChallengesPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Dashboard Intervenant */}
       <Route
@@ -313,6 +326,28 @@ function App() {
           <ProtectedRoute requiredRole="INTERVENANT">
             <NavLayout>
               <DisponibilitesPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Challenges Intervenant */}
+      <Route
+        path="/mes-challenges"
+        element={
+          <ProtectedRoute requiredRole="INTERVENANT">
+            <NavLayout>
+              <MesChallengesPage />
+            </NavLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/challenges/nouveau"
+        element={
+          <ProtectedRoute requiredRole="INTERVENANT">
+            <NavLayout>
+              <NouveauChallengePage />
             </NavLayout>
           </ProtectedRoute>
         }

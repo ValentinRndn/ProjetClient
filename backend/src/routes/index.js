@@ -20,6 +20,7 @@ import trackingRoutes from "./tracking.routes.js";
 import notificationsRoutes from "./notifications.routes.js";
 import backofficeRoutes from "./backoffice.routes.js";
 import collaborationsRoutes from "./collaborations.routes.js";
+import challengesRoutes from "./challenges.routes.js";
 
 const router = Router();
 
@@ -64,5 +65,8 @@ router.use("/backoffice", backofficeRoutes);
 
 // Routes collaborations (écoles + intervenants)
 router.use("/collaborations", collaborationsRoutes);
+
+// Routes challenges (intervenants créent, admin valide)
+router.use("/challenges", challengesRoutes);
 
 export default router;
