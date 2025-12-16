@@ -19,60 +19,39 @@ import {
   Target,
   Zap,
 } from "lucide-react";
+import PartnerLogosSlider from "@/components/features/PartnerLogosSlider";
+import ThematiquesSection from "@/components/features/ThematiquesSection";
 
 const avantages = [
   {
-    icon: <Users className="w-6 h-6" />,
-    title: "Réseau d'experts vérifiés",
-    description: "Accédez à des intervenants qualifiés et sélectionnés pour leur expertise et leur pédagogie.",
-  },
-  {
-    icon: <Trophy className="w-6 h-6" />,
-    title: "Challenges clés en main",
-    description: "Des projets pédagogiques innovants prêts à lancer pour dynamiser vos formations.",
-  },
-  {
-    icon: <FileText className="w-6 h-6" />,
-    title: "Gestion administrative simplifiée",
-    description: "Nous prenons en charge la facturation des intervenants. 0 facture à gérer pour vous.",
+    icon: <Zap className="w-6 h-6" />,
+    title: "Urgence intervizion",
+    description: "Nous proposons une solution pour trouver un intervenant au dernier moment en cas d'imprévu.",
   },
   {
     icon: <Clock className="w-6 h-6" />,
-    title: "Gain de temps",
-    description: "Trouvez le bon intervenant en quelques clics grâce à notre moteur de recherche avancé.",
+    title: "Réservation en ligne",
+    description: "Rencontrez des intervenants en prenant un rendez-vous avec l'intervenant depuis son emploi du temps.",
+  },
+  {
+    icon: <Users className="w-6 h-6" />,
+    title: "Des pages personnalisées",
+    description: "Chaque intervenant dispose d'une page avec son profil, ses compétences, son expérience et ses disponibilités.",
+  },
+  {
+    icon: <Target className="w-6 h-6" />,
+    title: "Un système de filtre",
+    description: "Nous avons mis en place un système de filtre pour simplifier vos recherches d'intervenants.",
+  },
+  {
+    icon: <FileText className="w-6 h-6" />,
+    title: "Prise en charge de la facturation",
+    description: "Nous traitons toutes les factures de nos intervenants afin de faciliter votre gestion administrative.",
   },
   {
     icon: <Shield className="w-6 h-6" />,
-    title: "Intervenants certifiés",
-    description: "Tous nos experts sont vérifiés et leurs compétences validées par notre équipe.",
-  },
-  {
-    icon: <HeadphonesIcon className="w-6 h-6" />,
-    title: "Support dédié",
-    description: "Une équipe à votre écoute pour vous accompagner tout au long de vos projets.",
-  },
-];
-
-const etapes = [
-  {
-    numero: "01",
-    titre: "Créez votre compte",
-    description: "Inscrivez votre établissement en quelques minutes et accédez à la plateforme.",
-  },
-  {
-    numero: "02",
-    titre: "Recherchez un intervenant",
-    description: "Parcourez notre réseau d'experts par domaine, disponibilité ou localisation.",
-  },
-  {
-    numero: "03",
-    titre: "Contactez et collaborez",
-    description: "Échangez directement avec les intervenants et déclarez vos collaborations.",
-  },
-  {
-    numero: "04",
-    titre: "On s'occupe du reste",
-    description: "Facturation, mandats, administratif... Nous gérons tout pour vous.",
+    title: "Des intervenants de confiance",
+    description: "Nous avons sélectionné des professionnels passionnés afin de vous proposer des intervenants de qualité.",
   },
 ];
 
@@ -149,6 +128,15 @@ export default function EspaceEcolesPage() {
         </div>
       </section>
 
+      {/* Partner Logos Slider */}
+      <PartnerLogosSlider
+        title="Ils nous font confiance"
+        subtitle="Découvrez les établissements qui recrutent leurs intervenants avec Vizion Academy"
+      />
+
+      {/* Thématiques Section */}
+      <ThematiquesSection />
+
       {/* Avantages Section */}
       <section
         className="py-20"
@@ -206,65 +194,6 @@ export default function EspaceEcolesPage() {
                 </div>
                 <h3 className="text-lg font-bold text-[#1c2942] mb-2">{avantage.title}</h3>
                 <p className="text-[#1c2942]/70">{avantage.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Comment ça marche Section */}
-      <section
-        className="py-20"
-        style={{ background: "linear-gradient(135deg, #ebf2fa 0%, #fdf1f7 100%)" }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-white text-[#6d74b5] border border-[#6d74b5]/20"
-            >
-              <Target className="w-4 h-4" />
-              Comment ça marche
-            </motion.div>
-
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
-            >
-              Démarrez en{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
-                4 étapes simples
-              </span>
-            </motion.h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {etapes.map((etape, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="relative"
-              >
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-white/50 h-full">
-                  <div className="text-4xl font-extrabold text-[#6d74b5]/20 mb-4">
-                    {etape.numero}
-                  </div>
-                  <h3 className="text-lg font-bold text-[#1c2942] mb-2">{etape.titre}</h3>
-                  <p className="text-[#1c2942]/70 text-sm">{etape.description}</p>
-                </div>
-                {index < etapes.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2">
-                    <ArrowRight className="w-6 h-6 text-[#6d74b5]/30" />
-                  </div>
-                )}
               </motion.div>
             ))}
           </div>

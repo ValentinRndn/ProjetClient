@@ -29,50 +29,41 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
   const navigate = useNavigate();
   const role = user?.role;
 
-  // Boutons pour les utilisateurs non connectés
-  const unAuthenticatedButtons = [
+  // Boutons du header (identiques pour tous)
+  const headerButtons = [
     <Button
-      key="login-btn"
-      onClick={() => navigate("/login")}
-      variant="ghost"
-      size="sm"
-      className="text-[#1c2942] hover:text-[#6d74b5] hover:bg-[#ebf2fa]"
-    >
-      Connexion
-    </Button>,
-    <Button
-      key="register-btn"
-      onClick={() => navigate("/register/intervenant")}
+      key="contact-btn"
+      onClick={() => navigate("/contact")}
       variant="primary"
       size="sm"
       className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white"
     >
-      S'inscrire
+      Contact
     </Button>,
-  ];
-
-  // Boutons pour les utilisateurs connectés
-  const authenticatedButtons = [
-    <Button
-      key="dashboard-btn"
-      onClick={() => navigate("/dashboard")}
-      variant="primary"
-      size="sm"
-      className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white"
-    >
-      <LayoutDashboardIcon className="w-4 h-4" />
-      Dashboard
-    </Button>,
-    <Button
-      key="logout-btn"
-      onClick={() => navigate("/logout")}
-      variant="ghost"
-      size="sm"
-      className="text-[#1c2942] hover:text-[#6d74b5] hover:bg-[#ebf2fa]"
-    >
-      <LogOutIcon className="w-4 h-4" />
-      Déconnexion
-    </Button>,
+    ...(isAuthenticated
+      ? [
+          <Button
+            key="dashboard-btn"
+            onClick={() => navigate("/dashboard")}
+            variant="ghost"
+            size="sm"
+            className="text-[#1c2942] hover:text-[#6d74b5] hover:bg-[#ebf2fa]"
+          >
+            <LayoutDashboardIcon className="w-4 h-4" />
+            Dashboard
+          </Button>,
+          <Button
+            key="logout-btn"
+            onClick={() => navigate("/logout")}
+            variant="ghost"
+            size="sm"
+            className="text-[#1c2942] hover:text-red-500 hover:bg-red-50 p-2"
+            title="Déconnexion"
+          >
+            <LogOutIcon className="w-4 h-4" />
+          </Button>,
+        ]
+      : []),
   ];
 
   // Navigation pour les visiteurs (non connectés) - 3 portes d'entrée avec dropdowns
@@ -156,11 +147,11 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       items={[
         <NavLink
           key="presentation-intervenants"
-          to="/intervenants"
+          to="/espace-intervenants"
           className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
         >
           <span className="font-medium text-[#1c2942]">Présentation</span>
-          <span className="text-xs text-[#1c2942]/50">Découvrez notre réseau d'experts</span>
+          <span className="text-xs text-[#1c2942]/50">Découvrez les avantages de rejoindre notre réseau</span>
         </NavLink>,
         <NavLink
           key="missions"
@@ -177,6 +168,14 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         >
           <span className="font-medium text-[#1c2942]">Devenir intervenant</span>
           <span className="text-xs text-[#1c2942]/50">Rejoignez notre réseau d'experts</span>
+        </NavLink>,
+        <NavLink
+          key="login-intervenant"
+          to="/login"
+          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
+        >
+          <span className="font-medium text-[#1c2942]">Connexion intervenant</span>
+          <span className="text-xs text-[#1c2942]/50">Accédez à votre espace</span>
         </NavLink>,
       ]}
     />,
@@ -360,7 +359,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
             </Link>,
           ]}
           navCenter={getNavItems()}
-          navEnd={isAuthenticated ? authenticatedButtons : unAuthenticatedButtons}
+          navEnd={headerButtons}
         />
       </header>
 

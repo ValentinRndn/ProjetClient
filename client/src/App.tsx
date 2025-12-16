@@ -36,6 +36,7 @@ import CGUPage from "./pages/CGUPage";
 import ChallengesPage from "./pages/ChallengesPage";
 import TousLesChallengesPage from "./pages/TousLesChallengesPage";
 import EspaceEcolesPage from "./pages/EspaceEcolesPage";
+import EspaceIntervenantsPage from "./pages/EspaceIntervenantsPage";
 import NavLayout from "./components/layouts/DefaultLayout";
 
 function App() {
@@ -149,6 +150,14 @@ function App() {
         element={
           <NavLayout>
             <EspaceEcolesPage />
+          </NavLayout>
+        }
+      />
+      <Route
+        path="/espace-intervenants"
+        element={
+          <NavLayout>
+            <EspaceIntervenantsPage />
           </NavLayout>
         }
       />
