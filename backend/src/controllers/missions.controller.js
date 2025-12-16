@@ -218,19 +218,114 @@ export async function removeMission(req, res, next) {
 
 /**
  * POST /api/v1/missions/:id/apply
- * Permet à un intervenant de postuler à une mission
+ * Permet à un intervenant de postuler à une mission (crée une candidature)
  */
 export async function applyToMission(req, res, next) {
     try {
         const { id } = req.params;
         const userId = req.user.id;
+        const { message, tarifPropose } = req.body;
         logger.info('Apply to mission attempt', { missionId: id, userId });
 
-        const updated = await missionsService.applyToMission(id, userId);
-        logger.info('Applied to mission successfully', { missionId: id, userId });
-        res.json({ success: true, data: updated, message: 'Candidature envoyée avec succès!' });
+        const candidature = await missionsService.applyToMission(id, userId, { message, tarifPropose });
+        logger.info('Candidature created successfully', { missionId: id, candidatureId: candidature.id, userId });
+        res.json({ success: true, data: candidature, message: 'Candidature envoyée avec succès!' });
     } catch (err) {
         logger.error('Apply to mission error', { missionId: req.params.id, userId: req.user?.id, error: err.message });
+        next(err);
+    }
+}
+
+/**
+ * GET /api/v1/missions/:id/candidatures
+ * Récupère les candidatures d'une mission (pour l'école propriétaire)
+ */
+export async function getCandidatures(req, res, next) {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        logger.info('Get mission candidatures', { missionId: id, userId });
+
+        const candidatures = await missionsService.getCandidatures(id, userId);
+        logger.info('Candidatures retrieved', { missionId: id, count: candidatures.length, userId });
+        res.json({ success: true, data: candidatures });
+    } catch (err) {
+        logger.error('Get candidatures error', { missionId: req.params.id, userId: req.user?.id, error: err.message });
+        next(err);
+    }
+}
+
+/**
+ * POST /api/v1/missions/candidatures/:candidatureId/accept
+ * L'école accepte une candidature (assigne l'intervenant à la mission)
+ */
+export async function acceptCandidature(req, res, next) {
+    try {
+        const { candidatureId } = req.params;
+        const userId = req.user.id;
+        logger.info('Accept candidature attempt', { candidatureId, userId });
+
+        const mission = await missionsService.acceptCandidature(candidatureId, userId);
+        logger.info('Candidature accepted, intervenant assigned', { candidatureId, missionId: mission.id, userId });
+        res.json({ success: true, data: mission, message: 'Candidature acceptée! L\'intervenant a été assigné à la mission.' });
+    } catch (err) {
+        logger.error('Accept candidature error', { candidatureId: req.params.candidatureId, userId: req.user?.id, error: err.message });
+        next(err);
+    }
+}
+
+/**
+ * POST /api/v1/missions/candidatures/:candidatureId/reject
+ * L'école refuse une candidature
+ */
+export async function rejectCandidature(req, res, next) {
+    try {
+        const { candidatureId } = req.params;
+        const userId = req.user.id;
+        logger.info('Reject candidature attempt', { candidatureId, userId });
+
+        const candidature = await missionsService.rejectCandidature(candidatureId, userId);
+        logger.info('Candidature rejected', { candidatureId, userId });
+        res.json({ success: true, data: candidature, message: 'Candidature refusée.' });
+    } catch (err) {
+        logger.error('Reject candidature error', { candidatureId: req.params.candidatureId, userId: req.user?.id, error: err.message });
+        next(err);
+    }
+}
+
+/**
+ * POST /api/v1/missions/candidatures/:candidatureId/withdraw
+ * L'intervenant retire sa candidature
+ */
+export async function withdrawCandidature(req, res, next) {
+    try {
+        const { candidatureId } = req.params;
+        const userId = req.user.id;
+        logger.info('Withdraw candidature attempt', { candidatureId, userId });
+
+        const candidature = await missionsService.withdrawCandidature(candidatureId, userId);
+        logger.info('Candidature withdrawn', { candidatureId, userId });
+        res.json({ success: true, data: candidature, message: 'Candidature retirée.' });
+    } catch (err) {
+        logger.error('Withdraw candidature error', { candidatureId: req.params.candidatureId, userId: req.user?.id, error: err.message });
+        next(err);
+    }
+}
+
+/**
+ * GET /api/v1/missions/candidatures/mes-candidatures
+ * Récupère toutes les candidatures de l'intervenant connecté
+ */
+export async function getMyCandidatures(req, res, next) {
+    try {
+        const userId = req.user.id;
+        logger.info('Get my candidatures', { userId });
+
+        const candidatures = await missionsService.getMyCandidatures(userId);
+        logger.info('My candidatures retrieved', { count: candidatures.length, userId });
+        res.json({ success: true, data: candidatures });
+    } catch (err) {
+        logger.error('Get my candidatures error', { userId: req.user?.id, error: err.message });
         next(err);
     }
 }

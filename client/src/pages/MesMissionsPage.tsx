@@ -1,10 +1,21 @@
 import { useEffect, useState } from "react";
-import { getMyEcoleMissions, getAllMissions, type Mission, type MissionStatus, deleteMission, updateMissionStatus } from "@/services/missions";
+import {
+  getMyEcoleMissions,
+  getAllMissions,
+  type Mission,
+  type MissionStatus,
+  deleteMission,
+  updateMissionStatus,
+  getMissionCandidatures,
+  acceptCandidature,
+  rejectCandidature,
+  type Candidature
+} from "@/services/missions";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
-import { Search, Briefcase, Plus, Trash2, CheckCircle, Filter, User, Calendar, RotateCcw, Target, Clock } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Search, Briefcase, Plus, Trash2, CheckCircle, Filter, User, Calendar, RotateCcw, Target, Clock, Users, X, MapPin, Award, Check, XCircle } from "lucide-react";
+import { useNavigate, Link } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function MesMissionsPage() {
@@ -16,6 +27,12 @@ export default function MesMissionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ACTIVE" | "COMPLETED" | "all">("all");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // État pour les candidatures
+  const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
+  const [candidatures, setCandidatures] = useState<Candidature[]>([]);
+  const [loadingCandidatures, setLoadingCandidatures] = useState(false);
+  const [showCandidaturesModal, setShowCandidaturesModal] = useState(false);
 
   const isAdmin = user?.role === "ADMIN";
 
@@ -71,6 +88,56 @@ export default function MesMissionsPage() {
     } catch (err) {
       setError("Erreur lors de la mise à jour du statut");
     }
+  };
+
+  // Fonctions pour gérer les candidatures
+  const handleViewCandidatures = async (mission: Mission) => {
+    setSelectedMission(mission);
+    setLoadingCandidatures(true);
+    setShowCandidaturesModal(true);
+    try {
+      const data = await getMissionCandidatures(mission.id);
+      setCandidatures(data);
+    } catch (err) {
+      setError("Erreur lors du chargement des candidatures");
+    } finally {
+      setLoadingCandidatures(false);
+    }
+  };
+
+  const handleAcceptCandidature = async (candidatureId: string) => {
+    try {
+      const updatedMission = await acceptCandidature(candidatureId);
+      setMissions(missions.map(m =>
+        m.id === updatedMission.id ? updatedMission : m
+      ));
+      setShowCandidaturesModal(false);
+      setSelectedMission(null);
+      setCandidatures([]);
+      setSuccessMessage("Candidature acceptée ! L'intervenant a été assigné à la mission.");
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setError("Erreur lors de l'acceptation de la candidature");
+    }
+  };
+
+  const handleRejectCandidature = async (candidatureId: string) => {
+    try {
+      await rejectCandidature(candidatureId);
+      setCandidatures(candidatures.map(c =>
+        c.id === candidatureId ? { ...c, status: "refusee" as const } : c
+      ));
+      setSuccessMessage("Candidature refusée");
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setError("Erreur lors du refus de la candidature");
+    }
+  };
+
+  const closeCandidaturesModal = () => {
+    setShowCandidaturesModal(false);
+    setSelectedMission(null);
+    setCandidatures([]);
   };
 
   const filteredMissions = missions.filter((mission) => {
@@ -330,7 +397,19 @@ export default function MesMissionsPage() {
                 )}
 
                 {/* Actions */}
-                <div className="pt-4 border-t border-[#1c2942]/10">
+                <div className="pt-4 border-t border-[#1c2942]/10 space-y-2">
+                  {/* Bouton voir candidatures - uniquement si pas d'intervenant assigné et mission active */}
+                  {mission.status === "ACTIVE" && !mission.intervenant && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleViewCandidatures(mission)}
+                      className="w-full rounded-xl bg-[#6d74b5] hover:bg-[#5a61a0]"
+                    >
+                      <Users className="w-4 h-4" />
+                      Voir les candidatures
+                    </Button>
+                  )}
                   {mission.status === "ACTIVE" && (
                     <Button
                       variant="outline"
@@ -365,6 +444,162 @@ export default function MesMissionsPage() {
           </div>
         )}
       </div>
+
+      {/* Modal des candidatures */}
+      {showCandidaturesModal && selectedMission && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+            {/* Header du modal */}
+            <div className="p-6 border-b border-[#1c2942]/10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-[#1c2942]">Candidatures</h2>
+                  <p className="text-sm text-[#1c2942]/60 mt-1">{selectedMission.title}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={closeCandidaturesModal}
+                  className="text-[#1c2942]/40 hover:text-[#1c2942] p-2 h-auto"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Contenu du modal */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {loadingCandidatures ? (
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="bg-[#ebf2fa] rounded-xl p-4 animate-pulse">
+                      <div className="h-5 bg-[#1c2942]/10 rounded w-1/3 mb-2"></div>
+                      <div className="h-4 bg-[#1c2942]/10 rounded w-2/3"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : candidatures.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-[#ebf2fa] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-[#6d74b5]" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-[#1c2942] mb-2">Aucune candidature</h3>
+                  <p className="text-[#1c2942]/60">Aucun intervenant n'a encore postulé à cette mission.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {candidatures.map((candidature) => (
+                    <div
+                      key={candidature.id}
+                      className={`bg-[#ebf2fa] rounded-xl p-4 border-2 ${
+                        candidature.status === "en_attente"
+                          ? "border-transparent"
+                          : candidature.status === "acceptee"
+                          ? "border-emerald-300 bg-emerald-50"
+                          : "border-red-200 bg-red-50"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          {/* Info intervenant */}
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 bg-[#6d74b5]/20 rounded-lg flex items-center justify-center">
+                              <User className="w-5 h-5 text-[#6d74b5]" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-[#1c2942]">
+                                {candidature.intervenant?.user?.prenom} {candidature.intervenant?.user?.nom}
+                              </p>
+                              <p className="text-sm text-[#1c2942]/60">{candidature.intervenant?.user?.email}</p>
+                            </div>
+                          </div>
+
+                          {/* Spécialité */}
+                          {candidature.intervenant?.specialite && (
+                            <div className="flex items-center gap-2 text-sm text-[#1c2942]/70 mb-2">
+                              <Award className="w-4 h-4" />
+                              <span>{candidature.intervenant.specialite}</span>
+                            </div>
+                          )}
+
+                          {/* Message de candidature */}
+                          {candidature.message && (
+                            <div className="bg-white rounded-lg p-3 mt-3">
+                              <p className="text-sm text-[#1c2942]/70 italic">"{candidature.message}"</p>
+                            </div>
+                          )}
+
+                          {/* Tarif proposé */}
+                          {candidature.tarifPropose && (
+                            <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#6d74b5]/10 text-[#6d74b5] rounded-lg text-sm font-medium">
+                              Tarif proposé: {(candidature.tarifPropose / 100).toFixed(2)} €
+                            </div>
+                          )}
+
+                          {/* Date de candidature */}
+                          <div className="flex items-center gap-1.5 text-xs text-[#1c2942]/40 mt-3">
+                            <Clock className="w-3 h-3" />
+                            <span>Postulé le {new Date(candidature.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex flex-col gap-2">
+                          {candidature.status === "en_attente" && (
+                            <>
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => handleAcceptCandidature(candidature.id)}
+                                className="bg-emerald-500 hover:bg-emerald-600 rounded-lg"
+                              >
+                                <Check className="w-4 h-4" />
+                                Accepter
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleRejectCandidature(candidature.id)}
+                                className="text-red-600 border-red-200 hover:bg-red-50 rounded-lg"
+                              >
+                                <XCircle className="w-4 h-4" />
+                                Refuser
+                              </Button>
+                            </>
+                          )}
+                          {candidature.status === "acceptee" && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium">
+                              <Check className="w-4 h-4" />
+                              Acceptée
+                            </span>
+                          )}
+                          {candidature.status === "refusee" && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-medium">
+                              <XCircle className="w-4 h-4" />
+                              Refusée
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer du modal */}
+            <div className="p-4 border-t border-[#1c2942]/10 bg-[#ebf2fa]/50">
+              <Button
+                variant="outline"
+                onClick={closeCandidaturesModal}
+                className="w-full rounded-xl"
+              >
+                Fermer
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

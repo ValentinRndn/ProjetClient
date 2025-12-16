@@ -191,11 +191,108 @@ export async function deleteMission(id: string): Promise<void> {
 }
 
 /**
- * Postuler à une mission (pour les intervenants)
+ * Postuler à une mission (pour les intervenants) - crée une candidature
  */
-export async function applyToMission(missionId: string): Promise<Mission> {
+export async function applyToMission(
+  missionId: string,
+  data?: { message?: string; tarifPropose?: number }
+): Promise<Candidature> {
+  const response = await apiClient.post<{ success: boolean; data: Candidature; message: string }>(
+    `/missions/${missionId}/apply`,
+    data || {}
+  );
+  return response.data || (response as unknown as Candidature);
+}
+
+// ============================================
+// Types et fonctions pour les candidatures
+// ============================================
+
+export type CandidatureStatus = "en_attente" | "acceptee" | "refusee" | "retiree";
+
+export interface Candidature {
+  id: string;
+  missionId: string;
+  intervenantId: string;
+  message?: string;
+  tarifPropose?: number;
+  status: CandidatureStatus;
+  createdAt: string;
+  updatedAt: string;
+  mission?: {
+    id: string;
+    title: string;
+    description?: string;
+    status: MissionStatus;
+    priceCents?: number;
+    startDate?: string;
+    endDate?: string;
+    ecole?: {
+      id: string;
+      name: string;
+    };
+  };
+  intervenant?: {
+    id: string;
+    firstName?: string;
+    lastName?: string;
+    profileImage?: string;
+    bio?: string;
+    expertises?: string[];
+    city?: string;
+    yearsExperience?: number;
+    user?: {
+      email: string;
+    };
+  };
+}
+
+/**
+ * Récupère les candidatures d'une mission (pour l'école propriétaire)
+ */
+export async function getMissionCandidatures(missionId: string): Promise<Candidature[]> {
+  const response = await apiClient.get<{ success: boolean; data: Candidature[] }>(
+    `/missions/${missionId}/candidatures`
+  );
+  return response.data || (response as unknown as Candidature[]);
+}
+
+/**
+ * Accepte une candidature (assigne l'intervenant à la mission)
+ */
+export async function acceptCandidature(candidatureId: string): Promise<Mission> {
   const response = await apiClient.post<{ success: boolean; data: Mission; message: string }>(
-    `/missions/${missionId}/apply`
+    `/missions/candidatures/${candidatureId}/accept`
   );
   return response.data || (response as unknown as Mission);
+}
+
+/**
+ * Refuse une candidature
+ */
+export async function rejectCandidature(candidatureId: string): Promise<Candidature> {
+  const response = await apiClient.post<{ success: boolean; data: Candidature; message: string }>(
+    `/missions/candidatures/${candidatureId}/reject`
+  );
+  return response.data || (response as unknown as Candidature);
+}
+
+/**
+ * Retire une candidature (pour l'intervenant)
+ */
+export async function withdrawCandidature(candidatureId: string): Promise<Candidature> {
+  const response = await apiClient.post<{ success: boolean; data: Candidature; message: string }>(
+    `/missions/candidatures/${candidatureId}/withdraw`
+  );
+  return response.data || (response as unknown as Candidature);
+}
+
+/**
+ * Récupère toutes les candidatures de l'intervenant connecté
+ */
+export async function getMyCandidatures(): Promise<Candidature[]> {
+  const response = await apiClient.get<{ success: boolean; data: Candidature[] }>(
+    `/missions/candidatures/mes-candidatures`
+  );
+  return response.data || (response as unknown as Candidature[]);
 }

@@ -16,7 +16,12 @@ import {
     changeMissionStatus,
     assignIntervenant,
     applyToMission,
-    removeMission
+    removeMission,
+    getCandidatures,
+    acceptCandidature,
+    rejectCandidature,
+    withdrawCandidature,
+    getMyCandidatures
 } from '../controllers/missions.controller.js';
 import { verifyToken, checkRole } from '../middlewares/auth.middleware.js';
 import validate from '../middlewares/validate.middleware.js';
@@ -49,6 +54,15 @@ const paramsSchema = Joi.object({
 
 const assignSchema = Joi.object({
     intervenantId: Joi.string().uuid().required()
+});
+
+const applySchema = Joi.object({
+    message: Joi.string().max(2000).optional(),
+    tarifPropose: Joi.number().integer().min(0).optional()
+});
+
+const candidatureParamsSchema = Joi.object({
+    candidatureId: Joi.string().uuid().required()
 });
 
 // ============================================
@@ -97,6 +111,31 @@ router.get('/ecole', verifyToken, checkRole(['ECOLE', 'ADMIN']), getMissionsByEc
  */
 router.get('/intervenant', verifyToken, checkRole(['INTERVENANT', 'ADMIN']), getMissionsByIntervenant);
 
+/**
+ * GET /api/v1/missions/candidatures/mes-candidatures
+ * Récupère toutes les candidatures de l'intervenant connecté
+ * IMPORTANT: Cette route doit être AVANT les routes avec :id
+ */
+router.get('/candidatures/mes-candidatures', verifyToken, checkRole(['INTERVENANT']), getMyCandidatures);
+
+/**
+ * POST /api/v1/missions/candidatures/:candidatureId/accept
+ * L'école accepte une candidature (assigne l'intervenant à la mission)
+ */
+router.post('/candidatures/:candidatureId/accept', validate({ params: candidatureParamsSchema }), verifyToken, checkRole(['ECOLE', 'ADMIN']), acceptCandidature);
+
+/**
+ * POST /api/v1/missions/candidatures/:candidatureId/reject
+ * L'école refuse une candidature
+ */
+router.post('/candidatures/:candidatureId/reject', validate({ params: candidatureParamsSchema }), verifyToken, checkRole(['ECOLE', 'ADMIN']), rejectCandidature);
+
+/**
+ * POST /api/v1/missions/candidatures/:candidatureId/withdraw
+ * L'intervenant retire sa candidature
+ */
+router.post('/candidatures/:candidatureId/withdraw', validate({ params: candidatureParamsSchema }), verifyToken, checkRole(['INTERVENANT']), withdrawCandidature);
+
 // ============================================
 // Routes CRUD classiques
 // ============================================
@@ -141,9 +180,15 @@ router.post('/:id/assign', validate({ params: paramsSchema, body: assignSchema }
 
 /**
  * POST /api/v1/missions/:id/apply
- * Permet à un intervenant de postuler à une mission
+ * Permet à un intervenant de postuler à une mission (crée une candidature)
  */
-router.post('/:id/apply', validate({ params: paramsSchema }), verifyToken, checkRole(['INTERVENANT']), applyToMission);
+router.post('/:id/apply', validate({ params: paramsSchema, body: applySchema }), verifyToken, checkRole(['INTERVENANT']), applyToMission);
+
+/**
+ * GET /api/v1/missions/:id/candidatures
+ * Récupère les candidatures d'une mission (pour l'école propriétaire)
+ */
+router.get('/:id/candidatures', validate({ params: paramsSchema }), verifyToken, checkRole(['ECOLE', 'ADMIN']), getCandidatures);
 
 /**
  * DELETE /api/v1/missions/:id

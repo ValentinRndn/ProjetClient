@@ -187,6 +187,9 @@ model Intervenant {
   // Relation One-to-Many avec Collaboration
   collaborations Collaboration[]
 
+  // Relation One-to-Many avec Candidature
+  candidatures Candidature[]
+
   @@index([userId])
   @@index([status])
 }
@@ -221,10 +224,47 @@ model Mission {
   // Relation One-to-Many vers Factures
   factures      Facture[]
 
+  // Relation One-to-Many vers Candidatures
+  candidatures  Candidature[]
+
   @@index([ecoleId])
   @@index([intervenantId])
   @@index([status])
   @@index([paymentStatus])
+}
+
+// ============================================
+// MODEL : Candidature
+// Candidatures des intervenants aux missions
+// ============================================
+model Candidature {
+  id            String    @id @default(uuid())
+  missionId     String
+  intervenantId String
+
+  // Message de motivation (optionnel)
+  message       String?   @db.Text
+
+  // Tarif proposé par l'intervenant (en centimes, optionnel)
+  tarifPropose  Int?
+
+  // Statut de la candidature
+  status        String    @default("en_attente") // en_attente, acceptee, refusee, retiree
+
+  // Dates
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  mission       Mission     @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  intervenant   Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
+
+  // Un intervenant ne peut postuler qu'une fois par mission
+  @@unique([missionId, intervenantId])
+  @@index([missionId])
+  @@index([intervenantId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 // ============================================

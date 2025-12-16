@@ -359,11 +359,12 @@ export async function remove(id, user) {
 }
 
 /**
- * applyToMission - Permet à un intervenant de postuler à une mission
+ * applyToMission - Permet à un intervenant de postuler à une mission (crée une candidature)
  * @param {string} missionId - ID de la mission
  * @param {string} userId - ID de l'utilisateur intervenant
+ * @param {Object} data - Données de candidature (message, tarifPropose)
  */
-export async function applyToMission(missionId, userId) {
+export async function applyToMission(missionId, userId, data = {}) {
     // Trouver l'intervenant associé à cet utilisateur
     const intervenant = await prisma.intervenant.findUnique({
         where: { userId }
@@ -405,21 +406,324 @@ export async function applyToMission(missionId, userId) {
         throw err;
     }
 
-    // Assigner l'intervenant à la mission
-    const updated = await prisma.mission.update({
-        where: { id: missionId },
-        data: { intervenantId: intervenant.id },
+    // Vérifier si l'intervenant a déjà postulé
+    const existingCandidature = await prisma.candidature.findUnique({
+        where: {
+            missionId_intervenantId: {
+                missionId,
+                intervenantId: intervenant.id
+            }
+        }
+    });
+
+    if (existingCandidature) {
+        const err = new Error('Vous avez déjà postulé à cette mission.');
+        err.status = 400;
+        throw err;
+    }
+
+    // Créer la candidature
+    const candidature = await prisma.candidature.create({
+        data: {
+            missionId,
+            intervenantId: intervenant.id,
+            message: data.message || null,
+            tarifPropose: data.tarifPropose ? Number(data.tarifPropose) : null,
+            status: 'en_attente'
+        },
         include: {
-            ecole: { select: { id: true, name: true, contactEmail: true } },
+            mission: {
+                select: {
+                    id: true,
+                    title: true,
+                    ecole: { select: { id: true, name: true, contactEmail: true } }
+                }
+            },
             intervenant: {
                 select: {
                     id: true,
-                    bio: true,
+                    firstName: true,
+                    lastName: true,
+                    profileImage: true,
+                    expertises: true,
                     user: { select: { id: true, email: true } }
                 }
             }
         }
     });
 
+    return candidature;
+}
+
+/**
+ * getCandidatures - Récupère les candidatures d'une mission (pour l'école)
+ * @param {string} missionId - ID de la mission
+ * @param {string} userId - ID de l'utilisateur (pour vérifier les droits)
+ */
+export async function getCandidatures(missionId, userId) {
+    // Vérifier que la mission existe et appartient à l'utilisateur
+    const mission = await prisma.mission.findUnique({
+        where: { id: missionId },
+        include: {
+            ecole: { select: { userId: true } }
+        }
+    });
+
+    if (!mission) {
+        const err = new Error('Mission non trouvée.');
+        err.status = 404;
+        throw err;
+    }
+
+    // Vérifier que l'utilisateur est l'école propriétaire ou admin
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user?.role !== 'ADMIN' && mission.ecole.userId !== userId) {
+        const err = new Error('Vous n\'avez pas accès aux candidatures de cette mission.');
+        err.status = 403;
+        throw err;
+    }
+
+    const candidatures = await prisma.candidature.findMany({
+        where: { missionId },
+        orderBy: { createdAt: 'desc' },
+        include: {
+            intervenant: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    profileImage: true,
+                    bio: true,
+                    expertises: true,
+                    city: true,
+                    yearsExperience: true,
+                    user: { select: { email: true } }
+                }
+            }
+        }
+    });
+
+    return candidatures;
+}
+
+/**
+ * acceptCandidature - L'école accepte une candidature (assigne l'intervenant)
+ * @param {string} candidatureId - ID de la candidature
+ * @param {string} userId - ID de l'utilisateur école
+ */
+export async function acceptCandidature(candidatureId, userId) {
+    const candidature = await prisma.candidature.findUnique({
+        where: { id: candidatureId },
+        include: {
+            mission: {
+                include: {
+                    ecole: { select: { userId: true } }
+                }
+            }
+        }
+    });
+
+    if (!candidature) {
+        const err = new Error('Candidature non trouvée.');
+        err.status = 404;
+        throw err;
+    }
+
+    // Vérifier les droits
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user?.role !== 'ADMIN' && candidature.mission.ecole.userId !== userId) {
+        const err = new Error('Vous n\'avez pas le droit d\'accepter cette candidature.');
+        err.status = 403;
+        throw err;
+    }
+
+    // Vérifier que la mission n'a pas déjà un intervenant
+    if (candidature.mission.intervenantId) {
+        const err = new Error('Un intervenant est déjà assigné à cette mission.');
+        err.status = 400;
+        throw err;
+    }
+
+    // Transaction : accepter la candidature, refuser les autres, assigner l'intervenant
+    const result = await prisma.$transaction(async (tx) => {
+        // 1. Mettre à jour la candidature acceptée
+        await tx.candidature.update({
+            where: { id: candidatureId },
+            data: { status: 'acceptee' }
+        });
+
+        // 2. Refuser toutes les autres candidatures de cette mission
+        await tx.candidature.updateMany({
+            where: {
+                missionId: candidature.missionId,
+                id: { not: candidatureId },
+                status: 'en_attente'
+            },
+            data: { status: 'refusee' }
+        });
+
+        // 3. Assigner l'intervenant à la mission
+        const updatedMission = await tx.mission.update({
+            where: { id: candidature.missionId },
+            data: { intervenantId: candidature.intervenantId },
+            include: {
+                ecole: { select: { id: true, name: true, contactEmail: true } },
+                intervenant: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        user: { select: { email: true } }
+                    }
+                },
+                candidatures: {
+                    include: {
+                        intervenant: {
+                            select: {
+                                id: true,
+                                firstName: true,
+                                lastName: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return updatedMission;
+    });
+
+    return result;
+}
+
+/**
+ * rejectCandidature - L'école refuse une candidature
+ * @param {string} candidatureId - ID de la candidature
+ * @param {string} userId - ID de l'utilisateur école
+ */
+export async function rejectCandidature(candidatureId, userId) {
+    const candidature = await prisma.candidature.findUnique({
+        where: { id: candidatureId },
+        include: {
+            mission: {
+                include: {
+                    ecole: { select: { userId: true } }
+                }
+            }
+        }
+    });
+
+    if (!candidature) {
+        const err = new Error('Candidature non trouvée.');
+        err.status = 404;
+        throw err;
+    }
+
+    // Vérifier les droits
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user?.role !== 'ADMIN' && candidature.mission.ecole.userId !== userId) {
+        const err = new Error('Vous n\'avez pas le droit de refuser cette candidature.');
+        err.status = 403;
+        throw err;
+    }
+
+    const updated = await prisma.candidature.update({
+        where: { id: candidatureId },
+        data: { status: 'refusee' },
+        include: {
+            intervenant: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    user: { select: { email: true } }
+                }
+            }
+        }
+    });
+
     return updated;
+}
+
+/**
+ * withdrawCandidature - L'intervenant retire sa candidature
+ * @param {string} candidatureId - ID de la candidature
+ * @param {string} userId - ID de l'utilisateur intervenant
+ */
+export async function withdrawCandidature(candidatureId, userId) {
+    const intervenant = await prisma.intervenant.findUnique({
+        where: { userId }
+    });
+
+    if (!intervenant) {
+        const err = new Error('Intervenant non trouvé.');
+        err.status = 404;
+        throw err;
+    }
+
+    const candidature = await prisma.candidature.findUnique({
+        where: { id: candidatureId }
+    });
+
+    if (!candidature) {
+        const err = new Error('Candidature non trouvée.');
+        err.status = 404;
+        throw err;
+    }
+
+    if (candidature.intervenantId !== intervenant.id) {
+        const err = new Error('Vous ne pouvez retirer que vos propres candidatures.');
+        err.status = 403;
+        throw err;
+    }
+
+    if (candidature.status !== 'en_attente') {
+        const err = new Error('Vous ne pouvez retirer qu\'une candidature en attente.');
+        err.status = 400;
+        throw err;
+    }
+
+    const updated = await prisma.candidature.update({
+        where: { id: candidatureId },
+        data: { status: 'retiree' }
+    });
+
+    return updated;
+}
+
+/**
+ * getMyCandidatures - Récupère les candidatures d'un intervenant
+ * @param {string} userId - ID de l'utilisateur intervenant
+ */
+export async function getMyCandidatures(userId) {
+    const intervenant = await prisma.intervenant.findUnique({
+        where: { userId }
+    });
+
+    if (!intervenant) {
+        const err = new Error('Intervenant non trouvé.');
+        err.status = 404;
+        throw err;
+    }
+
+    const candidatures = await prisma.candidature.findMany({
+        where: { intervenantId: intervenant.id },
+        orderBy: { createdAt: 'desc' },
+        include: {
+            mission: {
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    status: true,
+                    priceCents: true,
+                    startDate: true,
+                    endDate: true,
+                    ecole: { select: { id: true, name: true } }
+                }
+            }
+        }
+    });
+
+    return candidatures;
 }
