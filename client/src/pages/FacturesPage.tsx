@@ -251,7 +251,6 @@ export default function FacturesPage() {
           <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-white/20">
             {[
               { value: stats.total, label: "Total" },
-              { value: stats.brouillons, label: "Brouillons" },
               { value: stats.envoyees, label: "Envoyées" },
               { value: stats.payees, label: "Payées" },
               { value: stats.enRetard, label: "En retard", highlight: stats.enRetard > 0 },
@@ -395,7 +394,6 @@ export default function FacturesPage() {
                     style={{ borderColor: "#ebf2fa", color: "#1c2942" }}
                   >
                     <option value="">Tous</option>
-                    <option value="brouillon">Brouillon</option>
                     <option value="envoyee">Envoyée</option>
                     <option value="payee">Payée</option>
                     <option value="annulee">Annulée</option>

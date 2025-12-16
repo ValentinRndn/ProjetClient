@@ -1,4 +1,4 @@
-import { Calendar, Receipt, Zap, ArrowDown, Sparkles } from "lucide-react";
+import { ArrowDown, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 
 export function IntervenantsHero() {
@@ -49,45 +49,6 @@ export function IntervenantsHero() {
             sélectionnés pour leur expertise et leur pédagogie.
           </motion.p>
         </div>
-
-        {/* Key Points */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14 max-w-5xl mx-auto"
-        >
-          {[
-            {
-              icon: <Receipt className="w-6 h-6 text-white" />,
-              title: "Facturation simplifiée",
-              description: "Prise en charge complète de la facturation pour faciliter votre gestion administrative.",
-            },
-            {
-              icon: <Zap className="w-6 h-6 text-white" />,
-              title: "Remplacement express",
-              description: "Système d'urgence pour remplacer vos intervenants en cas de besoin.",
-            },
-            {
-              icon: <Calendar className="w-6 h-6 text-white" />,
-              title: "Réservation rapide",
-              description: "Réservez un créneau de rencontre en moins de 2 minutes.",
-            },
-          ].map((item, index) => (
-            <div
-              key={index}
-              className="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <div className="flex items-center justify-center w-14 h-14 bg-[#6d74b5] rounded-xl mb-4 mx-auto shadow-lg group-hover:scale-110 transition-transform">
-                {item.icon}
-              </div>
-              <h3 className="text-lg font-semibold text-center mb-2 text-[#1c2942]">{item.title}</h3>
-              <p className="text-center text-sm text-[#1c2942]/70">
-                {item.description}
-              </p>
-            </div>
-          ))}
-        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

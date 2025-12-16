@@ -44,7 +44,7 @@ async function createFactureForCollaboration(collaboration) {
       tva,
       montantTTC,
       description: `Collaboration: ${collaboration.titre}`,
-      status: 'brouillon',
+      status: 'envoyee',
       dateEcheance: collaboration.dateFin
         ? new Date(new Date(collaboration.dateFin).getTime() + 30 * 24 * 60 * 60 * 1000) // +30 jours après fin
         : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 jours par défaut

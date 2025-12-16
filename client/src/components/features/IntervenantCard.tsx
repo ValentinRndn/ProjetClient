@@ -148,7 +148,7 @@ export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCa
   const profileImageUrl = getProfileImageUrl();
 
   return (
-    <Card className="p-5 hover:shadow-xl transition-all duration-300 relative group hover:-translate-y-1">
+    <Card className="p-5 hover:shadow-xl transition-all duration-300 relative group hover:-translate-y-1 h-full flex flex-col">
       {/* Bouton favori pour les écoles */}
       {isEcole && intervenant.status === "approved" && (
         <button
@@ -219,7 +219,7 @@ export function IntervenantCard({ intervenant, onFavoriteChange }: IntervenantCa
         </div>
       )}
 
-      <div className="space-y-2 mb-4">
+      <div className="space-y-2 mb-4 flex-grow">
         {intervenant.city && (
           <div className="flex items-center gap-2 text-sm text-[#1c2942]/60">
             <MapPin className="w-4 h-4" />

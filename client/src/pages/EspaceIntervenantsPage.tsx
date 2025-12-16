@@ -3,7 +3,7 @@
  */
 import { useState } from "react";
 import { motion } from "motion/react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { Button } from "@/components/ui/Button";
 import {
   Users,
@@ -27,6 +27,7 @@ import {
   UserCheck,
   FileCheck,
   Rocket,
+  HelpCircle,
 } from "lucide-react";
 import PartnerLogosSlider from "@/components/features/PartnerLogosSlider";
 
@@ -525,6 +526,26 @@ export default function EspaceIntervenantsPage() {
               </motion.div>
             ))}
           </div>
+
+          {/* Bouton contact */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="text-center mt-10"
+          >
+            <Link to="/contact">
+              <Button
+                variant="outline"
+                size="lg"
+                className="rounded-full border-[#6d74b5] text-[#6d74b5] hover:bg-[#6d74b5] hover:text-white"
+              >
+                <HelpCircle className="w-5 h-5" />
+                Vous n'avez pas trouvé de réponse à votre question ?
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 

@@ -238,7 +238,7 @@ export default function NouvelleCollaborationPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={`Rechercher ${isEcole ? "un intervenant" : "une école"}...`}
+                    placeholder={`Rechercher par nom ${isEcole ? "de l'intervenant" : "de l'école"}...`}
                     className="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all"
                     style={{ borderColor: "#ebf2fa" }}
                   />
@@ -276,9 +276,10 @@ export default function NouvelleCollaborationPage() {
                           <p className="font-medium" style={{ color: "#1c2942" }}>
                             {getPartnerDisplayName(result)}
                           </p>
-                          {"city" in result && result.city && (
+                          {"user" in result && result.user?.email && (
                             <p className="text-sm" style={{ color: "#6d74b5" }}>
-                              {result.city}
+                              {result.user.email}
+                              {result.city && ` • ${result.city}`}
                             </p>
                           )}
                           {"address" in result && result.address && (

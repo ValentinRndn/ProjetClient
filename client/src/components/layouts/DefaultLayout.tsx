@@ -12,7 +12,6 @@ import {
   MapPin,
   ArrowRight,
   Linkedin,
-  Twitter,
   GraduationCap,
   Trophy,
   Users,
@@ -82,14 +81,6 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
           <span className="text-xs text-[#1c2942]/50">Découvrez notre offre pour les écoles</span>
         </NavLink>,
         <NavLink
-          key="intervenants"
-          to="/intervenants"
-          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
-        >
-          <span className="font-medium text-[#1c2942]">Trouver un intervenant</span>
-          <span className="text-xs text-[#1c2942]/50">Accédez à notre réseau d'experts qualifiés</span>
-        </NavLink>,
-        <NavLink
           key="login-ecole"
           to="/login"
           className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
@@ -146,14 +137,6 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         >
           <span className="font-medium text-[#1c2942]">Présentation</span>
           <span className="text-xs text-[#1c2942]/50">Découvrez les avantages de rejoindre notre réseau</span>
-        </NavLink>,
-        <NavLink
-          key="missions"
-          to="/missions"
-          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
-        >
-          <span className="font-medium text-[#1c2942]">Voir les missions</span>
-          <span className="text-xs text-[#1c2942]/50">Consultez les offres disponibles</span>
         </NavLink>,
         <NavLink
           key="register-intervenant"
@@ -232,7 +215,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="bg-[#1c2942] text-white">
+      <footer className="bg-[#28303a] text-white">
         {/* Main Footer */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
@@ -278,7 +261,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
                   <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
                     <MapPin className="w-4 h-4" />
                   </div>
-                  <span>Paris, France</span>
+                  <span>Lyon, France</span>
                 </div>
               </div>
             </div>
@@ -323,15 +306,6 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
                   aria-label="LinkedIn"
                 >
                   <Linkedin className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://twitter.com/vizionacademy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white/60 hover:bg-[#6d74b5] hover:text-white transition-colors"
-                  aria-label="Twitter"
-                >
-                  <Twitter className="w-4 h-4" />
                 </a>
               </div>
             </div>
