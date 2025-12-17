@@ -190,9 +190,6 @@ model Intervenant {
   // Relation One-to-Many avec Candidature
   candidatures Candidature[]
 
-  // Relation One-to-Many avec Challenge
-  challenges Challenge[]
-
   @@index([userId])
   @@index([status])
 }
@@ -698,8 +695,8 @@ model Collaboration {
 
 // ============================================
 // MODEL : Challenge
-// Challenges pédagogiques créés par les intervenants
-// et validés par l'admin avant publication
+// Challenges pédagogiques créés par les admins
+// Système de brouillon/publié
 // ============================================
 model Challenge {
   id              String    @id @default(uuid())
@@ -724,20 +721,14 @@ model Challenge {
   // Tarification
   priceCents      Int?      // Prix en centimes (optionnel)
 
-  // Statut de validation
-  status          String    @default("pending") // pending, approved, rejected
-  rejectionReason String?   // Raison du refus si rejeté
+  // Statut de publication (géré par admin uniquement)
+  status          String    @default("draft") // draft, published
 
   // Dates
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  approvedAt      DateTime? // Date d'approbation par l'admin
+  publishedAt     DateTime? // Date de publication
 
-  // Relation avec l'intervenant créateur
-  intervenantId   String
-  intervenant     Intervenant @relation(fields: [intervenantId], references: [id], onDelete: Cascade)
-
-  @@index([intervenantId])
   @@index([status])
   @@index([thematique])
   @@index([createdAt])

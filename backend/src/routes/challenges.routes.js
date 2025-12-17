@@ -1,5 +1,7 @@
 /**
  * Routes API pour les Challenges pédagogiques
+ * - Seuls les admins peuvent créer/modifier/supprimer
+ * - Système de brouillon (draft) / publié (published)
  */
 
 import express from 'express';
@@ -14,7 +16,7 @@ const router = express.Router();
 
 /**
  * GET /api/challenges/public
- * Récupérer tous les challenges approuvés (public)
+ * Récupérer tous les challenges publiés (public)
  */
 router.get('/public', async (req, res, next) => {
   try {
@@ -30,14 +32,14 @@ router.get('/public', async (req, res, next) => {
 
 /**
  * GET /api/challenges/public/:id
- * Récupérer un challenge approuvé par ID (public)
+ * Récupérer un challenge publié par ID (public)
  */
 router.get('/public/:id', async (req, res, next) => {
   try {
     const challenge = await challengesService.getChallengeById(req.params.id);
 
-    // Vérifier que le challenge est approuvé pour l'accès public
-    if (challenge.status !== 'approved') {
+    // Vérifier que le challenge est publié pour l'accès public
+    if (challenge.status !== 'published') {
       return res.status(404).json({ error: 'Challenge non trouvé' });
     }
 
@@ -48,85 +50,7 @@ router.get('/public/:id', async (req, res, next) => {
 });
 
 // ============================================
-// Routes authentifiées (Intervenants)
-// ============================================
-
-/**
- * POST /api/challenges
- * Créer un nouveau challenge (intervenant uniquement)
- */
-router.post('/', verifyToken, checkRole(['INTERVENANT']), async (req, res, next) => {
-  try {
-    const challenge = await challengesService.createChallenge(req.body, req.user.id);
-    res.status(201).json(challenge);
-  } catch (err) {
-    next(err);
-  }
-});
-
-/**
- * GET /api/challenges/my
- * Récupérer mes challenges (intervenant)
- */
-router.get('/my', verifyToken, checkRole(['INTERVENANT']), async (req, res, next) => {
-  try {
-    const challenges = await challengesService.getMyChallenges(req.user.id);
-    res.json(challenges);
-  } catch (err) {
-    next(err);
-  }
-});
-
-/**
- * GET /api/challenges/:id
- * Récupérer un challenge par ID (authentifié)
- */
-router.get('/:id', verifyToken, async (req, res, next) => {
-  try {
-    const challenge = await challengesService.getChallengeById(
-      req.params.id,
-      req.user.id,
-      req.user.role
-    );
-    res.json(challenge);
-  } catch (err) {
-    next(err);
-  }
-});
-
-/**
- * PUT /api/challenges/:id
- * Mettre à jour un challenge (propriétaire ou admin)
- */
-router.put('/:id', verifyToken, async (req, res, next) => {
-  try {
-    const challenge = await challengesService.updateChallenge(
-      req.params.id,
-      req.body,
-      req.user.id,
-      req.user.role
-    );
-    res.json(challenge);
-  } catch (err) {
-    next(err);
-  }
-});
-
-/**
- * DELETE /api/challenges/:id
- * Supprimer un challenge (propriétaire ou admin)
- */
-router.delete('/:id', verifyToken, async (req, res, next) => {
-  try {
-    await challengesService.deleteChallenge(req.params.id, req.user.id, req.user.role);
-    res.json({ success: true });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// ============================================
-// Routes Admin
+// Routes Admin uniquement
 // ============================================
 
 /**
@@ -160,12 +84,25 @@ router.get('/admin/stats', verifyToken, checkRole(['ADMIN']), async (req, res, n
 });
 
 /**
- * POST /api/challenges/admin/:id/approve
- * Approuver un challenge (admin)
+ * POST /api/challenges/admin
+ * Créer un nouveau challenge (admin uniquement)
  */
-router.post('/admin/:id/approve', verifyToken, checkRole(['ADMIN']), async (req, res, next) => {
+router.post('/admin', verifyToken, checkRole(['ADMIN']), async (req, res, next) => {
   try {
-    const challenge = await challengesService.approveChallenge(req.params.id);
+    const challenge = await challengesService.createChallenge(req.body);
+    res.status(201).json(challenge);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * GET /api/challenges/admin/:id
+ * Récupérer un challenge par ID (admin - peut voir les brouillons)
+ */
+router.get('/admin/:id', verifyToken, checkRole(['ADMIN']), async (req, res, next) => {
+  try {
+    const challenge = await challengesService.getChallengeById(req.params.id, 'ADMIN');
     res.json(challenge);
   } catch (err) {
     next(err);
@@ -173,13 +110,51 @@ router.post('/admin/:id/approve', verifyToken, checkRole(['ADMIN']), async (req,
 });
 
 /**
- * POST /api/challenges/admin/:id/reject
- * Rejeter un challenge (admin)
+ * PUT /api/challenges/admin/:id
+ * Mettre à jour un challenge (admin uniquement)
  */
-router.post('/admin/:id/reject', verifyToken, checkRole(['ADMIN']), async (req, res, next) => {
+router.put('/admin/:id', verifyToken, checkRole(['ADMIN']), async (req, res, next) => {
   try {
-    const { reason } = req.body;
-    const challenge = await challengesService.rejectChallenge(req.params.id, reason);
+    const challenge = await challengesService.updateChallenge(req.params.id, req.body);
+    res.json(challenge);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * DELETE /api/challenges/admin/:id
+ * Supprimer un challenge (admin uniquement)
+ */
+router.delete('/admin/:id', verifyToken, checkRole(['ADMIN']), async (req, res, next) => {
+  try {
+    await challengesService.deleteChallenge(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * POST /api/challenges/admin/:id/publish
+ * Publier un challenge (admin)
+ */
+router.post('/admin/:id/publish', verifyToken, checkRole(['ADMIN']), async (req, res, next) => {
+  try {
+    const challenge = await challengesService.publishChallenge(req.params.id);
+    res.json(challenge);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * POST /api/challenges/admin/:id/unpublish
+ * Dépublier un challenge (passer en brouillon) (admin)
+ */
+router.post('/admin/:id/unpublish', verifyToken, checkRole(['ADMIN']), async (req, res, next) => {
+  try {
+    const challenge = await challengesService.unpublishChallenge(req.params.id);
     res.json(challenge);
   } catch (err) {
     next(err);

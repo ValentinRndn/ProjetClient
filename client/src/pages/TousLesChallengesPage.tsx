@@ -15,8 +15,6 @@ import {
   Target,
   Lightbulb,
   CheckCircle,
-  User,
-  MapPin,
 } from "lucide-react";
 import {
   getPublicChallenges,
@@ -47,11 +45,6 @@ function ChallengeCard({
     };
     return colors[thematique] || "bg-gray-100 text-gray-800";
   };
-
-  const intervenantName = challenge.intervenant
-    ? `${challenge.intervenant.firstName || ""} ${challenge.intervenant.lastName || ""}`.trim() ||
-      challenge.intervenant.user?.email?.split("@")[0]
-    : "Intervenant";
 
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
@@ -105,30 +98,6 @@ function ChallengeCard({
           )}
         </div>
 
-        {/* Intervenant */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-4 pb-4 border-b border-gray-100">
-          <div className="w-8 h-8 rounded-full bg-[#ebf2fa] flex items-center justify-center">
-            {challenge.intervenant?.profileImage ? (
-              <img
-                src={challenge.intervenant.profileImage}
-                alt={intervenantName}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            ) : (
-              <User className="w-4 h-4 text-[#6d74b5]" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-[#1c2942] truncate">{intervenantName}</p>
-            {challenge.intervenant?.city && (
-              <p className="text-xs text-gray-400 flex items-center gap-1">
-                <MapPin className="w-3 h-3" />
-                {challenge.intervenant.city}
-              </p>
-            )}
-          </div>
-        </div>
-
         {/* Prix si défini */}
         {challenge.priceCents && (
           <div className="text-lg font-bold text-[#6d74b5] mb-4">
@@ -159,11 +128,6 @@ function ChallengeModal({
   onClose: () => void;
   onContact: () => void;
 }) {
-  const intervenantName = challenge.intervenant
-    ? `${challenge.intervenant.firstName || ""} ${challenge.intervenant.lastName || ""}`.trim() ||
-      challenge.intervenant.user?.email?.split("@")[0]
-    : "Intervenant";
-
   return (
     <div
       className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
@@ -231,7 +195,7 @@ function ChallengeModal({
               <ul className="space-y-2 text-gray-700">
                 {challenge.objectives.map((obj, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 mt-1 text-green-600 flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 mt-1 text-green-600 shrink-0" />
                     <span>{obj}</span>
                   </li>
                 ))}
@@ -249,7 +213,7 @@ function ChallengeModal({
               <ul className="space-y-2 text-gray-700">
                 {challenge.deliverables.map((del, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <Lightbulb className="w-4 h-4 mt-1 text-[#6d74b5] flex-shrink-0" />
+                    <Lightbulb className="w-4 h-4 mt-1 text-[#6d74b5] shrink-0" />
                     <span>{del}</span>
                   </li>
                 ))}
@@ -264,38 +228,6 @@ function ChallengeModal({
               <p className="text-gray-700">{challenge.prerequisites}</p>
             </div>
           )}
-
-          {/* Intervenant */}
-          <div className="border border-gray-200 rounded-lg p-4 mb-6">
-            <h4 className="font-semibold text-[#1c2942] mb-3">Proposé par</h4>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-[#ebf2fa] flex items-center justify-center">
-                {challenge.intervenant?.profileImage ? (
-                  <img
-                    src={challenge.intervenant.profileImage}
-                    alt={intervenantName}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                ) : (
-                  <User className="w-6 h-6 text-[#6d74b5]" />
-                )}
-              </div>
-              <div>
-                <p className="font-medium text-[#1c2942]">{intervenantName}</p>
-                {challenge.intervenant?.city && (
-                  <p className="text-sm text-gray-500 flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {challenge.intervenant.city}
-                  </p>
-                )}
-              </div>
-            </div>
-            {challenge.intervenant?.bio && (
-              <p className="text-sm text-gray-600 mt-3 line-clamp-3">
-                {challenge.intervenant.bio}
-              </p>
-            )}
-          </div>
 
           {/* Prix */}
           {challenge.priceCents && (

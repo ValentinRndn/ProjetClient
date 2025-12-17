@@ -1,33 +1,16 @@
 /**
  * Service de gestion des Challenges pédagogiques
- * - Les intervenants créent des challenges (status: pending)
- * - L'admin valide/rejette les challenges
- * - Seuls les challenges approuvés sont visibles publiquement
+ * - Seuls les admins peuvent créer/modifier/supprimer des challenges
+ * - Système de brouillon (draft) / publié (published)
+ * - Seuls les challenges publiés sont visibles publiquement
  */
 
 import prisma from '../../prisma.js';
 
 /**
- * Créer un nouveau challenge (intervenant uniquement)
+ * Créer un nouveau challenge (admin uniquement)
  */
-export async function createChallenge(data, userId) {
-  // Vérifier que l'utilisateur est bien un intervenant approuvé
-  const intervenant = await prisma.intervenant.findUnique({
-    where: { userId },
-  });
-
-  if (!intervenant) {
-    const err = new Error('Intervenant non trouvé');
-    err.status = 404;
-    throw err;
-  }
-
-  if (intervenant.status !== 'approved') {
-    const err = new Error('Votre profil doit être approuvé pour créer un challenge');
-    err.status = 403;
-    throw err;
-  }
-
+export async function createChallenge(data) {
   const challenge = await prisma.challenge.create({
     data: {
       title: data.title,
@@ -42,18 +25,8 @@ export async function createChallenge(data, userId) {
       imageUrl: data.imageUrl || null,
       videoUrl: data.videoUrl || null,
       priceCents: data.priceCents || null,
-      intervenantId: intervenant.id,
-      status: 'pending',
-    },
-    include: {
-      intervenant: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          user: { select: { email: true } },
-        },
-      },
+      status: data.status || 'draft',
+      publishedAt: data.status === 'published' ? new Date() : null,
     },
   });
 
@@ -61,11 +34,11 @@ export async function createChallenge(data, userId) {
 }
 
 /**
- * Récupérer les challenges publics (approuvés uniquement)
+ * Récupérer les challenges publics (publiés uniquement)
  */
 export async function getPublicChallenges(filters = {}) {
   const where = {
-    status: 'approved',
+    status: 'published',
   };
 
   if (filters.thematique) {
@@ -74,45 +47,18 @@ export async function getPublicChallenges(filters = {}) {
 
   const challenges = await prisma.challenge.findMany({
     where,
-    include: {
-      intervenant: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          profileImage: true,
-          city: true,
-          user: { select: { email: true } },
-        },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { publishedAt: 'desc' },
   });
 
   return challenges;
 }
 
 /**
- * Récupérer un challenge par ID (public si approuvé, ou propriétaire/admin)
+ * Récupérer un challenge par ID (public si publié, sinon admin requis)
  */
-export async function getChallengeById(id, userId = null, userRole = null) {
+export async function getChallengeById(id, userRole = null) {
   const challenge = await prisma.challenge.findUnique({
     where: { id },
-    include: {
-      intervenant: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          profileImage: true,
-          city: true,
-          bio: true,
-          expertises: true,
-          userId: true,
-          user: { select: { email: true } },
-        },
-      },
-    },
   });
 
   if (!challenge) {
@@ -122,11 +68,10 @@ export async function getChallengeById(id, userId = null, userRole = null) {
   }
 
   // Vérifier l'accès
-  const isOwner = challenge.intervenant.userId === userId;
   const isAdmin = userRole === 'ADMIN';
-  const isApproved = challenge.status === 'approved';
+  const isPublished = challenge.status === 'published';
 
-  if (!isApproved && !isOwner && !isAdmin) {
+  if (!isPublished && !isAdmin) {
     const err = new Error('Accès non autorisé');
     err.status = 403;
     throw err;
@@ -136,59 +81,16 @@ export async function getChallengeById(id, userId = null, userRole = null) {
 }
 
 /**
- * Récupérer les challenges d'un intervenant
+ * Mettre à jour un challenge (admin uniquement)
  */
-export async function getMyChallenges(userId) {
-  const intervenant = await prisma.intervenant.findUnique({
-    where: { userId },
-  });
-
-  if (!intervenant) {
-    const err = new Error('Intervenant non trouvé');
-    err.status = 404;
-    throw err;
-  }
-
-  const challenges = await prisma.challenge.findMany({
-    where: { intervenantId: intervenant.id },
-    orderBy: { createdAt: 'desc' },
-  });
-
-  return challenges;
-}
-
-/**
- * Mettre à jour un challenge (propriétaire ou admin)
- */
-export async function updateChallenge(id, data, userId, userRole) {
+export async function updateChallenge(id, data) {
   const challenge = await prisma.challenge.findUnique({
     where: { id },
-    include: {
-      intervenant: {
-        select: { userId: true },
-      },
-    },
   });
 
   if (!challenge) {
     const err = new Error('Challenge non trouvé');
     err.status = 404;
-    throw err;
-  }
-
-  const isOwner = challenge.intervenant.userId === userId;
-  const isAdmin = userRole === 'ADMIN';
-
-  if (!isOwner && !isAdmin) {
-    const err = new Error('Accès non autorisé');
-    err.status = 403;
-    throw err;
-  }
-
-  // L'intervenant ne peut modifier que si le challenge est pending ou rejected
-  if (isOwner && !isAdmin && challenge.status === 'approved') {
-    const err = new Error('Vous ne pouvez pas modifier un challenge déjà approuvé');
-    err.status = 400;
     throw err;
   }
 
@@ -207,41 +109,20 @@ export async function updateChallenge(id, data, userId, userRole) {
   if (data.videoUrl !== undefined) updateData.videoUrl = data.videoUrl;
   if (data.priceCents !== undefined) updateData.priceCents = data.priceCents;
 
-  // Si l'intervenant modifie un challenge rejeté, le repasser en pending
-  if (isOwner && challenge.status === 'rejected') {
-    updateData.status = 'pending';
-    updateData.rejectionReason = null;
-  }
-
   const updated = await prisma.challenge.update({
     where: { id },
     data: updateData,
-    include: {
-      intervenant: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          user: { select: { email: true } },
-        },
-      },
-    },
   });
 
   return updated;
 }
 
 /**
- * Supprimer un challenge (propriétaire ou admin)
+ * Supprimer un challenge (admin uniquement)
  */
-export async function deleteChallenge(id, userId, userRole) {
+export async function deleteChallenge(id) {
   const challenge = await prisma.challenge.findUnique({
     where: { id },
-    include: {
-      intervenant: {
-        select: { userId: true },
-      },
-    },
   });
 
   if (!challenge) {
@@ -250,23 +131,10 @@ export async function deleteChallenge(id, userId, userRole) {
     throw err;
   }
 
-  const isOwner = challenge.intervenant.userId === userId;
-  const isAdmin = userRole === 'ADMIN';
-
-  if (!isOwner && !isAdmin) {
-    const err = new Error('Accès non autorisé');
-    err.status = 403;
-    throw err;
-  }
-
   await prisma.challenge.delete({ where: { id } });
 
   return { success: true };
 }
-
-// ============================================
-// Fonctions Admin
-// ============================================
 
 /**
  * Récupérer tous les challenges (admin uniquement)
@@ -284,17 +152,6 @@ export async function getAllChallenges(filters = {}) {
 
   const challenges = await prisma.challenge.findMany({
     where,
-    include: {
-      intervenant: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          profileImage: true,
-          user: { select: { email: true } },
-        },
-      },
-    },
     orderBy: { createdAt: 'desc' },
   });
 
@@ -302,9 +159,9 @@ export async function getAllChallenges(filters = {}) {
 }
 
 /**
- * Approuver un challenge (admin uniquement)
+ * Publier un challenge (admin uniquement)
  */
-export async function approveChallenge(id) {
+export async function publishChallenge(id) {
   const challenge = await prisma.challenge.findUnique({
     where: { id },
   });
@@ -315,8 +172,8 @@ export async function approveChallenge(id) {
     throw err;
   }
 
-  if (challenge.status === 'approved') {
-    const err = new Error('Ce challenge est déjà approuvé');
+  if (challenge.status === 'published') {
+    const err = new Error('Ce challenge est déjà publié');
     err.status = 400;
     throw err;
   }
@@ -324,19 +181,8 @@ export async function approveChallenge(id) {
   const updated = await prisma.challenge.update({
     where: { id },
     data: {
-      status: 'approved',
-      approvedAt: new Date(),
-      rejectionReason: null,
-    },
-    include: {
-      intervenant: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          user: { select: { email: true } },
-        },
-      },
+      status: 'published',
+      publishedAt: new Date(),
     },
   });
 
@@ -344,9 +190,9 @@ export async function approveChallenge(id) {
 }
 
 /**
- * Rejeter un challenge (admin uniquement)
+ * Dépublier un challenge (passer en brouillon) (admin uniquement)
  */
-export async function rejectChallenge(id, reason) {
+export async function unpublishChallenge(id) {
   const challenge = await prisma.challenge.findUnique({
     where: { id },
   });
@@ -357,22 +203,17 @@ export async function rejectChallenge(id, reason) {
     throw err;
   }
 
+  if (challenge.status === 'draft') {
+    const err = new Error('Ce challenge est déjà en brouillon');
+    err.status = 400;
+    throw err;
+  }
+
   const updated = await prisma.challenge.update({
     where: { id },
     data: {
-      status: 'rejected',
-      rejectionReason: reason || 'Aucune raison spécifiée',
-      approvedAt: null,
-    },
-    include: {
-      intervenant: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          user: { select: { email: true } },
-        },
-      },
+      status: 'draft',
+      publishedAt: null,
     },
   });
 
@@ -383,17 +224,15 @@ export async function rejectChallenge(id, reason) {
  * Statistiques des challenges (admin)
  */
 export async function getChallengeStats() {
-  const [total, pending, approved, rejected] = await Promise.all([
+  const [total, draft, published] = await Promise.all([
     prisma.challenge.count(),
-    prisma.challenge.count({ where: { status: 'pending' } }),
-    prisma.challenge.count({ where: { status: 'approved' } }),
-    prisma.challenge.count({ where: { status: 'rejected' } }),
+    prisma.challenge.count({ where: { status: 'draft' } }),
+    prisma.challenge.count({ where: { status: 'published' } }),
   ]);
 
   return {
     total,
-    pending,
-    approved,
-    rejected,
+    draft,
+    published,
   };
 }

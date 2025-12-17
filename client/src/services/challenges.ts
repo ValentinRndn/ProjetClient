@@ -1,5 +1,7 @@
 /**
  * Service de gestion des Challenges pédagogiques
+ * - Seuls les admins peuvent créer/modifier/supprimer
+ * - Système de brouillon (draft) / publié (published)
  */
 
 import api from "@/lib/api";
@@ -18,22 +20,10 @@ export interface Challenge {
   imageUrl?: string;
   videoUrl?: string;
   priceCents?: number;
-  status: "pending" | "approved" | "rejected";
-  rejectionReason?: string;
+  status: "draft" | "published";
   createdAt: string;
   updatedAt: string;
-  approvedAt?: string;
-  intervenantId: string;
-  intervenant?: {
-    id: string;
-    firstName?: string;
-    lastName?: string;
-    profileImage?: string;
-    city?: string;
-    bio?: string;
-    expertises?: string[];
-    user?: { email: string };
-  };
+  publishedAt?: string;
 }
 
 export interface CreateChallengeData {
@@ -49,13 +39,13 @@ export interface CreateChallengeData {
   imageUrl?: string;
   videoUrl?: string;
   priceCents?: number;
+  status?: "draft" | "published";
 }
 
 export interface ChallengeStats {
   total: number;
-  pending: number;
-  approved: number;
-  rejected: number;
+  draft: number;
+  published: number;
 }
 
 // ============================================
@@ -63,7 +53,7 @@ export interface ChallengeStats {
 // ============================================
 
 /**
- * Récupérer tous les challenges approuvés (public)
+ * Récupérer tous les challenges publiés (public)
  */
 export async function getPublicChallenges(thematique?: string): Promise<Challenge[]> {
   const params = thematique ? `?thematique=${encodeURIComponent(thematique)}` : "";
@@ -72,7 +62,7 @@ export async function getPublicChallenges(thematique?: string): Promise<Challeng
 }
 
 /**
- * Récupérer un challenge approuvé par ID (public)
+ * Récupérer un challenge publié par ID (public)
  */
 export async function getPublicChallengeById(id: string): Promise<Challenge> {
   const response = await api.get(`/challenges/public/${id}`);
@@ -80,54 +70,16 @@ export async function getPublicChallengeById(id: string): Promise<Challenge> {
 }
 
 // ============================================
-// Routes authentifiées (Intervenants)
+// Routes Admin uniquement
 // ============================================
 
 /**
- * Créer un nouveau challenge (intervenant)
+ * Créer un nouveau challenge (admin)
  */
 export async function createChallenge(data: CreateChallengeData): Promise<Challenge> {
-  const response = await api.post("/challenges", data);
+  const response = await api.post("/challenges/admin", data);
   return response.data;
 }
-
-/**
- * Récupérer mes challenges (intervenant)
- */
-export async function getMyChallenges(): Promise<Challenge[]> {
-  const response = await api.get("/challenges/my");
-  return response.data;
-}
-
-/**
- * Récupérer un challenge par ID (authentifié)
- */
-export async function getChallengeById(id: string): Promise<Challenge> {
-  const response = await api.get(`/challenges/${id}`);
-  return response.data;
-}
-
-/**
- * Mettre à jour un challenge
- */
-export async function updateChallenge(
-  id: string,
-  data: Partial<CreateChallengeData>
-): Promise<Challenge> {
-  const response = await api.put(`/challenges/${id}`, data);
-  return response.data;
-}
-
-/**
- * Supprimer un challenge
- */
-export async function deleteChallenge(id: string): Promise<void> {
-  await api.delete(`/challenges/${id}`);
-}
-
-// ============================================
-// Routes Admin
-// ============================================
 
 /**
  * Récupérer tous les challenges (admin)
@@ -145,6 +97,32 @@ export async function getAllChallenges(filters?: {
 }
 
 /**
+ * Récupérer un challenge par ID (admin)
+ */
+export async function getChallengeById(id: string): Promise<Challenge> {
+  const response = await api.get(`/challenges/admin/${id}`);
+  return response.data;
+}
+
+/**
+ * Mettre à jour un challenge (admin)
+ */
+export async function updateChallenge(
+  id: string,
+  data: Partial<CreateChallengeData>
+): Promise<Challenge> {
+  const response = await api.put(`/challenges/admin/${id}`, data);
+  return response.data;
+}
+
+/**
+ * Supprimer un challenge (admin)
+ */
+export async function deleteChallenge(id: string): Promise<void> {
+  await api.delete(`/challenges/admin/${id}`);
+}
+
+/**
  * Statistiques des challenges (admin)
  */
 export async function getChallengeStats(): Promise<ChallengeStats> {
@@ -153,18 +131,18 @@ export async function getChallengeStats(): Promise<ChallengeStats> {
 }
 
 /**
- * Approuver un challenge (admin)
+ * Publier un challenge (admin)
  */
-export async function approveChallenge(id: string): Promise<Challenge> {
-  const response = await api.post(`/challenges/admin/${id}/approve`);
+export async function publishChallenge(id: string): Promise<Challenge> {
+  const response = await api.post(`/challenges/admin/${id}/publish`);
   return response.data;
 }
 
 /**
- * Rejeter un challenge (admin)
+ * Dépublier un challenge (passer en brouillon) (admin)
  */
-export async function rejectChallenge(id: string, reason?: string): Promise<Challenge> {
-  const response = await api.post(`/challenges/admin/${id}/reject`, { reason });
+export async function unpublishChallenge(id: string): Promise<Challenge> {
+  const response = await api.post(`/challenges/admin/${id}/unpublish`);
   return response.data;
 }
 
@@ -182,4 +160,4 @@ export const THEMATIQUES = [
   "Finance",
 ] as const;
 
-export type Thematique = typeof THEMATIQUES[number];
+export type Thematique = (typeof THEMATIQUES)[number];
