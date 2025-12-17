@@ -58,7 +58,9 @@ export interface ChallengeStats {
 export async function getPublicChallenges(thematique?: string): Promise<Challenge[]> {
   const params = thematique ? `?thematique=${encodeURIComponent(thematique)}` : "";
   const response = await api.get(`/challenges/public${params}`);
-  return response.data;
+  // L'API retourne directement un tableau, pas un objet {success, data}
+  // L'intercepteur axios retourne response quand pas de success
+  return response.data || response;
 }
 
 /**
