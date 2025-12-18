@@ -141,7 +141,7 @@ function App() {
       <Route
         path="/challenges"
         element={
-          <NavLayout>
+          <NavLayout footerVariant="gray">
             <ChallengesPage />
           </NavLayout>
         }
@@ -165,7 +165,7 @@ function App() {
       <Route
         path="/tous-les-challenges"
         element={
-          <NavLayout>
+          <NavLayout footerVariant="gray">
             <TousLesChallengesPage />
           </NavLayout>
         }
