@@ -1,0 +1,28 @@
+# Robots.txt pour Vizion Academy
+# https://www.vizionacademy.fr
+
+User-agent: *
+Allow: /
+Allow: /challenges
+Allow: /tous-les-challenges
+Allow: /espace-ecoles
+Allow: /espace-intervenants
+Allow: /contact
+Allow: /mentions-legales
+Allow: /cgu
+
+# Bloquer les pages privées et dashboard
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /login
+Disallow: /register
+Disallow: /register/*
+Disallow: /logout
+Disallow: /onboarding
+Disallow: /onboarding/*
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://www.vizionacademy.fr/sitemap.xml
