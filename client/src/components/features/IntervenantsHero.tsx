@@ -1,4 +1,4 @@
-import { ArrowDown, Sparkles } from "lucide-react";
+import { ArrowDown, Users } from "lucide-react";
 import { motion } from "motion/react";
 
 export function IntervenantsHero() {
@@ -8,7 +8,7 @@ export function IntervenantsHero() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop')`,
+          backgroundImage: `url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop')`,
         }}
       />
       {/* Color Overlay */}
@@ -22,8 +22,8 @@ export function IntervenantsHero() {
             transition={{ duration: 0.5 }}
             className="inline-flex items-center gap-2 bg-[#ebf2fa] text-[#1c2942] px-6 py-2.5 rounded-full text-sm font-bold mb-8 shadow-xl"
           >
-            <Sparkles className="w-4 h-4 text-[#6d74b5]" />
-            100% GRATUIT
+            <Users className="w-4 h-4 text-[#6d74b5]" />
+            Nos intervenants
           </motion.div>
 
           <motion.h1

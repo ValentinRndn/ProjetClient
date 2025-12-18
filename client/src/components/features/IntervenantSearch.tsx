@@ -1,5 +1,5 @@
 import { getAllIntervenants, type Intervenant } from "@/services/intervenants";
-import { MonitorIcon, BookOpen, Search, MapPin, Users, ChevronDown } from "lucide-react";
+import { MonitorIcon, BookOpen, Search, MapPin, Users, ChevronDown, Languages } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { IntervenantCard } from "./IntervenantCard";
 
@@ -8,6 +8,7 @@ export function IntervenantSearch() {
   const [selectedCity, setSelectedCity] = useState("all");
   const [selectedTheme, setSelectedTheme] = useState("all");
   const [selectedFormat, setSelectedFormat] = useState("all");
+  const [selectedLanguage, setSelectedLanguage] = useState("all");
   const [intervenants, setIntervenants] = useState<Intervenant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +41,7 @@ export function IntervenantSearch() {
   const allCities = ["Paris", "Lyon", "Marseille", "Toulouse", "Bordeaux"];
   const allThemes = ["Intelligence Artificielle", "Data Science", "Innovation"];
   const allFormats = ["Présentiel", "Distanciel", "Hybride"];
+  const allLanguages = ["Français", "Anglais", "Espagnol", "Allemand", "Italien", "Portugais", "Arabe", "Chinois"];
 
   // Filtrer les intervenants selon les critères
   const filteredIntervenants = useMemo(() => {
@@ -87,9 +89,18 @@ export function IntervenantSearch() {
         // TODO: Implémenter quand le format sera disponible dans les données
       }
 
+      // Filtre par langue (chercher dans la bio ou les langues si disponibles)
+      if (selectedLanguage !== "all") {
+        const bio = intervenant.bio?.toLowerCase() || "";
+        const languageLower = selectedLanguage.toLowerCase();
+        if (!bio.includes(languageLower)) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [intervenants, searchQuery, selectedCity, selectedTheme, selectedFormat]);
+  }, [intervenants, searchQuery, selectedCity, selectedTheme, selectedFormat, selectedLanguage]);
 
   return (
     <section id="liste-intervenants" className="bg-white">
@@ -157,6 +168,23 @@ export function IntervenantSearch() {
                   {allFormats.map((format) => (
                     <option key={format} value={format} className="text-[#1c2942]">
                       {format}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative">
+                <Languages className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6d74b5] w-4 h-4 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4 pointer-events-none" />
+                <select
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                  className="pl-10 pr-10 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#6d74b5] transition appearance-none cursor-pointer min-w-[160px]"
+                >
+                  <option value="all" className="text-[#1c2942]">Toutes langues</option>
+                  {allLanguages.map((language) => (
+                    <option key={language} value={language} className="text-[#1c2942]">
+                      {language}
                     </option>
                   ))}
                 </select>

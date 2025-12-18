@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Navigate, Link } from "react-router";
-import { listUsers, type User, type UsersListResponse } from "@/services/admin";
+import { listUsers, deleteUser, updateUserRole, type User, type UsersListResponse } from "@/services/admin";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Search, Users, UserCheck, Building2, Shield, ArrowLeft } from "lucide-react";
+import { Search, Users, UserCheck, Building2, Shield, ArrowLeft, Trash2, Edit2 } from "lucide-react";
 import { Alert } from "@/components/ui/Alert";
 import { Select } from "@/components/ui/Select";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +21,10 @@ export default function AdminUsersPage() {
   const [selectedRole, setSelectedRole] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
+  const [updatingRoleId, setUpdatingRoleId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -52,6 +56,36 @@ export default function AdminUsersPage() {
   const handleSearch = () => {
     setCurrentPage(1);
     fetchUsers();
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      setDeletingId(id);
+      await deleteUser(id);
+      setConfirmDeleteId(null);
+      await fetchUsers();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Erreur lors de la suppression";
+      setError(errorMessage);
+      console.error("Error deleting user:", err);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleRoleChange = async (id: string, newRole: "ADMIN" | "ECOLE" | "INTERVENANT") => {
+    try {
+      setUpdatingRoleId(id);
+      await updateUserRole(id, newRole);
+      setEditingRoleId(null);
+      await fetchUsers();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Erreur lors du changement de rôle";
+      setError(errorMessage);
+      console.error("Error updating user role:", err);
+    } finally {
+      setUpdatingRoleId(null);
+    }
   };
 
   const getRoleIcon = (role: string) => {
@@ -252,36 +286,121 @@ export default function AdminUsersPage() {
         ) : (
           <>
             <div className="space-y-4 mb-6">
-              {usersData.items.map((userItem) => (
-                <div
-                  key={userItem.id}
-                  className="rounded-xl p-6"
-                  style={{ backgroundColor: "#ffffff" }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: "#ebf2fa" }}
-                      >
-                        {getRoleIcon(userItem.role)}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-1">
-                          <h3 className="text-lg font-semibold" style={{ color: "#1c2942" }}>
-                            {userItem.email}
-                          </h3>
-                          {getRoleBadge(userItem.role)}
+              {usersData.items.map((userItem) => {
+                const isCurrentUser = userItem.id === user?.id;
+
+                return (
+                  <div
+                    key={userItem.id}
+                    className="rounded-xl p-6"
+                    style={{ backgroundColor: "#ffffff" }}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div
+                          className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: "#ebf2fa" }}
+                        >
+                          {getRoleIcon(userItem.role)}
                         </div>
-                        <p className="text-sm" style={{ color: "#6d74b5" }}>{userItem.email}</p>
-                        <p className="text-xs mt-1" style={{ color: "#6d74b5" }}>
-                          Inscrit le {new Date(userItem.createdAt).toLocaleDateString("fr-FR")}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <h3 className="text-lg font-semibold truncate" style={{ color: "#1c2942" }}>
+                              {userItem.name || userItem.email.split("@")[0]}
+                            </h3>
+                            {editingRoleId === userItem.id ? (
+                              <div className="flex items-center gap-2">
+                                <Select
+                                  value={userItem.role}
+                                  onChange={(e) => handleRoleChange(userItem.id, e.target.value as "ADMIN" | "ECOLE" | "INTERVENANT")}
+                                  disabled={updatingRoleId === userItem.id}
+                                  className="text-xs py-1"
+                                  style={{ borderColor: "#ebf2fa" }}
+                                >
+                                  <option value="ADMIN">Admin</option>
+                                  <option value="ECOLE">École</option>
+                                  <option value="INTERVENANT">Intervenant</option>
+                                </Select>
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => setEditingRoleId(null)}
+                                  disabled={updatingRoleId === userItem.id}
+                                  style={{ borderColor: "#ebf2fa" }}
+                                >
+                                  Annuler
+                                </Button>
+                              </div>
+                            ) : (
+                              getRoleBadge(userItem.role)
+                            )}
+                            {isCurrentUser && (
+                              <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#d1fae5", color: "#065f46" }}>
+                                Vous
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm truncate" style={{ color: "#6d74b5" }}>{userItem.email}</p>
+                          <p className="text-xs mt-1" style={{ color: "#6d74b5" }}>
+                            Inscrit le {new Date(userItem.createdAt).toLocaleDateString("fr-FR")}
+                          </p>
+                        </div>
                       </div>
+
+                      {/* Actions */}
+                      {!isCurrentUser && (
+                        <div className="flex items-center gap-2 shrink-0">
+                          {editingRoleId !== userItem.id && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => setEditingRoleId(userItem.id)}
+                              style={{ borderColor: "#ebf2fa" }}
+                              title="Modifier le rôle"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {confirmDeleteId === userItem.id ? (
+                            <div className="flex gap-2">
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => handleDelete(userItem.id)}
+                                disabled={deletingId === userItem.id}
+                                isLoading={deletingId === userItem.id}
+                                className="bg-red-500 hover:bg-red-600"
+                              >
+                                Confirmer
+                              </Button>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setConfirmDeleteId(null)}
+                                disabled={deletingId === userItem.id}
+                                style={{ borderColor: "#ebf2fa" }}
+                              >
+                                Annuler
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => setConfirmDeleteId(userItem.id)}
+                              className="text-red-500 hover:bg-red-50"
+                              style={{ borderColor: "#ebf2fa" }}
+                              title="Supprimer l'utilisateur"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Pagination */}

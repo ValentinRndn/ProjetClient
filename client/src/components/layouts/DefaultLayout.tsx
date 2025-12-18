@@ -4,7 +4,6 @@ import { Dropdown } from "@/components/shared/Dropdown";
 import { useAuth } from "@/hooks/useAuth";
 import { Navbar } from "@/components/shared/Navbar";
 import {
-  ChevronDownIcon,
   LogOutIcon,
   Mail,
   Phone,
@@ -59,7 +58,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       : []),
   ];
 
-  // Navigation principale - identique pour tous (connectés ou non)
+  // Navigation principale - avec gestion de l'état connecté/déconnecté
   const navItems = [
     <Dropdown
       key="ecole-dropdown"
@@ -68,7 +67,6 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         <span className="flex items-center gap-1.5 cursor-pointer font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors">
           <GraduationCap className="w-4 h-4" />
           Je suis une école
-          <ChevronDownIcon className="w-4 h-4" />
         </span>
       }
       items={[
@@ -82,11 +80,11 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         </NavLink>,
         <NavLink
           key="login-ecole"
-          to="/login"
+          to={isAuthenticated ? "/dashboard" : "/login"}
           className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
         >
-          <span className="font-medium text-[#1c2942]">Connexion école</span>
-          <span className="text-xs text-[#1c2942]/50">Accédez à votre espace</span>
+          <span className="font-medium text-[#1c2942]">{isAuthenticated ? "Dashboard" : "Connexion école"}</span>
+          <span className="text-xs text-[#1c2942]/50">{isAuthenticated ? "Accédez à votre tableau de bord" : "Accédez à votre espace"}</span>
         </NavLink>,
       ]}
     />,
@@ -97,7 +95,6 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         <span className="flex items-center gap-1.5 cursor-pointer font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors">
           <Trophy className="w-4 h-4" />
           Découvrir nos challenges
-          <ChevronDownIcon className="w-4 h-4" />
         </span>
       }
       items={[
@@ -126,7 +123,6 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
         <span className="flex items-center gap-1.5 cursor-pointer font-medium text-[#1c2942] hover:text-[#6d74b5] transition-colors">
           <Users className="w-4 h-4" />
           Je suis intervenant
-          <ChevronDownIcon className="w-4 h-4" />
         </span>
       }
       items={[
@@ -138,21 +134,23 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
           <span className="font-medium text-[#1c2942]">Présentation</span>
           <span className="text-xs text-[#1c2942]/50">Découvrez les avantages de rejoindre notre réseau</span>
         </NavLink>,
-        <NavLink
-          key="register-intervenant"
-          to="/register/intervenant"
-          className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
-        >
-          <span className="font-medium text-[#1c2942]">Devenir intervenant</span>
-          <span className="text-xs text-[#1c2942]/50">Rejoignez notre réseau d'experts</span>
-        </NavLink>,
+        ...(!isAuthenticated ? [
+          <NavLink
+            key="register-intervenant"
+            to="/register/intervenant"
+            className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
+          >
+            <span className="font-medium text-[#1c2942]">Devenir intervenant</span>
+            <span className="text-xs text-[#1c2942]/50">Rejoignez notre réseau d'experts</span>
+          </NavLink>,
+        ] : []),
         <NavLink
           key="login-intervenant"
-          to="/login"
+          to={isAuthenticated ? "/dashboard" : "/login"}
           className="flex flex-col hover:bg-[#ebf2fa] p-3 rounded-xl transition-colors"
         >
-          <span className="font-medium text-[#1c2942]">Connexion intervenant</span>
-          <span className="text-xs text-[#1c2942]/50">Accédez à votre espace</span>
+          <span className="font-medium text-[#1c2942]">{isAuthenticated ? "Dashboard" : "Connexion intervenant"}</span>
+          <span className="text-xs text-[#1c2942]/50">{isAuthenticated ? "Accédez à votre tableau de bord" : "Accédez à votre espace"}</span>
         </NavLink>,
       ]}
     />,
@@ -194,12 +192,12 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
             <Link
               key="logo"
               to="/"
-              className="flex items-center group"
+              className="group"
             >
               <img
-                src="/logo.svg"
+                src="/logo_without_text.png"
                 alt="Vizion Academy"
-                className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-10 w-10 object-contain transition-transform group-hover:scale-105"
               />
             </Link>,
           ]}
@@ -223,8 +221,8 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
             <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-6">
                 <img
-                  src="/light-logo.svg"
-                  className="w-12 h-12"
+                  src="/light_logo_without_text.png"
+                  className="h-12 w-12 object-contain"
                   alt="Vizion Academy"
                 />
                 <div>

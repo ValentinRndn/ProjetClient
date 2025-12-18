@@ -81,3 +81,31 @@ export async function validateIntervenant(
   }>(`/admin/intervenants/${id}/validate`, { status, reason });
   return response.data || (response as unknown as Intervenant);
 }
+
+/**
+ * Supprimer un intervenant (et son utilisateur associé)
+ */
+export async function deleteIntervenant(id: string): Promise<void> {
+  await apiClient.delete(`/intervenants/${id}`);
+}
+
+/**
+ * Supprimer un utilisateur
+ */
+export async function deleteUser(id: string): Promise<void> {
+  await apiClient.delete(`/users/${id}`);
+}
+
+/**
+ * Mettre à jour le rôle d'un utilisateur
+ */
+export async function updateUserRole(
+  id: string,
+  role: "ADMIN" | "ECOLE" | "INTERVENANT"
+): Promise<User> {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: User;
+  }>(`/users/${id}/role`, { role });
+  return response.data || (response as unknown as User);
+}

@@ -6,6 +6,7 @@
  */
 
 import prisma from "../../prisma.js";
+import { notifyIntervenantApproved, notifyIntervenantRejected } from "./email.service.js";
 
 /**
  * findAll - Liste tous les intervenants
@@ -187,17 +188,37 @@ export async function update(id, payload) {
 /**
  * updateStatus - Change le statut d'un intervenant (pending, approved, rejected)
  */
-export async function updateStatus(id, status) {
-  const existing = await prisma.intervenant.findUnique({ where: { id } });
+export async function updateStatus(id, status, reason = null) {
+  const existing = await prisma.intervenant.findUnique({
+    where: { id },
+    include: { user: { select: { id: true, email: true } } },
+  });
   if (!existing) return null;
 
-  return prisma.intervenant.update({
+  const updated = await prisma.intervenant.update({
     where: { id },
     data: { status },
     include: {
       user: { select: { id: true, email: true, role: true } },
     },
   });
+
+  // Envoyer les notifications selon le nouveau statut
+  const intervenantName = [existing.firstName, existing.lastName]
+    .filter(Boolean)
+    .join(' ') || 'Intervenant';
+
+  if (status === 'approved' && existing.status !== 'approved') {
+    // Notifier l'intervenant que son profil a été validé
+    notifyIntervenantApproved(existing.user.id, intervenantName)
+      .catch(err => console.error('Failed to send approval notification:', err));
+  } else if (status === 'rejected' && existing.status !== 'rejected') {
+    // Notifier l'intervenant que sa demande a été rejetée
+    notifyIntervenantRejected(existing.user.id, intervenantName, reason)
+      .catch(err => console.error('Failed to send rejection notification:', err));
+  }
+
+  return updated;
 }
 
 /**
@@ -265,4 +286,33 @@ export async function deleteDocument(intervenantId, documentId) {
   }
 
   return prisma.document.delete({ where: { id: documentId } });
+}
+
+/**
+ * deleteIntervenant - Supprime un intervenant et toutes ses données associées
+ */
+export async function deleteIntervenant(id) {
+  const existing = await prisma.intervenant.findUnique({
+    where: { id },
+    include: { user: true },
+  });
+
+  if (!existing) {
+    const err = new Error("Intervenant non trouvé.");
+    err.status = 404;
+    throw err;
+  }
+
+  // Supprimer les documents associés
+  await prisma.document.deleteMany({ where: { intervenantId: id } });
+
+  // Supprimer l'intervenant
+  await prisma.intervenant.delete({ where: { id } });
+
+  // Supprimer l'utilisateur associé si présent
+  if (existing.userId) {
+    await prisma.user.delete({ where: { id: existing.userId } });
+  }
+
+  return existing;
 }

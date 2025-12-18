@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Navigate, Link } from "react-router";
-import { getAllIntervenants, type Intervenant } from "@/services/intervenants";
-import { validateIntervenant } from "@/services/admin";
+import { getAllIntervenants, type Intervenant, type Document, fetchDocumentAsBlob } from "@/services/intervenants";
+import { validateIntervenant, deleteIntervenant } from "@/services/admin";
 import { Button } from "@/components/ui/Button";
-import { CheckCircle, XCircle, Clock, User, Mail, FileText, UserCheck, ArrowLeft } from "lucide-react";
+import { CheckCircle, XCircle, Clock, User, Mail, FileText, UserCheck, ArrowLeft, Download, Eye, ChevronDown, ChevronUp, File, Loader2, Trash2 } from "lucide-react";
 import { Alert } from "@/components/ui/Alert";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -14,6 +14,10 @@ export default function AdminIntervenantsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [downloadingDocId, setDownloadingDocId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchIntervenants();
@@ -52,6 +56,21 @@ export default function AdminIntervenantsPage() {
         next.delete(id);
         return next;
       });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      setDeletingId(id);
+      await deleteIntervenant(id);
+      setConfirmDeleteId(null);
+      await fetchIntervenants();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Erreur lors de la suppression";
+      setError(errorMessage);
+      console.error("Error deleting intervenant:", err);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -104,6 +123,73 @@ export default function AdminIntervenantsPage() {
   const pendingCount = intervenants.filter((i) => i.status === "pending").length;
   const approvedCount = intervenants.filter((i) => i.status === "approved").length;
   const rejectedCount = intervenants.filter((i) => i.status === "rejected").length;
+
+  const toggleExpanded = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleDownloadDocument = async (intervenant: Intervenant, doc: Document) => {
+    try {
+      setDownloadingDocId(doc.id);
+      const blobUrl = await fetchDocumentAsBlob(intervenant.id, doc.id);
+      if (blobUrl) {
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = doc.fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      } else {
+        setError("Impossible de télécharger le document");
+      }
+    } catch (err) {
+      console.error("Error downloading document:", err);
+      setError("Erreur lors du téléchargement du document");
+    } finally {
+      setDownloadingDocId(null);
+    }
+  };
+
+  const handleViewDocument = async (intervenant: Intervenant, doc: Document) => {
+    try {
+      setDownloadingDocId(doc.id);
+      const blobUrl = await fetchDocumentAsBlob(intervenant.id, doc.id);
+      if (blobUrl) {
+        window.open(blobUrl, "_blank");
+      } else {
+        setError("Impossible de visualiser le document");
+      }
+    } catch (err) {
+      console.error("Error viewing document:", err);
+      setError("Erreur lors de la visualisation du document");
+    } finally {
+      setDownloadingDocId(null);
+    }
+  };
+
+  const getDocumentTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      PIECE_IDENTITE: "Pièce d'identité",
+      RIB: "RIB",
+      CASIER_JUDICIAIRE: "Casier judiciaire (B3)",
+      JUSTIFICATIF_DOMICILE: "Justificatif de domicile",
+      ASSURANCE: "Assurance RC Pro",
+      DIPLOME: "Diplôme",
+      ATTESTATION: "Attestation",
+      PROFILE_IMAGE: "Photo de profil",
+      AUTRE: "Autre document",
+    };
+    return labels[type] || type;
+  };
 
   // Protection supplémentaire : rediriger si pas admin
   if (!authLoading && user && user.role !== "ADMIN") {
@@ -246,91 +332,239 @@ export default function AdminIntervenantsPage() {
           <div className="space-y-4">
             {intervenants.map((intervenant) => {
               const isProcessing = processingIds.has(intervenant.id);
+              const isExpanded = expandedIds.has(intervenant.id);
+              const documents = intervenant.documents || [];
+              const hasDocuments = documents.length > 0;
 
               return (
                 <div
                   key={intervenant.id}
-                  className="rounded-xl p-4 sm:p-6"
+                  className="rounded-xl overflow-hidden"
                   style={{ backgroundColor: "#ffffff" }}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                    {/* Avatar et infos */}
-                    <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
-                      {intervenant.profileImage ? (
-                        <img
-                          src={intervenant.profileImage}
-                          alt={getFullName(intervenant)}
-                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover shrink-0 border-2"
-                          style={{ borderColor: "#ebf2fa" }}
-                        />
-                      ) : (
-                        <div
-                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: "#ebf2fa" }}
-                        >
-                          <User className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: "#6d74b5" }} />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-1">
-                          <h3 className="text-base sm:text-lg font-semibold truncate" style={{ color: "#1c2942" }}>
-                            {getFullName(intervenant)}
-                          </h3>
-                          {getStatusBadge(intervenant.status)}
-                        </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm" style={{ color: "#6d74b5" }}>
-                          {intervenant.user?.email && (
-                            <div className="flex items-center gap-1 min-w-0">
-                              <Mail className="w-4 h-4 shrink-0" />
-                              <span className="truncate">{intervenant.user.email}</span>
-                            </div>
-                          )}
-                          {intervenant.siret && (
-                            <div className="flex items-center gap-1">
-                              <FileText className="w-4 h-4 shrink-0" />
-                              <span className="text-xs sm:text-sm">SIRET: {intervenant.siret}</span>
-                            </div>
-                          )}
-                        </div>
-                        {intervenant.bio && (
-                          <p className="text-sm mt-2 line-clamp-2 hidden sm:block" style={{ color: "#1c2942" }}>
-                            {intervenant.bio}
-                          </p>
+                  <div className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                      {/* Avatar et infos */}
+                      <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                        {intervenant.profileImage ? (
+                          <img
+                            src={intervenant.profileImage}
+                            alt={getFullName(intervenant)}
+                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover shrink-0 border-2"
+                            style={{ borderColor: "#ebf2fa" }}
+                          />
+                        ) : (
+                          <div
+                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: "#ebf2fa" }}
+                          >
+                            <User className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: "#6d74b5" }} />
+                          </div>
                         )}
-                        <div className="text-xs mt-2" style={{ color: "#6d74b5" }}>
-                          Inscrit le {new Date(intervenant.createdAt || "").toLocaleDateString("fr-FR")}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <h3 className="text-base sm:text-lg font-semibold truncate" style={{ color: "#1c2942" }}>
+                              {getFullName(intervenant)}
+                            </h3>
+                            {getStatusBadge(intervenant.status)}
+                          </div>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm" style={{ color: "#6d74b5" }}>
+                            {intervenant.user?.email && (
+                              <div className="flex items-center gap-1 min-w-0">
+                                <Mail className="w-4 h-4 shrink-0" />
+                                <span className="truncate">{intervenant.user.email}</span>
+                              </div>
+                            )}
+                            {intervenant.siret && (
+                              <div className="flex items-center gap-1">
+                                <FileText className="w-4 h-4 shrink-0" />
+                                <span className="text-xs sm:text-sm">SIRET: {intervenant.siret}</span>
+                              </div>
+                            )}
+                          </div>
+                          {intervenant.bio && (
+                            <p className="text-sm mt-2 line-clamp-2 hidden sm:block" style={{ color: "#1c2942" }}>
+                              {intervenant.bio}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-4 text-xs mt-2" style={{ color: "#6d74b5" }}>
+                            <span>Inscrit le {new Date(intervenant.createdAt || "").toLocaleDateString("fr-FR")}</span>
+                            {hasDocuments && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ backgroundColor: "#ebf2fa" }}>
+                                <File className="w-3 h-3" />
+                                {documents.length} document{documents.length > 1 ? "s" : ""}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Boutons d'action */}
+                      <div className="flex flex-col gap-2 w-full sm:w-auto sm:shrink-0">
+                        {intervenant.status === "pending" && (
+                          <div className="flex gap-2">
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => handleValidate(intervenant.id, "approved")}
+                              disabled={isProcessing}
+                              isLoading={isProcessing}
+                              className="flex-1 sm:flex-initial bg-emerald-500 hover:bg-emerald-600"
+                            >
+                              <CheckCircle className="w-4 h-4 sm:mr-1" />
+                              <span className="hidden sm:inline">Approuver</span>
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => handleValidate(intervenant.id, "rejected")}
+                              disabled={isProcessing}
+                              className="flex-1 sm:flex-initial"
+                              style={{ borderColor: "#ebf2fa" }}
+                            >
+                              <XCircle className="w-4 h-4 sm:mr-1" />
+                              <span className="hidden sm:inline">Rejeter</span>
+                            </Button>
+                          </div>
+                        )}
+                        <div className="flex gap-2">
+                          {hasDocuments && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => toggleExpanded(intervenant.id)}
+                              className="flex-1 sm:flex-initial"
+                              style={{ borderColor: "#ebf2fa" }}
+                            >
+                              {isExpanded ? (
+                                <>
+                                  <ChevronUp className="w-4 h-4 mr-1" />
+                                  <span className="hidden sm:inline">Masquer</span>
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown className="w-4 h-4 mr-1" />
+                                  <span className="hidden sm:inline">Documents</span> ({documents.length})
+                                </>
+                              )}
+                            </Button>
+                          )}
+                          {confirmDeleteId === intervenant.id ? (
+                            <div className="flex gap-2">
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => handleDelete(intervenant.id)}
+                                disabled={deletingId === intervenant.id}
+                                isLoading={deletingId === intervenant.id}
+                                className="bg-red-500 hover:bg-red-600"
+                              >
+                                Confirmer
+                              </Button>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setConfirmDeleteId(null)}
+                                disabled={deletingId === intervenant.id}
+                                style={{ borderColor: "#ebf2fa" }}
+                              >
+                                Annuler
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => setConfirmDeleteId(intervenant.id)}
+                              className="text-red-500 hover:bg-red-50"
+                              style={{ borderColor: "#ebf2fa" }}
+                              title="Supprimer l'intervenant"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>
-
-                    {/* Boutons d'action */}
-                    {intervenant.status === "pending" && (
-                      <div className="flex gap-2 w-full sm:w-auto sm:shrink-0">
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => handleValidate(intervenant.id, "approved")}
-                          disabled={isProcessing}
-                          isLoading={isProcessing}
-                          className="flex-1 sm:flex-initial bg-emerald-500 hover:bg-emerald-600"
-                        >
-                          <CheckCircle className="w-4 h-4 sm:mr-1" />
-                          <span className="hidden sm:inline">Approuver</span>
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => handleValidate(intervenant.id, "rejected")}
-                          disabled={isProcessing}
-                          className="flex-1 sm:flex-initial"
-                          style={{ borderColor: "#ebf2fa" }}
-                        >
-                          <XCircle className="w-4 h-4 sm:mr-1" />
-                          <span className="hidden sm:inline">Rejeter</span>
-                        </Button>
-                      </div>
-                    )}
                   </div>
+
+                  {/* Section documents expandée */}
+                  {isExpanded && hasDocuments && (
+                    <div
+                      className="border-t px-4 sm:px-6 py-4"
+                      style={{ borderColor: "#ebf2fa", backgroundColor: "#f8fafc" }}
+                    >
+                      <h4 className="text-sm font-semibold mb-3" style={{ color: "#1c2942" }}>
+                        Documents fournis
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {documents.map((doc) => (
+                          <div
+                            key={doc.id}
+                            className="flex items-center justify-between p-3 rounded-lg border"
+                            style={{ backgroundColor: "#ffffff", borderColor: "#ebf2fa" }}
+                          >
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                              <div
+                                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                                style={{ backgroundColor: "#ebf2fa" }}
+                              >
+                                <File className="w-5 h-5" style={{ color: "#6d74b5" }} />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium truncate" style={{ color: "#1c2942" }}>
+                                  {getDocumentTypeLabel(doc.type)}
+                                </p>
+                                <p className="text-xs truncate" style={{ color: "#6d74b5" }}>
+                                  {doc.fileName}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 ml-2">
+                              <button
+                                onClick={() => handleViewDocument(intervenant, doc)}
+                                disabled={downloadingDocId === doc.id}
+                                className="p-2 rounded-lg transition-colors hover:bg-gray-100 disabled:opacity-50"
+                                title="Visualiser"
+                              >
+                                {downloadingDocId === doc.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" style={{ color: "#6d74b5" }} />
+                                ) : (
+                                  <Eye className="w-4 h-4" style={{ color: "#6d74b5" }} />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => handleDownloadDocument(intervenant, doc)}
+                                disabled={downloadingDocId === doc.id}
+                                className="p-2 rounded-lg transition-colors hover:bg-gray-100 disabled:opacity-50"
+                                title="Télécharger"
+                              >
+                                <Download className="w-4 h-4" style={{ color: "#1c2942" }} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {documents.length === 0 && (
+                        <p className="text-sm text-center py-4" style={{ color: "#6d74b5" }}>
+                          Aucun document fourni
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Indication si pas de documents */}
+                  {!hasDocuments && intervenant.status === "pending" && (
+                    <div
+                      className="border-t px-4 sm:px-6 py-3 flex items-center gap-2"
+                      style={{ borderColor: "#fef3c7", backgroundColor: "#fffbeb" }}
+                    >
+                      <FileText className="w-4 h-4 shrink-0" style={{ color: "#92400e" }} />
+                      <p className="text-sm" style={{ color: "#92400e" }}>
+                        Aucun document fourni par cet intervenant
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })}

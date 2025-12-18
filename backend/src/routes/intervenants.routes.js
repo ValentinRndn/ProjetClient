@@ -11,6 +11,7 @@ import {
   getIntervenants,
   updateIntervenant,
   updateIntervenantStatus,
+  deleteIntervenant,
   getDocuments,
   uploadDocument,
   downloadDocument,
@@ -41,9 +42,8 @@ const statusSchema = Joi.object({
 
 // Types de documents pour l'onboarding complet
 const DOCUMENT_TYPES = [
-  'CV', 'DIPLOME', 'KBIS', 'ASSURANCE', 'RIB',
-  'PIECE_IDENTITE', 'ATTESTATION_URSSAF', 'ATTESTATION_FISCALE',
-  'CASIER_JUDICIAIRE', 'PROFILE_IMAGE', 'AUTRE'
+  'PIECE_IDENTITE', 'RIB', 'CASIER_JUDICIAIRE', 'JUSTIFICATIF_DOMICILE',
+  'ASSURANCE', 'DIPLOME', 'ATTESTATION', 'PROFILE_IMAGE', 'AUTRE'
 ];
 
 const documentSchema = Joi.object({
@@ -102,6 +102,15 @@ router.patch(
   verifyToken,
   checkRole(["ADMIN"]),
   updateIntervenantStatus
+);
+
+// Supprimer un intervenant (ADMIN only)
+router.delete(
+  "/:id",
+  validate({ params: paramsSchema }),
+  verifyToken,
+  checkRole(["ADMIN"]),
+  deleteIntervenant
 );
 
 // Gestion des documents (CDC MVP)

@@ -20,6 +20,8 @@ import {
   Mail,
   Handshake,
   Receipt,
+  Phone,
+  Headphones,
 } from "lucide-react";
 
 export default function DashboardEcolePage() {
@@ -124,6 +126,78 @@ export default function DashboardEcolePage() {
             </Alert>
           </div>
         )}
+
+        {/* Contacts Vizion Academy */}
+        <div className="bg-white rounded-2xl border border-[#1c2942]/10 shadow-lg p-6 mb-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-[#6d74b5] rounded-xl flex items-center justify-center">
+              <Headphones className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-xl font-bold text-[#1c2942]">Contacts Vizion Academy</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Mickael */}
+            <div className="bg-[#ebf2fa] rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-[#1c2942] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  MN
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#1c2942]">Mickael NOGUEIRA</h3>
+                  <p className="text-sm text-[#1c2942]/60">Gestion des intervenants</p>
+                </div>
+              </div>
+              <a
+                href="tel:0684889694"
+                className="flex items-center gap-2 text-[#6d74b5] hover:text-[#1c2942] font-medium transition-colors"
+              >
+                <Phone className="w-4 h-4" />
+                06 84 88 96 94
+              </a>
+            </div>
+
+            {/* Guillaume */}
+            <div className="bg-[#ebf2fa] rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-[#6d74b5] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  GR
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#1c2942]">Guillaume ROURE</h3>
+                  <p className="text-sm text-[#1c2942]/60">Écoles & Challenges</p>
+                </div>
+              </div>
+              <a
+                href="tel:0659196550"
+                className="flex items-center gap-2 text-[#6d74b5] hover:text-[#1c2942] font-medium transition-colors"
+              >
+                <Phone className="w-4 h-4" />
+                06 59 19 65 50
+              </a>
+            </div>
+
+            {/* Narjesse */}
+            <div className="bg-[#ebf2fa] rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  NM
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#1c2942]">Narjesse MALKI</h3>
+                  <p className="text-sm text-[#1c2942]/60">Facturation & Admin</p>
+                </div>
+              </div>
+              <a
+                href="tel:0650717742"
+                className="flex items-center gap-2 text-[#6d74b5] hover:text-[#1c2942] font-medium transition-colors"
+              >
+                <Phone className="w-4 h-4" />
+                06 50 71 77 42
+              </a>
+            </div>
+          </div>
+        </div>
 
         {isLoading ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

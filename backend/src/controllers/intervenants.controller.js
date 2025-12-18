@@ -279,12 +279,14 @@ export async function downloadDocument(req, res, next) {
     }
 
     // Autoriser l'accès si :
-    // 1. L'intervenant est approuvé (accès public)
-    // 2. C'est l'utilisateur propriétaire du document (vérifié via token si présent)
+    // 1. L'utilisateur est un admin
+    // 2. L'intervenant est approuvé (accès public)
+    // 3. C'est l'utilisateur propriétaire du document (vérifié via token si présent)
+    const isAdmin = req.user && req.user.role === "ADMIN";
     const isOwner = req.user && intervenant.userId === req.user.id;
     const isApproved = intervenant.status === "approved";
 
-    if (!isApproved && !isOwner) {
+    if (!isAdmin && !isApproved && !isOwner) {
       return res
         .status(403)
         .json({ success: false, message: "Document non accessible." });
@@ -365,6 +367,33 @@ export async function deleteDocument(req, res, next) {
     logger.error("Delete intervenant document error", {
       intervenantId: req.params.id,
       documentId: req.params.docId,
+      error: err.message,
+    });
+    next(err);
+  }
+}
+
+/**
+ * DELETE /api/v1/intervenants/:id
+ * Supprimer un intervenant (ADMIN only)
+ */
+export async function deleteIntervenant(req, res, next) {
+  try {
+    const { id } = req.params;
+    logger.info("Delete intervenant", {
+      intervenantId: id,
+      requesterId: req.user?.id,
+    });
+
+    const deleted = await intervenantsService.deleteIntervenant(id);
+    logger.info("Intervenant deleted successfully", {
+      intervenantId: id,
+      deletedUserId: deleted.userId,
+    });
+    res.json({ success: true, message: "Intervenant supprimé." });
+  } catch (err) {
+    logger.error("Delete intervenant error", {
+      intervenantId: req.params.id,
       error: err.message,
     });
     next(err);

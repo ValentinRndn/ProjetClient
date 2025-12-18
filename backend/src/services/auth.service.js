@@ -8,6 +8,7 @@
 import prisma from '../../prisma.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { notifyAdminNewIntervenantRegistration, sendWelcomeNotification } from './email.service.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
 const ACCESS_EXPIRES_IN = process.env.ACCESS_EXPIRES_IN || '15m';
@@ -103,6 +104,22 @@ export async function register(data) {
       expiresAt,
     },
   });
+
+  // Envoyer les notifications appropriées (asynchrone, non bloquant)
+  if (role === 'INTERVENANT' && result.intervenant) {
+    // Notifier les admins d'une nouvelle inscription intervenant
+    notifyAdminNewIntervenantRegistration({
+      intervenantId: result.intervenant.id,
+      email: result.user.email,
+      firstName: intervenantData?.firstName,
+      lastName: intervenantData?.lastName,
+    }).catch(err => console.error('Failed to send admin notification:', err));
+  }
+
+  // Envoyer notification de bienvenue
+  const userName = intervenantData?.firstName || ecoleData?.name || 'Utilisateur';
+  sendWelcomeNotification(result.user.id, userName)
+    .catch(err => console.error('Failed to send welcome notification:', err));
 
   return {
     user: {

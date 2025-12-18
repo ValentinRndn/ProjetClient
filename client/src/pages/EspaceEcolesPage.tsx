@@ -18,6 +18,10 @@ import {
   Sparkles,
   Target,
   Zap,
+  BookOpen,
+  Mic,
+  ClipboardCheck,
+  MessageCircle,
 } from "lucide-react";
 import PartnerLogosSlider from "@/components/features/PartnerLogosSlider";
 import ThematiquesSection from "@/components/features/ThematiquesSection";
@@ -136,6 +140,97 @@ export default function EspaceEcolesPage() {
 
       {/* Thématiques Section */}
       <ThematiquesSection />
+
+      {/* Section Que cherchez-vous ? */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Image à gauche */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative"
+            >
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop"
+                  alt="Discussion en équipe"
+                  className="w-full h-[500px] object-cover"
+                />
+                {/* Overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1c2942]/40 to-transparent" />
+              </div>
+              {/* Decorative element */}
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#6d74b5]/20 rounded-2xl -z-10" />
+              <div className="absolute -top-6 -left-6 w-24 h-24 bg-[#ebf2fa] rounded-2xl -z-10" />
+            </motion.div>
+
+            {/* Contenu à droite */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-[#6d74b5]/10 text-[#6d74b5] border border-[#6d74b5]/20">
+                <MessageCircle className="w-4 h-4" />
+                Nos services
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-8">
+                Que{" "}
+                <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
+                  cherchez-vous
+                </span>{" "}
+                ?
+              </h2>
+
+              <div className="space-y-6">
+                {/* Modules de cours */}
+                <div className="flex gap-4 p-5 bg-[#ebf2fa]/50 rounded-xl border border-[#ebf2fa] hover:shadow-lg transition-shadow">
+                  <div className="w-14 h-14 bg-[#6d74b5] rounded-xl flex items-center justify-center text-white shrink-0">
+                    <BookOpen className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-[#1c2942] mb-1">Modules de cours</h3>
+                    <p className="text-[#1c2942]/70">
+                      Les intervenants ont construit des modules de cours adaptables à vos objectifs pédagogiques
+                    </p>
+                  </div>
+                </div>
+
+                {/* Conférences */}
+                <div className="flex gap-4 p-5 bg-[#ebf2fa]/50 rounded-xl border border-[#ebf2fa] hover:shadow-lg transition-shadow">
+                  <div className="w-14 h-14 bg-[#6d74b5] rounded-xl flex items-center justify-center text-white shrink-0">
+                    <Mic className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-[#1c2942] mb-1">Conférences</h3>
+                    <p className="text-[#1c2942]/70">
+                      Des formats conférences à réserver directement auprès des intervenants
+                    </p>
+                  </div>
+                </div>
+
+                {/* Jurys d'examens */}
+                <div className="flex gap-4 p-5 bg-[#ebf2fa]/50 rounded-xl border border-[#ebf2fa] hover:shadow-lg transition-shadow">
+                  <div className="w-14 h-14 bg-[#6d74b5] rounded-xl flex items-center justify-center text-white shrink-0">
+                    <ClipboardCheck className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-[#1c2942] mb-1">Jurys d'examens</h3>
+                    <p className="text-[#1c2942]/70">
+                      Des profils aux compétences variées pour noter au mieux vos étudiants
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* Avantages Section */}
       <section

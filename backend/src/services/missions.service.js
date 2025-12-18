@@ -7,6 +7,12 @@
  */
 
 import prisma from '../../prisma.js';
+import {
+    notifyIntervenantsNewMission,
+    notifySchoolNewCandidature,
+    notifyApplicationAccepted,
+    notifyApplicationRejected
+} from './email.service.js';
 
 /**
  * findAll - Listing avec filtres + recherche textuelle
@@ -216,6 +222,12 @@ export async function createByEcole(payload, userId) {
             }
         }
     });
+
+    // Notifier les intervenants si la mission est publiée (status ACTIVE)
+    if (created.status === 'ACTIVE') {
+        notifyIntervenantsNewMission(created)
+            .catch(err => console.error('Failed to notify intervenants of new mission:', err));
+    }
 
     return created;
 }
@@ -436,7 +448,14 @@ export async function applyToMission(missionId, userId, data = {}) {
                 select: {
                     id: true,
                     title: true,
-                    ecole: { select: { id: true, name: true, contactEmail: true } }
+                    ecole: {
+                        select: {
+                            id: true,
+                            name: true,
+                            contactEmail: true,
+                            user: { select: { id: true } }
+                        }
+                    }
                 }
             },
             intervenant: {
@@ -451,6 +470,10 @@ export async function applyToMission(missionId, userId, data = {}) {
             }
         }
     });
+
+    // Notifier l'école de la nouvelle candidature
+    notifySchoolNewCandidature(candidature)
+        .catch(err => console.error('Failed to notify school of new candidature:', err));
 
     return candidature;
 }
@@ -552,7 +575,26 @@ export async function acceptCandidature(candidatureId, userId) {
             data: { status: 'acceptee' }
         });
 
-        // 2. Refuser toutes les autres candidatures de cette mission
+        // 2. Récupérer les autres candidatures avant de les refuser (pour les notifications)
+        const otherCandidatures = await tx.candidature.findMany({
+            where: {
+                missionId: candidature.missionId,
+                id: { not: candidatureId },
+                status: 'en_attente'
+            },
+            include: {
+                intervenant: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        user: { select: { id: true, email: true } }
+                    }
+                }
+            }
+        });
+
+        // 3. Refuser toutes les autres candidatures de cette mission
         await tx.candidature.updateMany({
             where: {
                 missionId: candidature.missionId,
@@ -562,7 +604,7 @@ export async function acceptCandidature(candidatureId, userId) {
             data: { status: 'refusee' }
         });
 
-        // 3. Assigner l'intervenant à la mission
+        // 4. Assigner l'intervenant à la mission
         const updatedMission = await tx.mission.update({
             where: { id: candidature.missionId },
             data: { intervenantId: candidature.intervenantId },
@@ -573,7 +615,7 @@ export async function acceptCandidature(candidatureId, userId) {
                         id: true,
                         firstName: true,
                         lastName: true,
-                        user: { select: { email: true } }
+                        user: { select: { id: true, email: true } }
                     }
                 },
                 candidatures: {
@@ -590,10 +632,34 @@ export async function acceptCandidature(candidatureId, userId) {
             }
         });
 
-        return updatedMission;
+        return { updatedMission, otherCandidatures };
     });
 
-    return result;
+    // Notifier l'intervenant accepté
+    if (result.updatedMission.intervenant?.user?.id) {
+        const ecoleName = result.updatedMission.ecole?.name || 'L\'école';
+        const missionTitle = result.updatedMission.title || 'la mission';
+        notifyApplicationAccepted(
+            result.updatedMission.intervenant.user.id,
+            missionTitle,
+            ecoleName
+        ).catch(err => console.error('Failed to notify accepted intervenant:', err));
+    }
+
+    // Notifier les intervenants refusés
+    for (const otherCandidature of result.otherCandidatures) {
+        if (otherCandidature.intervenant?.user?.id) {
+            const ecoleName = result.updatedMission.ecole?.name || 'L\'école';
+            const missionTitle = result.updatedMission.title || 'la mission';
+            notifyApplicationRejected(
+                otherCandidature.intervenant.user.id,
+                missionTitle,
+                ecoleName
+            ).catch(err => console.error('Failed to notify rejected intervenant:', err));
+        }
+    }
+
+    return result.updatedMission;
 }
 
 /**
@@ -607,7 +673,7 @@ export async function rejectCandidature(candidatureId, userId) {
         include: {
             mission: {
                 include: {
-                    ecole: { select: { userId: true } }
+                    ecole: { select: { userId: true, name: true } }
                 }
             }
         }
@@ -636,11 +702,28 @@ export async function rejectCandidature(candidatureId, userId) {
                     id: true,
                     firstName: true,
                     lastName: true,
-                    user: { select: { email: true } }
+                    user: { select: { id: true, email: true } }
+                }
+            },
+            mission: {
+                select: {
+                    title: true,
+                    ecole: { select: { name: true } }
                 }
             }
         }
     });
+
+    // Notifier l'intervenant du refus
+    if (updated.intervenant?.user?.id) {
+        const ecoleName = updated.mission?.ecole?.name || 'L\'école';
+        const missionTitle = updated.mission?.title || 'la mission';
+        notifyApplicationRejected(
+            updated.intervenant.user.id,
+            missionTitle,
+            ecoleName
+        ).catch(err => console.error('Failed to notify rejected intervenant:', err));
+    }
 
     return updated;
 }
