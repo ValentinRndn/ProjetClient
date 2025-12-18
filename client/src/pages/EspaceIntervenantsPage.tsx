@@ -361,7 +361,7 @@ export default function EspaceIntervenantsPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.15 }}
-                className="relative flex flex-col items-center"
+                className="relative flex flex-col items-center h-full"
               >
                 {/* Step number badge - centered above card */}
                 <div className="relative z-20 mb-[-28px]">
@@ -371,12 +371,12 @@ export default function EspaceIntervenantsPage() {
                 </div>
 
                 {/* Card */}
-                <div className="bg-white rounded-2xl pt-10 pb-6 px-6 shadow-lg border border-[#ebf2fa] hover:shadow-xl transition-shadow w-full text-center">
-                  <div className="w-12 h-12 bg-[#ebf2fa] rounded-xl flex items-center justify-center text-[#6d74b5] mb-4 mx-auto">
+                <div className="bg-white rounded-2xl pt-10 pb-6 px-6 shadow-lg border border-[#ebf2fa] hover:shadow-xl transition-shadow w-full text-center h-full flex flex-col">
+                  <div className="w-12 h-12 bg-[#ebf2fa] rounded-xl flex items-center justify-center text-[#6d74b5] mb-4 mx-auto shrink-0">
                     {etape.icon}
                   </div>
                   <h3 className="text-lg font-bold text-[#1c2942] mb-2">{etape.title}</h3>
-                  <p className="text-[#1c2942]/70 text-sm">{etape.description}</p>
+                  <p className="text-[#1c2942]/70 text-sm flex-1">{etape.description}</p>
                 </div>
 
               </motion.div>
@@ -434,13 +434,13 @@ export default function EspaceIntervenantsPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-6 shadow-lg border border-[#ebf2fa] text-center"
+                className="bg-white rounded-2xl p-6 shadow-lg border border-[#ebf2fa] text-center h-full flex flex-col"
               >
-                <div className="w-14 h-14 bg-[#6d74b5]/10 rounded-xl flex items-center justify-center text-[#6d74b5] mb-4 mx-auto">
+                <div className="w-14 h-14 bg-[#6d74b5]/10 rounded-xl flex items-center justify-center text-[#6d74b5] mb-4 mx-auto shrink-0">
                   {condition.icon}
                 </div>
                 <h3 className="text-lg font-bold text-[#1c2942] mb-2">{condition.title}</h3>
-                <p className="text-[#1c2942]/70 text-sm">{condition.description}</p>
+                <p className="text-[#1c2942]/70 text-sm flex-1">{condition.description}</p>
               </motion.div>
             ))}
           </div>
@@ -451,7 +451,7 @@ export default function EspaceIntervenantsPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            className="mt-16 max-w-3xl mx-auto"
+            className="mt-16 max-w-4xl mx-auto"
           >
             <div className="bg-[#1c2942] rounded-2xl p-8 text-center">
               <h3 className="text-2xl font-bold text-white mb-4">
