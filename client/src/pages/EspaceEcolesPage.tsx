@@ -4,6 +4,7 @@
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/Button";
+import { SEO } from "@/components/shared/SEO";
 import {
   GraduationCap,
   Users,
@@ -64,6 +65,12 @@ export default function EspaceEcolesPage() {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Espace Écoles - Trouvez vos intervenants experts"
+        description="Grandes écoles, trouvez des intervenants experts qualifiés pour vos formations. Réservation en ligne, profils vérifiés, accompagnement personnalisé."
+        keywords="intervenant école, formateur grande école, expert formation, intervenant professionnel, recrutement formateur"
+        canonical="https://www.vizionacademy.fr/espace-ecoles"
+      />
       {/* Hero Section */}
       <section
         className="relative py-20 sm:py-28 overflow-hidden"

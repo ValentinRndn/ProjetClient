@@ -5,6 +5,7 @@
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/Button";
+import { SEO } from "@/components/shared/SEO";
 import {
   Trophy,
   Users,
@@ -108,6 +109,12 @@ export default function ChallengesPage() {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Challenges Immersifs pour Étudiants"
+        description="Découvrez nos challenges immersifs clé en main : hackathons, business games, simulations. Des expériences pédagogiques innovantes pour vos étudiants."
+        keywords="challenges étudiants, hackathon école, business game, simulation entreprise, pédagogie innovante, challenge immersif"
+        canonical="https://www.vizionacademy.fr/challenges"
+      />
       {/* Hero Section - Fond sombre #28303a */}
       <section
         className="relative py-20 sm:py-28 overflow-hidden"

@@ -1,9 +1,15 @@
 import { PageContainer } from "@/components/ui/PageContainer";
 import { Card } from "@/components/ui/Card";
+import { SEO } from "@/components/shared/SEO";
 
 export default function CGUPage() {
   return (
     <PageContainer maxWidth="4xl" className="py-12">
+      <SEO
+        title="CGU & Politique de Confidentialité"
+        description="Conditions générales d'utilisation et politique de confidentialité de Vizion Academy."
+        canonical="https://www.vizionacademy.fr/cgu"
+      />
       <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
         Conditions Générales d'Utilisation
         <br />

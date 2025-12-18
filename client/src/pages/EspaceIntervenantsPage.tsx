@@ -5,6 +5,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate, Link } from "react-router";
 import { Button } from "@/components/ui/Button";
+import { SEO } from "@/components/shared/SEO";
 import {
   Users,
   CheckCircle,
@@ -145,6 +146,12 @@ export default function EspaceIntervenantsPage() {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Espace Intervenants - Devenez formateur expert"
+        description="Rejoignez notre réseau d'intervenants experts. Missions flexibles, zéro administratif, visibilité auprès de +35 grandes écoles partenaires."
+        keywords="devenir intervenant, formateur indépendant, mission formation, intervenant école, expert pédagogique"
+        canonical="https://www.vizionacademy.fr/espace-intervenants"
+      />
       {/* Hero Section */}
       <section
         className="relative py-20 sm:py-28 overflow-hidden"

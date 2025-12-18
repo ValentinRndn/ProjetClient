@@ -1,9 +1,15 @@
 import { PageContainer } from "@/components/ui/PageContainer";
 import { Card } from "@/components/ui/Card";
+import { SEO } from "@/components/shared/SEO";
 
 export default function MentionsLegalesPage() {
   return (
     <PageContainer maxWidth="4xl" className="py-12">
+      <SEO
+        title="Mentions Légales"
+        description="Mentions légales de Vizion Academy. Informations sur l'éditeur, l'hébergeur et les conditions d'utilisation du site."
+        canonical="https://www.vizionacademy.fr/mentions-legales"
+      />
       <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
         Mentions Légales
       </h1>

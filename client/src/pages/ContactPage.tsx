@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
+import { SEO } from "@/components/shared/SEO";
 import {
   Mail,
   Phone,
@@ -120,6 +121,12 @@ export default function ContactPage() {
 
   return (
     <div style={{ backgroundColor: "#ebf2fa", minHeight: "100vh" }}>
+      <SEO
+        title="Contact"
+        description="Contactez Vizion Academy pour vos besoins en intervenants ou challenges. Notre équipe vous répond sous 24h."
+        keywords="contact vizion academy, demande intervenant, devis challenge"
+        canonical="https://www.vizionacademy.fr/contact"
+      />
       {/* Header compact */}
       <div style={{ backgroundColor: "#1c2942", minHeight: "150px" }} className="flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full">

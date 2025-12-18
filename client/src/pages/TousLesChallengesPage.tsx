@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/Button";
+import { SEO } from "@/components/shared/SEO";
 import {
   Search,
   Filter,
@@ -344,6 +345,12 @@ export default function TousLesChallengesPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#28303a" }}>
+      <SEO
+        title="Tous nos Challenges Immersifs"
+        description="Explorez notre catalogue de challenges immersifs : hackathons, business games, simulations d'entreprise. Trouvez le challenge idéal pour vos étudiants."
+        keywords="catalogue challenges, hackathon étudiant, business game école, challenge pédagogique, simulation entreprise"
+        canonical="https://www.vizionacademy.fr/tous-les-challenges"
+      />
       {/* Hero Section */}
       <section className="relative py-16 sm:py-20 overflow-hidden">
         {/* Background Image */}
