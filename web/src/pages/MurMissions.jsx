@@ -4,6 +4,7 @@ import { Briefcase, TrendingUp } from 'lucide-react';
 
 // Components
 import MainNav from '../components/MainNav';
+import Footer from '../components/Footer';
 import SearchFilters from '../components/missions/SearchFilters';
 import MissionCard from '../components/missions/MissionCard';
 import ApplyModal from '../components/missions/ApplyModal';

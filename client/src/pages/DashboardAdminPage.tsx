@@ -139,6 +139,90 @@ export default function DashboardAdminPage() {
           <>
             {/* Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Actions rapides */}
+              <div className="bg-white rounded-2xl border border-[#1c2942]/10 shadow-lg p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-[#ebf2fa] rounded-xl flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-[#6d74b5]" />
+                  </div>
+                  <h2 className="text-xl font-bold text-[#1c2942]">Actions rapides</h2>
+                </div>
+
+                <div className="space-y-3">
+                  <Link to="/dashboard/admin/intervenants" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#1c2942] rounded-lg flex items-center justify-center">
+                          <UserCheck className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Gérer les intervenants</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/dashboard/admin/users" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#6d74b5] rounded-lg flex items-center justify-center">
+                          <Users className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Gérer les utilisateurs</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/gestion-missions" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
+                          <Target className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Gérer les missions</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/dashboard/admin/factures" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#6d74b5] rounded-lg flex items-center justify-center">
+                          <Receipt className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Facturation</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/dashboard/admin/challenges" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                          <Trophy className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Gérer les challenges</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  <Link to="/intervenants" className="block group">
+                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#1c2942] rounded-lg flex items-center justify-center">
+                          <Eye className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-[#1c2942]">Annuaire public</span>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+                </div>
+              </div>
+
               {/* Statistiques intervenants */}
               <div className="lg:col-span-2 bg-white rounded-2xl border border-[#1c2942]/10 shadow-lg p-6">
                 <div className="flex items-center gap-3 mb-6">
@@ -236,90 +320,6 @@ export default function DashboardAdminPage() {
                     </div>
                   </div>
                 )}
-              </div>
-
-              {/* Actions rapides */}
-              <div className="bg-white rounded-2xl border border-[#1c2942]/10 shadow-lg p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-[#ebf2fa] rounded-xl flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-[#6d74b5]" />
-                  </div>
-                  <h2 className="text-xl font-bold text-[#1c2942]">Actions rapides</h2>
-                </div>
-
-                <div className="space-y-3">
-                  <Link to="/dashboard/admin/intervenants" className="block group">
-                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#1c2942] rounded-lg flex items-center justify-center">
-                          <UserCheck className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-semibold text-[#1c2942]">Gérer les intervenants</span>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
-
-                  <Link to="/dashboard/admin/users" className="block group">
-                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#6d74b5] rounded-lg flex items-center justify-center">
-                          <Users className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-semibold text-[#1c2942]">Gérer les utilisateurs</span>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
-
-                  <Link to="/gestion-missions" className="block group">
-                    <div className="flex items-center justify-between p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
-                          <Target className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-semibold text-[#1c2942]">Gérer les missions</span>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
-
-                  <Link to="/dashboard/admin/factures" className="block group">
-                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#6d74b5] rounded-lg flex items-center justify-center">
-                          <Receipt className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-semibold text-[#1c2942]">Facturation</span>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
-
-                  <Link to="/dashboard/admin/challenges" className="block group">
-                    <div className="flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                          <Trophy className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-semibold text-[#1c2942]">Gérer les challenges</span>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
-
-                  <Link to="/intervenants" className="block group">
-                    <div className="flex items-center justify-between p-4 bg-[#ebf2fa] hover:bg-[#ebf2fa]/70 rounded-xl transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#1c2942] rounded-lg flex items-center justify-center">
-                          <Eye className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-semibold text-[#1c2942]">Annuaire public</span>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-[#6d74b5] group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
-                </div>
               </div>
             </div>
           </>

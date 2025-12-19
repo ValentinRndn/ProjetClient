@@ -6,6 +6,7 @@ import { ChevronDown } from 'lucide-react';
 import MainNav from '../components/MainNav';
 import banner from '../assets/banner.jpg';
 import IntervenantModal from '../components/IntervenantModal';
+import Footer from '../components/Footer';
 
 export default function VizionAcademy() {
     const [dropdownOpen, setDropdownOpen] = React.useState(null);
@@ -377,56 +378,7 @@ export default function VizionAcademy() {
       </motion.section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-br from-bleu-nuit to-bleu-intense text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-            <div>
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-violet to-bleu-intense shadow-lg">
-                  <img src={logo} alt="Logo Vizion Academy" className="w-full h-full object-contain" />
-                </div>
-                <span className="font-bold text-xl">Vizion<br/>Academy</span>
-              </div>
-              <p className="text-bleu-pastel leading-relaxed">
-                Mise en relation entre experts et établissements d'enseignements
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-lg mb-6 text-beige-elegant">Navigation</h4>
-              <ul className="space-y-3">
-                <li><a href="#" className="text-bleu-pastel hover:text-beige-elegant transition flex items-center gap-2"><span>→</span> Présentation</a></li>
-                <li><a href="#" className="text-bleu-pastel hover:text-beige-elegant transition flex items-center gap-2"><span>→</span> Dashboard écoles</a></li>
-                <li><a href="#" className="text-bleu-pastel hover:text-beige-elegant transition flex items-center gap-2"><span>→</span> Dashboard intervenant</a></li>
-                <li><a href="#" className="text-bleu-pastel hover:text-beige-elegant transition flex items-center gap-2"><span>→</span> Voir les challenges</a></li>
-                <li><a href="#" className="text-bleu-pastel hover:text-beige-elegant transition flex items-center gap-2"><span>→</span> Contact</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-lg mb-6 text-beige-elegant">Contact</h4>
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <span className="text-beige-elegant">📧</span>
-                  <a href="mailto:secretariat@vizionacademy.fr" className="text-bleu-pastel hover:text-beige-elegant transition">secretariat@vizionacademy.fr</a>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-beige-elegant">📞</span>
-                  <a href="tel:0552198550" className="text-bleu-pastel hover:text-beige-elegant transition">05 52 19 85 50</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-bleu-intense/30 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
-            <p className="text-bleu-pastel">© 2025 Vizion Academy. Tous droits réservés.</p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-bleu-pastel hover:text-beige-elegant transition">Mentions légales</a>
-              <a href="#" className="text-bleu-pastel hover:text-beige-elegant transition">Politique de confidentialité</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer variant="blue" />
 
       {/* Modal Intervenant */}
       {isModalOpen && selectedIntervenant && (

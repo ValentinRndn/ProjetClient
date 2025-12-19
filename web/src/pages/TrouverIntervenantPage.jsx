@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import MainNav from '../components/MainNav';
 import IntervenantModal from '../components/IntervenantModal';
+import Footer from '../components/Footer';
 import { 
   Search, MapPin, BookOpen, Monitor, Mail, Phone, 
   Users, FileText, Mic, GraduationCap, Zap, Calendar,
@@ -527,27 +528,7 @@ export default function TrouverIntervenantPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">VA</span>
-              </div>
-              <span className="font-bold text-xl">Vizion Academy</span>
-            </div>
-
-            <div className="flex space-x-8 text-sm">
-              <a href="#" className="hover:text-indigo-400 transition">Mentions légales</a>
-              <a href="#" className="hover:text-indigo-400 transition">Politique de confidentialité</a>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>© 2025 Vizion Academy. Développé sur <span className="text-indigo-400 font-semibold">base44</span>.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer variant="blue" />
 
       {/* Modal Intervenant */}
       <IntervenantModal 

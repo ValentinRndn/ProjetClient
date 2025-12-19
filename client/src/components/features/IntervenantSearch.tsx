@@ -38,8 +38,30 @@ export function IntervenantSearch() {
     fetchIntervenants();
   }, []);
 
-  const allCities = ["Paris", "Lyon", "Marseille", "Toulouse", "Bordeaux"];
-  const allThemes = ["Intelligence Artificielle", "Data Science", "Innovation"];
+  const allCities = [
+    "Paris",
+    "Lyon",
+    "Lille",
+    "Toulouse",
+    "Bordeaux",
+    "Marseille–Aix-en-Provence",
+    "Montpellier",
+    "Rennes",
+    "Strasbourg",
+    "Nantes"
+  ];
+  const allThemes = [
+    "Marketing",
+    "Intelligences artificielles",
+    "RSE",
+    "Communication",
+    "Entrepreneuriat",
+    "Digital",
+    "Créativité",
+    "Art",
+    "Langues étrangères",
+    "Finance"
+  ];
   const allFormats = ["Présentiel", "Distanciel", "Hybride"];
   const allLanguages = ["Français", "Anglais", "Espagnol", "Allemand", "Italien", "Portugais", "Arabe", "Chinois"];
 

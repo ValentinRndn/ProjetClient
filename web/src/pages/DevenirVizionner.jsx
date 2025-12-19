@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronDown, Check, User, FileText, Calendar, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import MainNav from '../components/MainNav';
+import Footer from '../components/Footer';
 
 // ============================================
 // COMPOSANTS RÉUTILISABLES
@@ -461,23 +462,8 @@ export default function DevenirVizionner() {
         </div>
       </section>
 
-      {/* Footer simple */}
-      <footer className="bg-bleu-nuit text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-6">
-            <h3 className="text-2xl font-bold mb-2">Vizion Academy</h3>
-            <p className="text-bleu-pastel">Mise en relation entre experts et établissements d'enseignement</p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-bleu-pastel">
-            <a href="#" className="hover:text-beige-elegant transition">Mentions légales</a>
-            <a href="#" className="hover:text-beige-elegant transition">Politique de confidentialité</a>
-            <a href="#" className="hover:text-beige-elegant transition">Contact</a>
-          </div>
-          <div className="mt-8 text-sm text-bleu-pastel">
-            © 2025 Vizion Academy. Tous droits réservés.
-          </div>
-        </div>
-      </footer>
+      {/* Footer */}
+      <Footer variant="blue" />
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import MainNav from '../components/MainNav';
+import Footer from '../components/Footer';
 
 const VizionChallengesPage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -86,20 +87,6 @@ const VizionChallengesPage = () => {
     }
   ];
 
-  const footerSections = [
-    {
-      title: 'Présentation',
-      links: ['Trouver un intervenant', 'Dashboard École']
-    },
-    {
-      title: 'Présentation',
-      links: ['Voir les challenges', 'Simuler un coût']
-    },
-    {
-      title: 'Présentation',
-      links: ['Devenir Intervenant', 'Dashboard Intervenant', 'Mur des missions']
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
@@ -408,64 +395,7 @@ const VizionChallengesPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#1B263B] text-white mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
-            {/* Brand Column */}
-            <div className="lg:col-span-2">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#4F46E5] to-[#1E3A8A] rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">V</span>
-                </div>
-                <span className="text-xl font-bold">Vizion Academy</span>
-              </div>
-              <p className="text-[#E0E3FF] text-sm mb-6">
-                Mise en relation entre experts et établissements d'enseignement.
-              </p>
-              <div className="space-y-2 text-sm">
-                <a href="mailto:secretariat@vizionacademy.fr" className="flex items-center space-x-2 text-[#D7C49E] hover:text-white transition-colors">
-                  <Mail size={16} />
-                  <span>secretariat@vizionacademy.fr</span>
-                </a>
-                <a href="tel:0659196550" className="flex items-center space-x-2 text-[#D7C49E] hover:text-white transition-colors">
-                  <Phone size={16} />
-                  <span>06 59 19 65 50</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Navigation Columns */}
-            {footerSections.map((section, index) => (
-              <div key={index}>
-                <h4 className="font-semibold text-[#D7C49E] mb-4">{section.title}</h4>
-                <ul className="space-y-2">
-                  {section.links.map((link) => (
-                    <li key={link}>
-                      <a href="#" className="text-sm text-[#E0E3FF] hover:text-white transition-colors">
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          {/* Footer Bottom */}
-          <div className="border-t border-[#1E3A8A] pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-[#E0E3FF]">
-                <a href="#" className="hover:text-white transition-colors">Mentions légales</a>
-                <span className="text-[#1E3A8A]">•</span>
-                <a href="#" className="hover:text-white transition-colors">Politique de confidentialité</a>
-              </div>
-              <p className="text-sm text-[#E0E3FF]">
-                © 2025 Vizion Academy. Développé sur <span className="text-[#D7C49E]">base44</span>.
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer variant="gray" />
     </div>
   );
 };

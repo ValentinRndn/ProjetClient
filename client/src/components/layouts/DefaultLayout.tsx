@@ -17,7 +17,11 @@ import {
 } from "lucide-react";
 import { PropsWithChildren } from "react";
 
-export default function DefaultLayout({ children }: PropsWithChildren) {
+interface DefaultLayoutProps extends PropsWithChildren {
+  footerVariant?: 'blue' | 'gray';
+}
+
+export default function DefaultLayout({ children, footerVariant = 'blue' }: DefaultLayoutProps) {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -213,7 +217,7 @@ export default function DefaultLayout({ children }: PropsWithChildren) {
       <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="bg-[#28303a] text-white">
+      <footer className={`${footerVariant === 'gray' ? 'bg-[#28303a]' : 'bg-gradient-to-br from-[#1c2942] to-[#2a3f5f]'} text-white`}>
         {/* Main Footer */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
