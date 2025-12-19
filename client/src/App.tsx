@@ -35,6 +35,7 @@ import MentionsLegalesPage from "./pages/MentionsLegalesPage";
 import CGUPage from "./pages/CGUPage";
 import ChallengesPage from "./pages/ChallengesPage";
 import TousLesChallengesPage from "./pages/TousLesChallengesPage";
+import ChallengeDetailPage from "./pages/ChallengeDetailPage";
 import EspaceEcolesPage from "./pages/EspaceEcolesPage";
 import EspaceIntervenantsPage from "./pages/EspaceIntervenantsPage";
 import AdminChallengesPage from "./pages/AdminChallengesPage";
@@ -167,6 +168,14 @@ function App() {
         element={
           <NavLayout footerVariant="gray">
             <TousLesChallengesPage />
+          </NavLayout>
+        }
+      />
+      <Route
+        path="/challenges/:id"
+        element={
+          <NavLayout footerVariant="gray">
+            <ChallengeDetailPage />
           </NavLayout>
         }
       />
