@@ -58,11 +58,11 @@ export function HeroBanner({
               backgroundImage: `url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop')`,
             }}
           />
-          {/* Gradient Overlay - from blue to pink */}
+          {/* Gradient Overlay */}
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(135deg, rgba(28, 41, 66, 0.9) 0%, rgba(109, 116, 181, 0.85) 40%, rgba(219, 186, 207, 0.8) 100%)`,
+              background: `linear-gradient(135deg, rgba(15, 25, 45, 0.82) 0%, rgba(28, 41, 66, 0.78) 100%)`,
             }}
           />
         </>

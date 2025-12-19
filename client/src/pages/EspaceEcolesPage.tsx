@@ -83,11 +83,11 @@ export default function EspaceEcolesPage() {
             backgroundImage: `url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop')`,
           }}
         />
-        {/* Gradient Overlay - from blue to pink */}
+        {/* Gradient Overlay */}
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(135deg, rgba(28, 41, 66, 0.9) 0%, rgba(109, 116, 181, 0.85) 40%, rgba(219, 186, 207, 0.8) 100%)`,
+            background: `linear-gradient(135deg, rgba(15, 25, 45, 0.82) 0%, rgba(28, 41, 66, 0.78) 100%)`,
           }}
         />
 
@@ -105,11 +105,8 @@ export default function EspaceEcolesPage() {
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
                 Trouvez les{" "}
-                <span className="bg-gradient-to-r from-[#2a3a5c] to-[#5a6390] bg-clip-text text-transparent">
-                  meilleurs
-                </span>{" "}
-                <span className="bg-gradient-to-r from-[#2a3a5c] to-[#5a6390] bg-clip-text text-transparent">
-                  experts
+                <span className="text-[#6d74b5]">
+                  meilleurs experts
                 </span>{" "}
                 pour vos formations
               </h1>
@@ -122,7 +119,7 @@ export default function EspaceEcolesPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   onClick={() => navigate("/intervenants")}
-                  className="bg-gradient-to-r from-[#1c2942] to-[#4a5280] hover:from-[#2a3a5c] hover:to-[#5a6390] text-white px-8 py-3"
+                  className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white px-8 py-3"
                 >
                   Voir les intervenants
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -190,7 +187,7 @@ export default function EspaceEcolesPage() {
 
               <h2 className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-8">
                 Que{" "}
-                <span className="bg-gradient-to-r from-[#6d74b5] to-[#8b91c9] bg-clip-text text-transparent">
+                <span className="text-[#6d74b5]">
                   cherchez-vous
                 </span>{" "}
                 ?
@@ -266,7 +263,7 @@ export default function EspaceEcolesPage() {
               className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
             >
               Pourquoi choisir{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#8b91c9] bg-clip-text text-transparent">
+              <span className="text-[#6d74b5]">
                 Vizion Academy
               </span>{" "}
               ?
