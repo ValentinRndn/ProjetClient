@@ -58,8 +58,13 @@ export function HeroBanner({
               backgroundImage: `url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop')`,
             }}
           />
-          {/* Color Overlay */}
-          <div className="absolute inset-0 bg-[#1c2942]/75" />
+          {/* Gradient Overlay - from blue to pink */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(135deg, rgba(28, 41, 66, 0.9) 0%, rgba(109, 116, 181, 0.85) 40%, rgba(219, 186, 207, 0.8) 100%)`,
+            }}
+          />
         </>
       )}
 
@@ -67,9 +72,9 @@ export function HeroBanner({
       {!isImageVariant && (
         <div className="absolute inset-0 overflow-hidden">
           {/* Floating Orbs */}
-          <div className="absolute top-20 left-10 w-72 h-72 bg-[#6d74b5]/10 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#fdf1f7]/50 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#6d74b5]/5 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#6d74b5]/20 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#dbbacf]/30 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-linear-to-r from-[#6d74b5]/10 to-[#dbbacf]/10 rounded-full blur-3xl" />
 
           {/* Grid Pattern */}
           <div
@@ -105,10 +110,12 @@ export function HeroBanner({
             </div>
           )}
 
-          <h1 className={cn(
-            "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 sm:mb-8 leading-[1.1] tracking-tight animate-fade-in-up stagger-1",
-            colors.title
-          )}>
+          <h1
+            className={cn(
+              "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 sm:mb-8 leading-[1.1] tracking-tight animate-fade-in-up stagger-1",
+              colors.title
+            )}
+          >
             {title}
           </h1>
 
@@ -119,10 +126,12 @@ export function HeroBanner({
           )}
 
           {description && (
-            <p className={cn(
-              "text-lg sm:text-xl md:text-2xl mb-10 sm:mb-14 max-w-3xl mx-auto leading-relaxed animate-fade-in-up stagger-2",
-              colors.description
-            )}>
+            <p
+              className={cn(
+                "text-lg sm:text-xl md:text-2xl mb-10 sm:mb-14 max-w-3xl mx-auto leading-relaxed animate-fade-in-up stagger-2",
+                colors.description
+              )}
+            >
               {description}
             </p>
           )}

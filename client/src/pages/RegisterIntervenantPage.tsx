@@ -1,7 +1,7 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, Link } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import type { RegisterData } from "@/services/auth";
@@ -123,6 +123,101 @@ const CONTRACT_TERMS = [
       "Votre profil sera validé par notre équipe après vérification de vos documents. Ce processus peut prendre 24 à 48h ouvrées.",
   },
 ];
+
+// Composant pour formater le contrat avec une meilleure mise en forme
+function ContractRenderer({ content }: { content: string }) {
+  const lines = content.split('\n');
+
+  const renderLine = (line: string, index: number) => {
+    const trimmedLine = line.trim();
+
+    // Ligne vide
+    if (!trimmedLine) {
+      return <div key={index} className="h-3" />;
+    }
+
+    // Séparateurs (---)
+    if (trimmedLine === '---') {
+      return <hr key={index} className="my-6 border-[#6d74b5]/30" />;
+    }
+
+    // Titres principaux en majuscules (CONTRAT DE PRESTATION, PREAMBULE, etc.)
+    if (trimmedLine === trimmedLine.toUpperCase() && trimmedLine.length > 3 && !trimmedLine.startsWith('-') && !trimmedLine.startsWith('•')) {
+      // Annexes
+      if (trimmedLine.startsWith('ANNEXE')) {
+        return (
+          <h2 key={index} className="text-lg font-bold text-[#6d74b5] mt-8 mb-4 pb-2 border-b-2 border-[#6d74b5]/30">
+            {trimmedLine}
+          </h2>
+        );
+      }
+      // Titre du contrat
+      if (trimmedLine === 'CONTRAT DE PRESTATION DE SERVICE') {
+        return (
+          <h1 key={index} className="text-xl font-bold text-[#1c2942] text-center mb-6 pb-3 border-b-2 border-[#1c2942]">
+            {trimmedLine}
+          </h1>
+        );
+      }
+      // Autres titres majuscules (articles)
+      return (
+        <h3 key={index} className="text-base font-bold text-[#1c2942] mt-6 mb-3">
+          {trimmedLine}
+        </h3>
+      );
+    }
+
+    // Sous-titres (lignes qui commencent par un numéro suivi d'un point)
+    if (/^\d+\.\s/.test(trimmedLine)) {
+      return (
+        <h4 key={index} className="text-sm font-semibold text-[#1c2942] mt-4 mb-2">
+          {trimmedLine}
+        </h4>
+      );
+    }
+
+    // Listes à puces
+    if (trimmedLine.startsWith('-') || trimmedLine.startsWith('•')) {
+      return (
+        <div key={index} className="flex gap-2 ml-4 mb-1">
+          <span className="text-[#6d74b5] shrink-0">•</span>
+          <span className="text-sm text-[#1c2942]/80">{trimmedLine.substring(1).trim()}</span>
+        </div>
+      );
+    }
+
+    // ENTRE, ET, Ci-après (mots-clés de structure)
+    if (['ENTRE', 'ET'].includes(trimmedLine)) {
+      return (
+        <p key={index} className="text-sm font-semibold text-[#6d74b5] my-3">
+          {trimmedLine}
+        </p>
+      );
+    }
+
+    // Ci-après mentions
+    if (trimmedLine.startsWith('Ci-après')) {
+      return (
+        <p key={index} className="text-sm italic text-[#1c2942]/70 mb-2">
+          {trimmedLine}
+        </p>
+      );
+    }
+
+    // Paragraphes normaux
+    return (
+      <p key={index} className="text-sm text-[#1c2942]/80 mb-2 leading-relaxed">
+        {trimmedLine}
+      </p>
+    );
+  };
+
+  return (
+    <div className="space-y-0">
+      {lines.map((line, index) => renderLine(line, index))}
+    </div>
+  );
+}
 
 // CGV - Contrat de prestation de service complet (étape 3)
 const CGV_CONTRACT = `CONTRAT DE PRESTATION DE SERVICE
@@ -550,7 +645,9 @@ export default function RegisterIntervenantPage() {
   const [localError, setLocalError] = useState<string | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedCGV, setAcceptedCGV] = useState(false);
+  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [createdUserId, setCreatedUserId] = useState<string | null>(null);
+  const contractScrollRef = useRef<HTMLDivElement>(null);
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, File | null>>({});
   const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string[]>([]);
@@ -586,6 +683,26 @@ export default function RegisterIntervenantPage() {
       }
     }
   }, [user, currentStep, navigate]);
+
+  // Détection du scroll jusqu'en bas du contrat
+  const handleContractScroll = useCallback(() => {
+    const container = contractScrollRef.current;
+    if (container) {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      // On considère qu'on est en bas si on est à moins de 50px du fond
+      if (scrollTop + clientHeight >= scrollHeight - 50) {
+        setHasScrolledToBottom(true);
+      }
+    }
+  }, []);
+
+  // Reset du scroll state quand on revient à l'étape 3
+  useEffect(() => {
+    if (currentStep === 3) {
+      setHasScrolledToBottom(false);
+      setAcceptedCGV(false);
+    }
+  }, [currentStep]);
 
   // Étape 1 -> 2 : Valider les champs
   const handleStep1Next = async () => {
@@ -952,27 +1069,50 @@ export default function RegisterIntervenantPage() {
 
                 {/* Contrat CGV complet */}
                 <div className="border border-[#1c2942]/20 rounded-xl overflow-hidden">
-                  <div className="bg-[#ebf2fa] px-4 py-2 border-b border-[#1c2942]/10">
-                    <span className="text-sm font-medium text-[#1c2942]">Contrat de prestation de service complet</span>
+                  <div className="bg-[#ebf2fa] px-4 py-3 border-b border-[#1c2942]/10 flex items-center justify-between">
+                    <span className="text-sm font-medium text-[#1c2942]">Contrat de prestation de service</span>
+                    {!hasScrolledToBottom ? (
+                      <span className="text-xs text-amber-600 font-medium flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" />
+                        Faites défiler jusqu'en bas pour continuer
+                      </span>
+                    ) : (
+                      <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                        <Check className="w-3 h-3" />
+                        Contrat lu
+                      </span>
+                    )}
                   </div>
-                  <div className="max-h-[350px] overflow-y-auto p-4 bg-white">
-                    <pre className="whitespace-pre-wrap text-sm text-[#1c2942]/80 font-sans leading-relaxed">
-                      {CGV_CONTRACT}
-                    </pre>
+                  <div
+                    ref={contractScrollRef}
+                    onScroll={handleContractScroll}
+                    className="max-h-[450px] overflow-y-auto p-6 bg-white"
+                  >
+                    <ContractRenderer content={CGV_CONTRACT} />
                   </div>
                 </div>
 
-                <div className="mt-6 p-4 bg-[#6d74b5]/10 rounded-xl border border-[#6d74b5]/30">
-                  <label className="flex items-start gap-3 cursor-pointer">
+                <div className={`mt-6 p-4 rounded-xl border transition-all ${
+                  hasScrolledToBottom
+                    ? "bg-[#6d74b5]/10 border-[#6d74b5]/30"
+                    : "bg-gray-100 border-gray-200"
+                }`}>
+                  <label className={`flex items-start gap-3 ${hasScrolledToBottom ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}>
                     <input
                       type="checkbox"
                       checked={acceptedCGV}
-                      onChange={(e) => setAcceptedCGV(e.target.checked)}
-                      className="w-5 h-5 mt-0.5 rounded border-[#1c2942]/30 text-[#6d74b5] focus:ring-[#6d74b5]"
+                      onChange={(e) => hasScrolledToBottom && setAcceptedCGV(e.target.checked)}
+                      disabled={!hasScrolledToBottom}
+                      className="w-5 h-5 mt-0.5 rounded border-[#1c2942]/30 text-[#6d74b5] focus:ring-[#6d74b5] disabled:opacity-50"
                     />
                     <span className="text-sm text-[#1c2942]">
                       <strong>J'ai lu et j'accepte les Conditions Générales de Vente (CGV) et le contrat de prestation de service dans son intégralité.</strong> Je m'engage à respecter
                       l'ensemble des clauses mentionnées dans ce contrat.
+                      {!hasScrolledToBottom && (
+                        <span className="block text-xs text-amber-600 mt-1">
+                          Veuillez lire l'intégralité du contrat avant de pouvoir accepter.
+                        </span>
+                      )}
                     </span>
                   </label>
                 </div>

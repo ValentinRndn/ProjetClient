@@ -22,6 +22,8 @@ import {
   Receipt,
   Phone,
   Headphones,
+  ExternalLink,
+  GraduationCap,
 } from "lucide-react";
 
 export default function DashboardEcolePage() {
@@ -207,18 +209,6 @@ export default function DashboardEcolePage() {
                     </div>
                   </Link>
 
-                  <Link to="/dashboard/ecole/factures" className="block group">
-                    <div className="flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                          <Receipt className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="font-semibold text-[#1c2942]">Mes factures</span>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
-
                   <Link to="/dashboard/ecole/favoris" className="block group">
                     <div className="flex items-center justify-between p-4 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors">
                       <div className="flex items-center gap-3">
@@ -361,6 +351,33 @@ export default function DashboardEcolePage() {
                     06 50 71 77 42
                   </a>
                 </div>
+              </div>
+            </div>
+
+            {/* Partenariat Alternance - Full width */}
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200/50 p-6 mt-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
+                    <GraduationCap className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-amber-600">Partenaire Alternance</p>
+                    <h3 className="text-xl font-bold text-[#1c2942]">Emage-me</h3>
+                    <p className="text-[#1c2942]/70 text-sm">
+                      Trouvez vos futurs alternants grâce à notre partenaire.
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href="https://emage-me.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+                >
+                  Découvrir
+                  <ExternalLink className="w-4 h-4" />
+                </a>
               </div>
             </div>
           </>

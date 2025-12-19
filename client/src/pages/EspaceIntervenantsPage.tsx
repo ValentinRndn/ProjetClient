@@ -164,14 +164,13 @@ export default function EspaceIntervenantsPage() {
             backgroundImage: `url('https://images.unsplash.com/photo-1515169067868-5387ec356754?q=80&w=2070&auto=format&fit=crop')`,
           }}
         />
-        {/* Color Overlay */}
-        <div className="absolute inset-0 bg-[#1c2942]/85" />
-
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-[#6d74b5]/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#fdf1f7]/10 rounded-full blur-3xl" />
-        </div>
+        {/* Gradient Overlay - from blue to pink */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(135deg, rgba(28, 41, 66, 0.9) 0%, rgba(109, 116, 181, 0.85) 40%, rgba(219, 186, 207, 0.8) 100%)`,
+          }}
+        />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -187,8 +186,11 @@ export default function EspaceIntervenantsPage() {
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
                 Rejoignez notre réseau d'experts,{" "}
-                <span className="bg-gradient-to-r from-[#6d74b5] to-[#fdf1f7] bg-clip-text text-transparent">
-                  Devenez Vizionner
+                <span className="bg-gradient-to-r from-[#2a3a5c] to-[#5a6390] bg-clip-text text-transparent">
+                  Devenez
+                </span>{" "}
+                <span className="bg-gradient-to-r from-[#2a3a5c] to-[#5a6390] bg-clip-text text-transparent">
+                  Vizionner
                 </span>
               </h1>
 
@@ -197,20 +199,22 @@ export default function EspaceIntervenantsPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  onClick={() => navigate("/register/intervenant")}
-                  className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white px-8 py-3"
-                >
-                  Devenir Vizionner
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-                <Button
-                  onClick={() => navigate("/contact")}
-                  variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 px-8 py-3"
-                >
-                  Nous contacter
-                </Button>
+                <Link to="/register/intervenant">
+                  <Button
+                    className="bg-gradient-to-r from-[#1c2942] to-[#4a5280] hover:from-[#2a3a5c] hover:to-[#5a6390] text-white px-8 py-3"
+                  >
+                    Devenir Vizionner
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+                <Link to="/contact">
+                  <Button
+                    variant="outline"
+                    className="border-white/30 text-white hover:bg-white/10 px-8 py-3"
+                  >
+                    Nous contacter
+                  </Button>
+                </Link>
               </div>
             </motion.div>
 
@@ -276,7 +280,7 @@ export default function EspaceIntervenantsPage() {
               className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
             >
               Pourquoi devenir{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#6d74b5] to-[#8b91c9] bg-clip-text text-transparent">
                 Vizionner
               </span>{" "}
               ?
@@ -336,7 +340,7 @@ export default function EspaceIntervenantsPage() {
               className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
             >
               Comment rejoindre{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#6d74b5] to-[#8b91c9] bg-clip-text text-transparent">
                 Vizion Academy
               </span>{" "}
               ?
@@ -410,7 +414,7 @@ export default function EspaceIntervenantsPage() {
               className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
             >
               Conditions pour devenir{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#6d74b5] to-[#8b91c9] bg-clip-text text-transparent">
                 Vizionner
               </span>
             </motion.h2>
@@ -581,7 +585,7 @@ export default function EspaceIntervenantsPage() {
               className="text-3xl sm:text-4xl font-bold text-[#1c2942] mb-4"
             >
               Ce que disent nos{" "}
-              <span className="bg-gradient-to-r from-[#6d74b5] to-[#1c2942] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#6d74b5] to-[#8b91c9] bg-clip-text text-transparent">
                 Vizionners
               </span>
             </motion.h2>
@@ -634,20 +638,22 @@ export default function EspaceIntervenantsPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                onClick={() => navigate("/register/intervenant")}
-                className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white px-8 py-3"
-              >
-                Créer mon profil
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-              <Button
-                onClick={() => navigate("/contact")}
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 px-8 py-3"
-              >
-                Nous contacter
-              </Button>
+              <Link to="/register/intervenant">
+                <Button
+                  className="bg-[#6d74b5] hover:bg-[#5a61a0] text-white px-8 py-3"
+                >
+                  Créer mon profil
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10 px-8 py-3"
+                >
+                  Nous contacter
+                </Button>
+              </Link>
             </div>
           </motion.div>
         </div>

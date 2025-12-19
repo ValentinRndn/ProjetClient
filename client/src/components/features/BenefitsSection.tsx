@@ -68,12 +68,14 @@ export function BenefitsSection({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="h-full"
             >
               <BenefitCard
                 icon={benefit.icon}
                 title={benefit.title}
                 description={benefit.description}
                 variant="gradient"
+                className="h-full"
               />
             </motion.div>
           ))}

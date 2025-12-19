@@ -40,12 +40,12 @@ export default function Hero() {
         <>
           Entre{" "}
           <span className="relative">
-            <span className="bg-gradient-to-r from-[#6d74b5] to-[#8b91c9] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#2a3a5c] to-[#5a6390] bg-clip-text text-transparent">
               immersion
             </span>
           </span>{" "}
           et{" "}
-          <span className="bg-gradient-to-r from-[#6d74b5] to-[#8b91c9] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#2a3a5c] to-[#5a6390] bg-clip-text text-transparent">
             pédagogie
           </span>
           ,
@@ -70,8 +70,8 @@ export default function Hero() {
                 />
                 <defs>
                   <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#6d74b5" />
-                    <stop offset="100%" stopColor="#8b91c9" />
+                    <stop offset="0%" stopColor="#2a3a5c" />
+                    <stop offset="100%" stopColor="#5a6390" />
                   </linearGradient>
                 </defs>
               </svg>

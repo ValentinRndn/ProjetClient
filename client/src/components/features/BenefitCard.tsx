@@ -25,7 +25,7 @@ export function BenefitCard({
   return (
     <div
       className={cn(
-        "group relative rounded-2xl p-6 sm:p-8 transition-all duration-300",
+        "group relative rounded-2xl p-6 sm:p-8 transition-all duration-300 flex flex-col",
         "transform hover:-translate-y-1",
         variants[variant],
         className
