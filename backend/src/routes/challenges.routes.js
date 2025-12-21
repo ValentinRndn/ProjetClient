@@ -7,8 +7,15 @@
 import express from 'express';
 import { verifyToken, checkRole } from '../middlewares/auth.middleware.js';
 import * as challengesService from '../services/challenges.service.js';
+import { uploadSingleOptional } from '../config/multer.js';
+import fs from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
 
 const router = express.Router();
+
+// Dossier pour les images des challenges
+const CHALLENGES_UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'challenges');
 
 // ============================================
 // Routes publiques
@@ -52,6 +59,40 @@ router.get('/public/:id', async (req, res, next) => {
 // ============================================
 // Routes Admin uniquement
 // ============================================
+
+/**
+ * POST /api/challenges/admin/upload-image
+ * Upload une image pour un challenge (admin)
+ */
+router.post('/admin/upload-image', verifyToken, checkRole(['ADMIN']), uploadSingleOptional('image'), async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Aucune image fournie' });
+    }
+
+    // Créer le dossier s'il n'existe pas
+    await fs.mkdir(CHALLENGES_UPLOAD_DIR, { recursive: true });
+
+    // Générer un nom unique pour le fichier
+    const ext = path.extname(req.file.originalname).toLowerCase() || '.jpg';
+    const filename = `${crypto.randomUUID()}${ext}`;
+    const filepath = path.join(CHALLENGES_UPLOAD_DIR, filename);
+
+    // Sauvegarder le fichier
+    await fs.writeFile(filepath, req.file.buffer);
+
+    // Retourner l'URL publique
+    const imageUrl = `/uploads/challenges/${filename}`;
+
+    res.json({
+      success: true,
+      imageUrl,
+      filename
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 /**
  * GET /api/challenges/admin/all

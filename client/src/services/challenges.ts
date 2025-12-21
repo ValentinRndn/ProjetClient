@@ -20,10 +20,17 @@ export interface Challenge {
   imageUrl?: string;
   videoUrl?: string;
   priceCents?: number;
-  status: "draft" | "published";
+  status: "draft" | "published" | "not_ready";
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
+  // Nouveaux champs pour le détail des challenges
+  tags?: string[];
+  schedule?: string;
+  requirements?: string;
+  highlights?: string[];
+  conclusion?: string[];
+  galleryImages?: string[];
 }
 
 export interface CreateChallengeData {
@@ -39,13 +46,21 @@ export interface CreateChallengeData {
   imageUrl?: string;
   videoUrl?: string;
   priceCents?: number;
-  status?: "draft" | "published";
+  status?: "draft" | "published" | "not_ready";
+  // Nouveaux champs pour le détail des challenges
+  tags?: string[];
+  schedule?: string;
+  requirements?: string;
+  highlights?: string[];
+  conclusion?: string[];
+  galleryImages?: string[];
 }
 
 export interface ChallengeStats {
   total: number;
   draft: number;
   published: number;
+  notReady: number;
 }
 
 // ============================================
@@ -146,6 +161,24 @@ export async function publishChallenge(id: string): Promise<Challenge> {
 export async function unpublishChallenge(id: string): Promise<Challenge> {
   const response = await api.post(`/challenges/admin/${id}/unpublish`);
   return response.data;
+}
+
+/**
+ * Upload une image pour un challenge (admin)
+ */
+export async function uploadChallengeImage(file: File): Promise<{ imageUrl: string; filename: string }> {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await api.post("/challenges/admin/upload-image", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    timeout: 60000, // 60 secondes pour l'upload
+  });
+  // L'intercepteur retourne directement response.data quand success existe
+  // Donc response contient { success, imageUrl, filename }
+  return response as unknown as { imageUrl: string; filename: string };
 }
 
 // Liste des thématiques disponibles

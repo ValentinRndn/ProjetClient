@@ -17,9 +17,21 @@ import {
   GraduationCap,
   ArrowLeft,
   Mail,
-  ChevronRight,
+  Play,
+  Wrench,
+  ListChecks,
 } from "lucide-react";
 import { getPublicChallengeById, type Challenge } from "@/services/challenges";
+
+// Helper pour extraire l'ID YouTube
+function getYouTubeEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11
+    ? `https://www.youtube.com/embed/${match[2]}`
+    : null;
+}
 
 export default function ChallengeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -108,6 +120,8 @@ export default function ChallengeDetailPage() {
     );
   }
 
+  const youtubeEmbedUrl = challenge.videoUrl ? getYouTubeEmbedUrl(challenge.videoUrl) : null;
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#28303a" }}>
       {/* Hero Section */}
@@ -124,20 +138,32 @@ export default function ChallengeDetailPage() {
 
           {/* Header du challenge */}
           <div className="max-w-4xl">
-            {/* Badge thématique */}
+            {/* Tags */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="mb-4"
+              className="mb-4 flex flex-wrap gap-2"
             >
-              <span
-                className="px-4 py-2 rounded-full text-sm font-medium shadow-lg inline-flex items-center gap-2"
-                style={{ backgroundColor: "#dbbacf", color: "#28303a" }}
-              >
-                <Sparkles className="w-4 h-4" />
-                {challenge.thematique}
-              </span>
+              {challenge.tags && challenge.tags.length > 0 ? (
+                challenge.tags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 rounded-full text-sm font-medium"
+                    style={{ backgroundColor: "rgba(219, 186, 207, 0.3)", color: "#dbbacf" }}
+                  >
+                    #{tag}
+                  </span>
+                ))
+              ) : (
+                <span
+                  className="px-4 py-2 rounded-full text-sm font-medium shadow-lg inline-flex items-center gap-2"
+                  style={{ backgroundColor: "#dbbacf", color: "#28303a" }}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {challenge.thematique}
+                </span>
+              )}
             </motion.div>
 
             {/* Titre */}
@@ -150,40 +176,31 @@ export default function ChallengeDetailPage() {
               {challenge.title}
             </motion.h1>
 
-            {/* Métadonnées */}
+            {/* Description courte */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="text-xl text-white/80 mb-6"
+            >
+              {challenge.description}
+            </motion.p>
+
+            {/* Bouton Contact */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex flex-wrap gap-3"
             >
-              {challenge.duration && (
-                <span
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm"
-                  style={{ backgroundColor: "rgba(219, 186, 207, 0.2)", color: "#dbbacf" }}
-                >
-                  <Clock className="w-4 h-4" />
-                  {challenge.duration}
-                </span>
-              )}
-              {challenge.targetAudience && (
-                <span
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm"
-                  style={{ backgroundColor: "rgba(219, 186, 207, 0.2)", color: "#dbbacf" }}
-                >
-                  <Users className="w-4 h-4" />
-                  {challenge.targetAudience}
-                </span>
-              )}
-              {challenge.priceCents && (
-                <span
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
-                  style={{ backgroundColor: "rgba(219, 186, 207, 0.3)", color: "#dbbacf" }}
-                >
-                  <Star className="w-4 h-4" />
-                  {(challenge.priceCents / 100).toLocaleString("fr-FR")} €
-                </span>
-              )}
+              <Button
+                variant="primary"
+                className="py-3 px-8 rounded-xl shadow-lg text-[#28303a] font-semibold"
+                style={{ backgroundColor: "#dbbacf" }}
+                onClick={handleContact}
+              >
+                <Mail className="w-5 h-5 mr-2" />
+                Contactez nous
+              </Button>
             </motion.div>
           </div>
         </div>
@@ -194,34 +211,47 @@ export default function ChallengeDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Colonne principale */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Description */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="rounded-2xl shadow-xl p-6 md:p-8"
-              style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderColor: "rgba(219, 186, 207, 0.2)", borderWidth: 1 }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: "rgba(219, 186, 207, 0.2)" }}
-                >
-                  <BookOpen className="w-5 h-5" style={{ color: "#dbbacf" }} />
-                </div>
-                <h2 className="text-xl font-bold text-white">Description</h2>
-              </div>
-              <p className="text-white/70 whitespace-pre-line leading-relaxed">
-                {challenge.description}
-              </p>
-            </motion.div>
-
-            {/* Objectifs */}
-            {challenge.objectives && challenge.objectives.length > 0 && (
+            {/* Vidéo YouTube ou Image */}
+            {youtubeEmbedUrl ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.35 }}
+                transition={{ duration: 0.5, delay: 0.25 }}
+                className="rounded-2xl shadow-xl overflow-hidden"
+                style={{ borderColor: "rgba(219, 186, 207, 0.2)", borderWidth: 1 }}
+              >
+                <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                  <iframe
+                    className="absolute inset-0 w-full h-full"
+                    src={youtubeEmbedUrl}
+                    title={challenge.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </motion.div>
+            ) : challenge.imageUrl ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.25 }}
+                className="rounded-2xl shadow-xl overflow-hidden"
+                style={{ borderColor: "rgba(219, 186, 207, 0.2)", borderWidth: 1 }}
+              >
+                <img
+                  src={challenge.imageUrl}
+                  alt={challenge.title}
+                  className="w-full h-auto object-cover"
+                />
+              </motion.div>
+            ) : null}
+
+            {/* Pour conclure, c'est quoi ? */}
+            {challenge.conclusion && challenge.conclusion.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
                 className="rounded-2xl shadow-xl p-6 md:p-8"
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderColor: "rgba(219, 186, 207, 0.2)", borderWidth: 1 }}
               >
@@ -230,84 +260,29 @@ export default function ChallengeDetailPage() {
                     className="w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{ backgroundColor: "rgba(219, 186, 207, 0.2)" }}
                   >
-                    <Target className="w-5 h-5" style={{ color: "#dbbacf" }} />
+                    <ListChecks className="w-5 h-5" style={{ color: "#dbbacf" }} />
                   </div>
-                  <h2 className="text-xl font-bold text-white">Objectifs pédagogiques</h2>
+                  <h2 className="text-xl font-bold text-white">Pour conclure, {challenge.title} c'est quoi ?</h2>
                 </div>
-                <div className="space-y-3">
-                  {challenge.objectives.map((obj, i) => (
+                <div className="space-y-4">
+                  {challenge.conclusion.map((item, i) => (
                     <div
                       key={i}
                       className="flex items-start gap-3 p-4 rounded-xl"
                       style={{ backgroundColor: "rgba(219, 186, 207, 0.1)" }}
                     >
                       <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "#dbbacf" }} />
-                      <span className="text-white/80">{obj}</span>
+                      <span className="text-white/80">{item}</span>
                     </div>
                   ))}
                 </div>
-              </motion.div>
-            )}
-
-            {/* Livrables */}
-            {challenge.deliverables && challenge.deliverables.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="rounded-2xl shadow-xl p-6 md:p-8"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderColor: "rgba(219, 186, 207, 0.2)", borderWidth: 1 }}
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: "rgba(219, 186, 207, 0.2)" }}
-                  >
-                    <Zap className="w-5 h-5" style={{ color: "#dbbacf" }} />
-                  </div>
-                  <h2 className="text-xl font-bold text-white">Livrables attendus</h2>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {challenge.deliverables.map((del, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 p-4 rounded-xl"
-                      style={{ backgroundColor: "rgba(219, 186, 207, 0.1)" }}
-                    >
-                      <Lightbulb className="w-5 h-5 shrink-0" style={{ color: "#dbbacf" }} />
-                      <span className="text-white/80">{del}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Prérequis (version mobile) */}
-            {challenge.prerequisites && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.45 }}
-                className="rounded-2xl shadow-xl p-6 md:p-8 lg:hidden"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderColor: "rgba(219, 186, 207, 0.2)", borderWidth: 1 }}
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: "rgba(219, 186, 207, 0.2)" }}
-                  >
-                    <GraduationCap className="w-5 h-5" style={{ color: "#dbbacf" }} />
-                  </div>
-                  <h2 className="text-xl font-bold text-white">Prérequis</h2>
-                </div>
-                <p className="text-white/70 leading-relaxed">{challenge.prerequisites}</p>
               </motion.div>
             )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Card infos rapides */}
+            {/* Horaires et public */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -320,58 +295,32 @@ export default function ChallengeDetailPage() {
                   className="w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{ backgroundColor: "rgba(219, 186, 207, 0.2)" }}
                 >
-                  <Trophy className="w-5 h-5" style={{ color: "#dbbacf" }} />
+                  <Clock className="w-5 h-5" style={{ color: "#dbbacf" }} />
                 </div>
-                <h2 className="text-lg font-bold text-white">Infos clés</h2>
+                <h2 className="text-lg font-bold text-white">Horaires et public</h2>
               </div>
 
-              <div className="space-y-3">
-                {challenge.duration && (
-                  <div
-                    className="flex items-center gap-3 p-3 rounded-xl"
-                    style={{ backgroundColor: "rgba(219, 186, 207, 0.1)" }}
-                  >
-                    <Clock className="w-5 h-5" style={{ color: "#dbbacf" }} />
-                    <div>
-                      <p className="text-xs text-white/50 uppercase font-medium">Durée</p>
-                      <p className="text-sm font-semibold text-white">{challenge.duration}</p>
-                    </div>
-                  </div>
+              <div className="space-y-3 text-white/80 text-sm">
+                {challenge.schedule && (
+                  <p>• {challenge.schedule}</p>
+                )}
+                {!challenge.schedule && challenge.duration && (
+                  <p>• Durée: {challenge.duration}</p>
                 )}
                 {challenge.targetAudience && (
-                  <div
-                    className="flex items-center gap-3 p-3 rounded-xl"
-                    style={{ backgroundColor: "rgba(219, 186, 207, 0.1)" }}
-                  >
-                    <Users className="w-5 h-5" style={{ color: "#dbbacf" }} />
-                    <div>
-                      <p className="text-xs text-white/50 uppercase font-medium">Public cible</p>
-                      <p className="text-sm font-semibold text-white">{challenge.targetAudience}</p>
-                    </div>
-                  </div>
+                  <p>• Type de public: {challenge.targetAudience}</p>
                 )}
-                {challenge.thematique && (
-                  <div
-                    className="flex items-center gap-3 p-3 rounded-xl"
-                    style={{ backgroundColor: "rgba(219, 186, 207, 0.1)" }}
-                  >
-                    <Sparkles className="w-5 h-5" style={{ color: "#dbbacf" }} />
-                    <div>
-                      <p className="text-xs text-white/50 uppercase font-medium">Thématique</p>
-                      <p className="text-sm font-semibold text-white">{challenge.thematique}</p>
-                    </div>
-                  </div>
-                )}
+                <p>• Adaptables selon les besoins.</p>
               </div>
             </motion.div>
 
-            {/* Prérequis (sidebar - desktop) */}
-            {challenge.prerequisites && (
+            {/* Besoins */}
+            {challenge.requirements && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.35 }}
-                className="rounded-2xl shadow-xl p-6 hidden lg:block"
+                className="rounded-2xl shadow-xl p-6"
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderColor: "rgba(219, 186, 207, 0.2)", borderWidth: 1 }}
               >
                 <div className="flex items-center gap-3 mb-4">
@@ -379,35 +328,70 @@ export default function ChallengeDetailPage() {
                     className="w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{ backgroundColor: "rgba(219, 186, 207, 0.2)" }}
                   >
-                    <GraduationCap className="w-5 h-5" style={{ color: "#dbbacf" }} />
+                    <Wrench className="w-5 h-5" style={{ color: "#dbbacf" }} />
                   </div>
-                  <h2 className="text-lg font-bold text-white">Prérequis</h2>
+                  <h2 className="text-lg font-bold text-white">Besoins</h2>
                 </div>
-                <p className="text-white/70 text-sm leading-relaxed">{challenge.prerequisites}</p>
+                <p className="text-white/80 text-sm">{challenge.requirements}</p>
               </motion.div>
             )}
 
-            {/* Prix Card */}
-            {challenge.priceCents && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="rounded-2xl shadow-xl p-6 text-white"
-                style={{ backgroundColor: "#dbbacf" }}
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <Star className="w-5 h-5" style={{ color: "#28303a" }} />
-                  <span className="font-bold" style={{ color: "#28303a" }}>Tarif indicatif</span>
+            {/* Le côté Waouh ! */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="rounded-2xl shadow-xl p-6"
+              style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", borderColor: "rgba(219, 186, 207, 0.2)", borderWidth: 1 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ backgroundColor: "rgba(219, 186, 207, 0.2)" }}
+                >
+                  <Sparkles className="w-5 h-5" style={{ color: "#dbbacf" }} />
                 </div>
-                <div className="text-center py-4">
-                  <p className="text-4xl font-bold" style={{ color: "#28303a" }}>
-                    {(challenge.priceCents / 100).toLocaleString("fr-FR")} €
-                  </p>
-                  <p className="text-sm mt-1" style={{ color: "#28303a", opacity: 0.7 }}>HT / session</p>
-                </div>
-              </motion.div>
-            )}
+                <h2 className="text-lg font-bold text-white">Le côté Wahoo !</h2>
+              </div>
+              <div className="space-y-3">
+                {challenge.highlights && challenge.highlights.length > 0 ? (
+                  challenge.highlights.map((highlight, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 p-3 rounded-xl"
+                      style={{ backgroundColor: "rgba(219, 186, 207, 0.1)" }}
+                    >
+                      <Trophy className="w-5 h-5" style={{ color: "#dbbacf" }} />
+                      <span className="text-sm text-white">{highlight}</span>
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <div
+                      className="flex items-center gap-3 p-3 rounded-xl"
+                      style={{ backgroundColor: "rgba(219, 186, 207, 0.1)" }}
+                    >
+                      <Trophy className="w-5 h-5" style={{ color: "#dbbacf" }} />
+                      <span className="text-sm text-white">Lots à gagner</span>
+                    </div>
+                    <div
+                      className="flex items-center gap-3 p-3 rounded-xl"
+                      style={{ backgroundColor: "rgba(219, 186, 207, 0.1)" }}
+                    >
+                      <Zap className="w-5 h-5" style={{ color: "#dbbacf" }} />
+                      <span className="text-sm text-white">Expérience immersive</span>
+                    </div>
+                    <div
+                      className="flex items-center gap-3 p-3 rounded-xl"
+                      style={{ backgroundColor: "rgba(219, 186, 207, 0.1)" }}
+                    >
+                      <Users className="w-5 h-5" style={{ color: "#dbbacf" }} />
+                      <span className="text-sm text-white">Jury professionnel</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </motion.div>
 
             {/* Actions */}
             <motion.div

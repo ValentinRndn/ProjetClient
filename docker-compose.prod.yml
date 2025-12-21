@@ -39,6 +39,14 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-vizion}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-vizion_db}?schema=public
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGIN: ${CORS_ORIGIN:-https://vizion.yourdomain.com}
+      # Email SMTP Configuration
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      EMAIL_FROM: ${EMAIL_FROM}
+      FRONTEND_URL: ${FRONTEND_URL:-https://vizion.yourdomain.com}
     volumes:
       - uploads_data:/app/uploads
     depends_on:

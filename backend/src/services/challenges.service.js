@@ -27,6 +27,13 @@ export async function createChallenge(data) {
       priceCents: data.priceCents || null,
       status: data.status || 'draft',
       publishedAt: data.status === 'published' ? new Date() : null,
+      // Nouveaux champs
+      tags: data.tags || [],
+      schedule: data.schedule || null,
+      requirements: data.requirements || null,
+      highlights: data.highlights || [],
+      conclusion: data.conclusion || [],
+      galleryImages: data.galleryImages || [],
     },
   });
 
@@ -34,11 +41,12 @@ export async function createChallenge(data) {
 }
 
 /**
- * Récupérer les challenges publics (publiés uniquement)
+ * Récupérer les challenges publics (publiés et not_ready)
+ * Les challenges not_ready apparaissent en fin de liste
  */
 export async function getPublicChallenges(filters = {}) {
   const where = {
-    status: 'published',
+    status: { in: ['published', 'not_ready'] },
   };
 
   if (filters.thematique) {
@@ -50,7 +58,12 @@ export async function getPublicChallenges(filters = {}) {
     orderBy: { publishedAt: 'desc' },
   });
 
-  return challenges;
+  // Trier pour mettre les not_ready en fin de liste
+  return challenges.sort((a, b) => {
+    if (a.status === 'not_ready' && b.status !== 'not_ready') return 1;
+    if (a.status !== 'not_ready' && b.status === 'not_ready') return -1;
+    return 0; // Garder l'ordre par publishedAt pour les challenges du même type
+  });
 }
 
 /**
@@ -69,9 +82,9 @@ export async function getChallengeById(id, userRole = null) {
 
   // Vérifier l'accès
   const isAdmin = userRole === 'ADMIN';
-  const isPublished = challenge.status === 'published';
+  const isPubliclyVisible = challenge.status === 'published' || challenge.status === 'not_ready';
 
-  if (!isPublished && !isAdmin) {
+  if (!isPubliclyVisible && !isAdmin) {
     const err = new Error('Accès non autorisé');
     err.status = 403;
     throw err;
@@ -108,6 +121,26 @@ export async function updateChallenge(id, data) {
   if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
   if (data.videoUrl !== undefined) updateData.videoUrl = data.videoUrl;
   if (data.priceCents !== undefined) updateData.priceCents = data.priceCents;
+  // Gestion du statut
+  if (data.status !== undefined) {
+    updateData.status = data.status;
+    // Mettre à jour publishedAt selon le statut
+    if (data.status === 'published' || data.status === 'not_ready') {
+      // Ne définir publishedAt que s'il n'existe pas déjà
+      if (!challenge.publishedAt) {
+        updateData.publishedAt = new Date();
+      }
+    } else if (data.status === 'draft') {
+      updateData.publishedAt = null;
+    }
+  }
+  // Nouveaux champs
+  if (data.tags !== undefined) updateData.tags = data.tags;
+  if (data.schedule !== undefined) updateData.schedule = data.schedule;
+  if (data.requirements !== undefined) updateData.requirements = data.requirements;
+  if (data.highlights !== undefined) updateData.highlights = data.highlights;
+  if (data.conclusion !== undefined) updateData.conclusion = data.conclusion;
+  if (data.galleryImages !== undefined) updateData.galleryImages = data.galleryImages;
 
   const updated = await prisma.challenge.update({
     where: { id },
@@ -152,7 +185,7 @@ export async function getAllChallenges(filters = {}) {
 
   const challenges = await prisma.challenge.findMany({
     where,
-    orderBy: { createdAt: 'desc' },
+    orderBy: { updatedAt: 'desc' },
   });
 
   return challenges;
@@ -224,15 +257,17 @@ export async function unpublishChallenge(id) {
  * Statistiques des challenges (admin)
  */
 export async function getChallengeStats() {
-  const [total, draft, published] = await Promise.all([
+  const [total, draft, published, notReady] = await Promise.all([
     prisma.challenge.count(),
     prisma.challenge.count({ where: { status: 'draft' } }),
     prisma.challenge.count({ where: { status: 'published' } }),
+    prisma.challenge.count({ where: { status: 'not_ready' } }),
   ]);
 
   return {
     total,
     draft,
     published,
+    notReady,
   };
 }

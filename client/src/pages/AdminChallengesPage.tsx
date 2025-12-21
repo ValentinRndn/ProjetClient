@@ -3,7 +3,7 @@
  * - Créer, éditer, supprimer des challenges
  * - Système de brouillon/publié
  */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router";
 import {
   getAllChallenges,
@@ -13,6 +13,7 @@ import {
   deleteChallenge,
   publishChallenge,
   unpublishChallenge,
+  uploadChallengeImage,
   THEMATIQUES,
   type Challenge,
   type ChallengeStats,
@@ -37,11 +38,18 @@ import {
   X,
   Send,
   EyeOff,
+  Upload,
+  Image as ImageIcon,
+  Loader2,
 } from "lucide-react";
 
 interface ChallengeFormData extends CreateChallengeData {
   objectivesText: string;
   deliverablesText: string;
+  tagsText: string;
+  highlightsText: string;
+  conclusionText: string;
+  galleryImagesText: string;
 }
 
 const emptyFormData: ChallengeFormData = {
@@ -59,6 +67,17 @@ const emptyFormData: ChallengeFormData = {
   priceCents: undefined,
   objectivesText: "",
   deliverablesText: "",
+  // Nouveaux champs
+  tags: [],
+  schedule: "",
+  requirements: "",
+  highlights: [],
+  conclusion: [],
+  galleryImages: [],
+  tagsText: "",
+  highlightsText: "",
+  conclusionText: "",
+  galleryImagesText: "",
 };
 
 export default function AdminChallengesPage() {
@@ -76,6 +95,10 @@ export default function AdminChallengesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<ChallengeFormData>(emptyFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  // Ref pour scroller vers le formulaire
+  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchData();
@@ -122,9 +145,24 @@ export default function AdminChallengesPage() {
       priceCents: challenge.priceCents,
       objectivesText: (challenge.objectives || []).join("\n"),
       deliverablesText: (challenge.deliverables || []).join("\n"),
+      // Nouveaux champs
+      tags: challenge.tags || [],
+      schedule: challenge.schedule || "",
+      requirements: challenge.requirements || "",
+      highlights: challenge.highlights || [],
+      conclusion: challenge.conclusion || [],
+      galleryImages: challenge.galleryImages || [],
+      tagsText: (challenge.tags || []).join(", "),
+      highlightsText: (challenge.highlights || []).join("\n"),
+      conclusionText: (challenge.conclusion || []).join("\n"),
+      galleryImagesText: (challenge.galleryImages || []).join("\n"),
     });
     setEditingId(challenge.id);
     setShowForm(true);
+    // Scroller vers le formulaire après l'affichage
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   const handleCloseForm = () => {
@@ -133,7 +171,36 @@ export default function AdminChallengesPage() {
     setFormData(emptyFormData);
   };
 
-  const handleSubmit = async (asDraft: boolean) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Vérifier le type de fichier
+    if (!file.type.startsWith("image/")) {
+      setError("Veuillez sélectionner une image (JPEG, PNG, etc.)");
+      return;
+    }
+
+    // Vérifier la taille (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError("L'image ne doit pas dépasser 10 Mo");
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      const result = await uploadChallengeImage(file);
+      setFormData({ ...formData, imageUrl: result.imageUrl });
+      setSuccessMessage("Image uploadée avec succès");
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setError("Erreur lors de l'upload de l'image");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleSubmit = async (status: "draft" | "published" | "not_ready") => {
     if (!formData.title.trim() || !formData.description.trim() || !formData.thematique) {
       setError("Veuillez remplir tous les champs obligatoires");
       return;
@@ -160,7 +227,26 @@ export default function AdminChallengesPage() {
         imageUrl: formData.imageUrl?.trim() || undefined,
         videoUrl: formData.videoUrl?.trim() || undefined,
         priceCents: formData.priceCents,
-        status: asDraft ? "draft" : "published",
+        status,
+        // Nouveaux champs
+        tags: formData.tagsText
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        schedule: formData.schedule?.trim() || undefined,
+        requirements: formData.requirements?.trim() || undefined,
+        highlights: formData.highlightsText
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        conclusion: formData.conclusionText
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        galleryImages: formData.galleryImagesText
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
       };
 
       if (editingId) {
@@ -168,9 +254,12 @@ export default function AdminChallengesPage() {
         setSuccessMessage("Challenge mis à jour avec succès");
       } else {
         await createChallenge(data);
-        setSuccessMessage(
-          asDraft ? "Brouillon enregistré avec succès" : "Challenge publié avec succès"
-        );
+        const messages = {
+          draft: "Brouillon enregistré avec succès",
+          published: "Challenge publié avec succès",
+          not_ready: "Challenge marqué 'Bientôt disponible' avec succès",
+        };
+        setSuccessMessage(messages[status]);
       }
 
       handleCloseForm();
@@ -186,10 +275,17 @@ export default function AdminChallengesPage() {
   const handlePublish = async (id: string) => {
     try {
       await publishChallenge(id);
+      const challenge = challenges.find((c) => c.id === id);
+      const previousStatus = challenge?.status;
       setChallenges(
         challenges.map((c) => (c.id === id ? { ...c, status: "published" as const } : c))
       );
-      setStats(stats ? { ...stats, draft: stats.draft - 1, published: stats.published + 1 } : null);
+      if (stats && previousStatus) {
+        const newStats = { ...stats, published: stats.published + 1 };
+        if (previousStatus === "draft") newStats.draft = stats.draft - 1;
+        if (previousStatus === "not_ready") newStats.notReady = stats.notReady - 1;
+        setStats(newStats);
+      }
       setSuccessMessage("Challenge publié avec succès");
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
@@ -200,14 +296,42 @@ export default function AdminChallengesPage() {
   const handleUnpublish = async (id: string) => {
     try {
       await unpublishChallenge(id);
+      const challenge = challenges.find((c) => c.id === id);
+      const previousStatus = challenge?.status;
       setChallenges(
         challenges.map((c) => (c.id === id ? { ...c, status: "draft" as const } : c))
       );
-      setStats(stats ? { ...stats, draft: stats.draft + 1, published: stats.published - 1 } : null);
+      if (stats && previousStatus) {
+        const newStats = { ...stats, draft: stats.draft + 1 };
+        if (previousStatus === "published") newStats.published = stats.published - 1;
+        if (previousStatus === "not_ready") newStats.notReady = stats.notReady - 1;
+        setStats(newStats);
+      }
       setSuccessMessage("Challenge dépublié (brouillon)");
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       setError("Erreur lors de la dépublication");
+    }
+  };
+
+  const handleSetNotReady = async (id: string) => {
+    try {
+      await updateChallenge(id, { status: "not_ready" });
+      const challenge = challenges.find((c) => c.id === id);
+      const previousStatus = challenge?.status;
+      setChallenges(
+        challenges.map((c) => (c.id === id ? { ...c, status: "not_ready" as const } : c))
+      );
+      if (stats && previousStatus) {
+        const newStats = { ...stats, notReady: stats.notReady + 1 };
+        if (previousStatus === "draft") newStats.draft = stats.draft - 1;
+        if (previousStatus === "published") newStats.published = stats.published - 1;
+        setStats(newStats);
+      }
+      setSuccessMessage("Challenge marqué comme 'Bientôt disponible'");
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setError("Erreur lors du changement de statut");
     }
   };
 
@@ -249,6 +373,13 @@ export default function AdminChallengesPage() {
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
             <FileText className="w-3.5 h-3.5" />
             Brouillon
+          </span>
+        );
+      case "not_ready":
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+            <Eye className="w-3.5 h-3.5" />
+            Bientôt disponible
           </span>
         );
       default:
@@ -303,7 +434,7 @@ export default function AdminChallengesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Statistiques */}
         {stats && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <p className="text-2xl font-bold text-[#1c2942]">{stats.total}</p>
               <p className="text-sm text-[#1c2942]/60">Total</p>
@@ -311,6 +442,10 @@ export default function AdminChallengesPage() {
             <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-amber-400">
               <p className="text-2xl font-bold text-amber-600">{stats.draft}</p>
               <p className="text-sm text-[#1c2942]/60">Brouillons</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-orange-400">
+              <p className="text-2xl font-bold text-orange-600">{stats.notReady}</p>
+              <p className="text-sm text-[#1c2942]/60">Bientôt dispo</p>
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-emerald-400">
               <p className="text-2xl font-bold text-emerald-600">{stats.published}</p>
@@ -332,6 +467,7 @@ export default function AdminChallengesPage() {
           >
             <option value="">Tous les statuts</option>
             <option value="draft">Brouillons</option>
+            <option value="not_ready">Bientôt disponible</option>
             <option value="published">Publiés</option>
           </select>
           <select
@@ -363,7 +499,7 @@ export default function AdminChallengesPage() {
 
         {/* Formulaire de création/édition */}
         {showForm && (
-          <div className="bg-white rounded-xl p-6 mb-6 shadow-lg border-2 border-[#6d74b5]">
+          <div ref={formRef} className="bg-white rounded-xl p-6 mb-6 shadow-lg border-2 border-[#6d74b5]">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-[#1c2942]">
                 {editingId ? "Modifier le challenge" : "Nouveau challenge"}
@@ -526,31 +662,181 @@ export default function AdminChallengesPage() {
                 />
               </div>
 
-              {/* Image URL */}
-              <div>
+              {/* Image Upload */}
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-[#1c2942] mb-1">
-                  URL de l'image
+                  Image de couverture
                 </label>
-                <input
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  className="w-full px-4 py-2 border border-[#ebf2fa] rounded-lg focus:ring-2 focus:ring-[#6d74b5]"
-                  placeholder="https://..."
-                />
+                <div className="flex items-start gap-4">
+                  {/* Zone d'upload */}
+                  <div className="flex-1">
+                    <label
+                      className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                        isUploadingImage
+                          ? "border-[#6d74b5] bg-[#ebf2fa]"
+                          : "border-[#ebf2fa] hover:border-[#6d74b5] hover:bg-[#ebf2fa]/50"
+                      }`}
+                    >
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        {isUploadingImage ? (
+                          <>
+                            <Loader2 className="w-8 h-8 text-[#6d74b5] animate-spin mb-2" />
+                            <p className="text-sm text-[#1c2942]/60">Upload en cours...</p>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-8 h-8 text-[#6d74b5] mb-2" />
+                            <p className="text-sm text-[#1c2942]/60">
+                              <span className="font-semibold text-[#6d74b5]">Cliquez pour uploader</span> ou glissez-déposez
+                            </p>
+                            <p className="text-xs text-[#1c2942]/40 mt-1">PNG, JPG jusqu'à 10Mo</p>
+                          </>
+                        )}
+                      </div>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={isUploadingImage}
+                      />
+                    </label>
+
+                    {/* URL manuelle */}
+                    <div className="mt-2">
+                      <input
+                        type="url"
+                        value={formData.imageUrl}
+                        onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                        className="w-full px-3 py-1.5 text-sm border border-[#ebf2fa] rounded-lg focus:ring-2 focus:ring-[#6d74b5]"
+                        placeholder="Ou entrez une URL d'image..."
+                      />
+                    </div>
+                  </div>
+
+                  {/* Prévisualisation */}
+                  {formData.imageUrl && (
+                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[#ebf2fa] bg-[#ebf2fa]">
+                      <img
+                        src={formData.imageUrl}
+                        alt="Prévisualisation"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                        className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Video URL */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-[#1c2942] mb-1">
-                  URL de la vidéo
+                  URL de la vidéo YouTube
                 </label>
                 <input
                   type="url"
                   value={formData.videoUrl}
                   onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                   className="w-full px-4 py-2 border border-[#ebf2fa] rounded-lg focus:ring-2 focus:ring-[#6d74b5]"
-                  placeholder="https://youtube.com/..."
+                  placeholder="https://youtube.com/watch?v=... ou https://youtu.be/..."
+                />
+              </div>
+
+              {/* Séparateur nouveaux champs */}
+              <div className="md:col-span-2 border-t border-[#ebf2fa] pt-4 mt-2">
+                <h3 className="text-lg font-semibold text-[#1c2942] mb-4">Informations détaillées</h3>
+              </div>
+
+              {/* Tags */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-[#1c2942] mb-1">
+                  Tags (séparés par des virgules)
+                </label>
+                <input
+                  type="text"
+                  value={formData.tagsText}
+                  onChange={(e) => setFormData({ ...formData, tagsText: e.target.value })}
+                  className="w-full px-4 py-2 border border-[#ebf2fa] rounded-lg focus:ring-2 focus:ring-[#6d74b5]"
+                  placeholder="Ex: #IA, #Marketing, #Digital"
+                />
+              </div>
+
+              {/* Schedule */}
+              <div>
+                <label className="block text-sm font-medium text-[#1c2942] mb-1">
+                  Horaires et public
+                </label>
+                <textarea
+                  value={formData.schedule}
+                  onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-[#ebf2fa] rounded-lg focus:ring-2 focus:ring-[#6d74b5] resize-none"
+                  placeholder="Ex: 9h-17h sur 2 jours&#10;Classe entière ou demi-groupe"
+                />
+              </div>
+
+              {/* Requirements */}
+              <div>
+                <label className="block text-sm font-medium text-[#1c2942] mb-1">
+                  Besoins / Matériel requis
+                </label>
+                <textarea
+                  value={formData.requirements}
+                  onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-[#ebf2fa] rounded-lg focus:ring-2 focus:ring-[#6d74b5] resize-none"
+                  placeholder="Ex: Salle informatique&#10;1 ordinateur par élève"
+                />
+              </div>
+
+              {/* Highlights */}
+              <div>
+                <label className="block text-sm font-medium text-[#1c2942] mb-1">
+                  Le côté Wahoo ! (un par ligne)
+                </label>
+                <textarea
+                  value={formData.highlightsText}
+                  onChange={(e) => setFormData({ ...formData, highlightsText: e.target.value })}
+                  rows={4}
+                  className="w-full px-4 py-2 border border-[#ebf2fa] rounded-lg focus:ring-2 focus:ring-[#6d74b5] resize-none"
+                  placeholder="Lots à gagner&#10;Expérience immersive&#10;Jury professionnel"
+                />
+              </div>
+
+              {/* Conclusion */}
+              <div>
+                <label className="block text-sm font-medium text-[#1c2942] mb-1">
+                  Pour conclure, c'est quoi ? (un par ligne)
+                </label>
+                <textarea
+                  value={formData.conclusionText}
+                  onChange={(e) => setFormData({ ...formData, conclusionText: e.target.value })}
+                  rows={4}
+                  className="w-full px-4 py-2 border border-[#ebf2fa] rounded-lg focus:ring-2 focus:ring-[#6d74b5] resize-none"
+                  placeholder="Une immersion dans le monde professionnel&#10;Un travail en équipe stimulant&#10;..."
+                />
+              </div>
+
+              {/* Gallery Images */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-[#1c2942] mb-1">
+                  Galerie d'images (une URL par ligne)
+                </label>
+                <textarea
+                  value={formData.galleryImagesText}
+                  onChange={(e) => setFormData({ ...formData, galleryImagesText: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-[#ebf2fa] rounded-lg focus:ring-2 focus:ring-[#6d74b5] resize-none"
+                  placeholder="https://image1.jpg&#10;https://image2.jpg&#10;..."
                 />
               </div>
             </div>
@@ -558,7 +844,7 @@ export default function AdminChallengesPage() {
             {/* Actions du formulaire */}
             <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-[#ebf2fa]">
               <Button
-                onClick={() => handleSubmit(true)}
+                onClick={() => handleSubmit("draft")}
                 disabled={isSubmitting}
                 variant="outline"
               >
@@ -566,7 +852,15 @@ export default function AdminChallengesPage() {
                 {isSubmitting ? "Enregistrement..." : "Enregistrer en brouillon"}
               </Button>
               <Button
-                onClick={() => handleSubmit(false)}
+                onClick={() => handleSubmit("not_ready")}
+                disabled={isSubmitting}
+                className="bg-orange-500 hover:bg-orange-600"
+              >
+                <Eye className="w-4 h-4" />
+                {isSubmitting ? "Enregistrement..." : "Bientôt disponible"}
+              </Button>
+              <Button
+                onClick={() => handleSubmit("published")}
                 disabled={isSubmitting}
                 className="bg-emerald-600 hover:bg-emerald-700"
               >
@@ -706,14 +1000,52 @@ export default function AdminChallengesPage() {
                         </Button>
 
                         {challenge.status === "draft" && (
-                          <Button
-                            size="sm"
-                            onClick={() => handlePublish(challenge.id)}
-                            className="bg-emerald-600 hover:bg-emerald-700"
-                          >
-                            <Send className="w-4 h-4" />
-                            Publier
-                          </Button>
+                          <>
+                            <Button
+                              size="sm"
+                              onClick={() => handlePublish(challenge.id)}
+                              className="bg-emerald-600 hover:bg-emerald-700"
+                            >
+                              <Send className="w-4 h-4" />
+                              Publier
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleSetNotReady(challenge.id)}
+                              className="bg-orange-500 hover:bg-orange-600"
+                            >
+                              <Eye className="w-4 h-4" />
+                              Bientôt dispo
+                            </Button>
+                          </>
+                        )}
+
+                        {challenge.status === "not_ready" && (
+                          <>
+                            <Link to={`/tous-les-challenges`}>
+                              <Button size="sm" variant="outline">
+                                <Eye className="w-4 h-4" />
+                                Voir en ligne
+                              </Button>
+                            </Link>
+                            <Button
+                              size="sm"
+                              onClick={() => handlePublish(challenge.id)}
+                              className="bg-emerald-600 hover:bg-emerald-700"
+                            >
+                              <Send className="w-4 h-4" />
+                              Publier
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleUnpublish(challenge.id)}
+                              className="text-amber-600 border-amber-200 hover:bg-amber-50"
+                            >
+                              <EyeOff className="w-4 h-4" />
+                              Brouillon
+                            </Button>
+                          </>
                         )}
 
                         {challenge.status === "published" && (

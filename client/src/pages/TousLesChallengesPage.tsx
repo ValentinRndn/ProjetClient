@@ -27,8 +27,20 @@ function ChallengeCard({
   challenge: Challenge;
   index: number;
 }) {
+  const navigate = useNavigate();
+
+  // Si le challenge est not_ready, rediriger vers la page contact
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (challenge.status === "not_ready") {
+      navigate("/contact", { state: { challengeTitle: challenge.title } });
+    } else {
+      navigate(`/challenges/${challenge.id}`);
+    }
+  };
+
   return (
-    <Link to={`/challenges/${challenge.id}`}>
+    <div onClick={handleClick}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -48,15 +60,25 @@ function ChallengeCard({
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#28303a] to-transparent" />
+            {challenge.status === "not_ready" && (
+              <div className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500 text-white">
+                Bientôt disponible
+              </div>
+            )}
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <h3 className="text-xl font-bold text-white">{challenge.title}</h3>
             </div>
           </div>
         ) : (
           <div
-            className="p-6"
+            className="p-6 relative"
             style={{ backgroundColor: "rgba(219, 186, 207, 0.15)" }}
           >
+            {challenge.status === "not_ready" && (
+              <div className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500 text-white">
+                Bientôt disponible
+              </div>
+            )}
             <h3 className="text-xl font-bold text-white mb-2">{challenge.title}</h3>
           </div>
         )}
@@ -108,12 +130,12 @@ function ChallengeCard({
             className="w-full text-[#28303a]"
             style={{ backgroundColor: "#dbbacf" }}
           >
-            Voir le Challenge
+            {challenge.status === "not_ready" ? "Nous contacter" : "Voir le Challenge"}
             <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </motion.div>
-    </Link>
+    </div>
   );
 }
 

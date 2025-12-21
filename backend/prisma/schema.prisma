@@ -706,23 +706,30 @@ model Challenge {
   description     String    @db.Text
   shortDescription String?  // Description courte pour les cartes
   thematique      String    // Marketing, IA, RSE, etc.
+  tags            String[]  @default([]) // Tags/hashtags du challenge
 
   // Détails du challenge
   duration        String?   // Ex: "2 jours", "1 semaine"
   targetAudience  String?   // Ex: "Étudiants en marketing", "BTS Commerce"
+  schedule        String?   // Horaires détaillés
+  requirements    String?   // Besoins/matériel requis
   objectives      String[]  @default([]) // Objectifs pédagogiques
   deliverables    String[]  @default([]) // Livrables attendus
   prerequisites   String?   // Prérequis
+  highlights      String[]  @default([]) // Le côté Waouh ! (points forts)
+  conclusion      String[]  @default([]) // Pour conclure, c'est quoi ? (étapes)
 
   // Médias
   imageUrl        String?   // Image de couverture
-  videoUrl        String?   // Vidéo de présentation
+  videoUrl        String?   // Vidéo de présentation YouTube
+  galleryImages   String[]  @default([]) // Galerie d'images pour slider
 
   // Tarification
   priceCents      Int?      // Prix en centimes (optionnel)
 
   // Statut de publication (géré par admin uniquement)
-  status          String    @default("draft") // draft, published
+  // draft = brouillon, published = publié, not_ready = visible mais redirige vers contact
+  status          String    @default("draft")
 
   // Dates
   createdAt       DateTime  @default(now())
